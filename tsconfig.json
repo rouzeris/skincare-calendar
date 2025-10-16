@@ -3,11 +3,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "esnext",
-    "types": [
-      "vite/client",
-      "node",
-      "@types/bun"
-    ],
+    "types": ["vite/client", "node", "@types/bun"],
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
@@ -20,10 +16,10 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "vendor"
-  ]
+  "exclude": ["node_modules", "dist", "vendor"]
 }
