@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAccount } from 'jazz-tools/react';
 import { Calendar } from './ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -12,12 +13,14 @@ import {
   calculateStatus,
   generateProductId,
 } from '../jazz/types';
-import {  } from '../jazz/JazzProvider';
+import { SkincareAccount } from '../jazz/schema';
 
 export function CosmeticCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const { me } = useAccount();
+  const { me } = useAccount(SkincareAccount, {
+    resolve: { root: { products: true } },
+  });
 
   const isLoading = me === undefined;
 

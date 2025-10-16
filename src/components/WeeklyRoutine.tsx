@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { useAccount } from 'jazz-tools/react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -13,7 +14,7 @@ import {
   calculateStatus,
   generateRoutineId,
 } from '../jazz/types';
-import { useAccount } from '../jazz/JazzProvider';
+import { SkincareAccount } from '../jazz/schema';
 
 const DAYS_OF_WEEK = [
   { key: 'monday', label: 'Poniedziałek' },
@@ -61,9 +62,11 @@ export function WeeklyRoutine() {
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [selectedTimeOfDay, setSelectedTimeOfDay] = useState<'morning' | 'evening'>('morning');
 
-  const { me } = useAccount();
+  const { me } = useAccount(SkincareAccount, {
+    resolve: { root: { products: true, routines: true } },
+  });
 
-  const isLoading = !me;
+  const isLoading = me === undefined;
 
   const products = useMemo(() => {
     if (!me) return [] as CosmeticProduct[];

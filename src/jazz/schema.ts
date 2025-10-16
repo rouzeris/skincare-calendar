@@ -17,7 +17,9 @@ export const SkincareAccount = co
     root: SkincareAccountRoot,
   })
   .withMigration((account) => {
-    if (!account.$jazz.has('root')) {
+    const root = account.root;
+
+    if (!root) {
       account.$jazz.set('root', {
         products: demoProducts,
         routines: demoRoutines,
@@ -25,11 +27,11 @@ export const SkincareAccount = co
       return;
     }
 
-    if (!account.root.$jazz.has('products')) {
-      account.root.$jazz.set('products', demoProducts);
+    if (!root.$jazz.has('products')) {
+      root.$jazz.set('products', demoProducts);
     }
 
-    if (!account.root.$jazz.has('routines')) {
-      account.root.$jazz.set('routines', demoRoutines);
+    if (!root.$jazz.has('routines')) {
+      root.$jazz.set('routines', demoRoutines);
     }
   });
