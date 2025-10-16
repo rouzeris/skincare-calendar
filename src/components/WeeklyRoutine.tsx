@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Plus, Sun, Moon, AlertTriangle, Info } from 'lucide-react';
 import { apiClient, CosmeticProduct, RoutineStep, ActiveIngredient } from '../utils/api';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { AddRoutineDialog } from './AddRoutineDialog';
 
 const DAYS_OF_WEEK = [

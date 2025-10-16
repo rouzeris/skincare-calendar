@@ -157,12 +157,20 @@ export function AddProductDialog({ isOpen, onClose, onAdd }: AddProductDialogPro
     setProductSuggestions([]);
     setShowBrandSuggestions(false);
     setShowProductSuggestions(false);
+    setIsScannerOpen(false);
     onClose();
   };
 
   return (
     <TooltipProvider>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleClose();
+          }
+        }}
+      >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Dodaj nowy produkt</DialogTitle>

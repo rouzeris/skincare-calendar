@@ -7,7 +7,7 @@ import { Plus, Loader2 } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 import { AddProductDialog } from './AddProductDialog';
 import { apiClient, CosmeticProduct } from '../utils/api';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 export function CosmeticCalendar() {
   const [products, setProducts] = useState<CosmeticProduct[]>([]);

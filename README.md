@@ -5,7 +5,12 @@
 
   ## Running the code
 
-  Run `npm i` to install the dependencies.
+  1. Copy `.env.example` to `.env.local` and fill in your Supabase project details.
+     ```bash
+     cp .env.example .env.local
+     ```
+  2. Run `npm i` to install the dependencies.
+  3. Start the development server z `npm run dev`.
 
-  Run `npm run dev` to start the development server.
+  > 💡 Nie masz jeszcze Supabase? Bez wypełnionych zmiennych środowiskowych aplikacja uruchomi się w trybie demo i zapisze dane w pamięci przeglądarki.
   
