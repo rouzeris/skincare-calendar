@@ -1,12 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Plus, Sun, Moon, AlertTriangle, Info } from 'lucide-react';
-import { apiClient, CosmeticProduct, RoutineStep, ActiveIngredient } from '../utils/api';
 import { toast } from 'sonner';
 import { AddRoutineDialog } from './AddRoutineDialog';
+import {
+  ActiveIngredient,
+  CosmeticProduct,
+  RoutineStep,
+  calculateStatus,
+  generateRoutineId,
+} from '../jazz/types';
+import { useAccount } from '../jazz/JazzProvider';
 
 const DAYS_OF_WEEK = [
   { key: 'monday', label: 'Poniedziałek' },
@@ -50,53 +57,71 @@ const ACTIVE_INGREDIENTS: ActiveIngredient[] = [
 ];
 
 export function WeeklyRoutine() {
-  const [routines, setRoutines] = useState<RoutineStep[]>([]);
-  const [products, setProducts] = useState<CosmeticProduct[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [selectedTimeOfDay, setSelectedTimeOfDay] = useState<'morning' | 'evening'>('morning');
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const { me } = useAccount();
 
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      const [routinesData, productsData] = await Promise.all([
-        apiClient.getRoutines(),
-        apiClient.getProducts()
-      ]);
-      setRoutines(routinesData);
-      setProducts(productsData);
-    } catch (error) {
-      console.error('Error loading data:', error);
-      toast.error('Błąd podczas ładowania danych');
-    } finally {
-      setIsLoading(false);
+  const isLoading = !me;
+
+  const products = useMemo(() => {
+    if (!me) return [] as CosmeticProduct[];
+
+    const normalized = [...me.root.products].map((product) => {
+        const computedStatus = calculateStatus(product.expiryDate);
+        if (product.status !== computedStatus) {
+          product.$jazz.set('status', computedStatus);
+        }
+
+        return {
+          id: product.id,
+          name: product.name,
+          brand: product.brand,
+          type: product.type,
+          openedDate: product.openedDate,
+          expiryDate: product.expiryDate,
+          createdAt: product.createdAt,
+          status: computedStatus,
+        };
+      });
+
+    return normalized.sort((a, b) => a.name.localeCompare(b.name));
+  }, [me]);
+
+  const routines = useMemo(() => {
+    if (!me) return [] as RoutineStep[];
+
+    return [...me.root.routines].map((routine) => ({
+      id: routine.id,
+      day: routine.day,
+      timeOfDay: routine.timeOfDay,
+      productIds: Array.from(routine.productIds ?? []),
+      notes: routine.notes ?? undefined,
+      createdAt: routine.createdAt,
+      updatedAt: routine.updatedAt,
+    }));
+  }, [me]);
+
+  const addRoutineStep = (routineData: Omit<RoutineStep, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!me) {
+      toast.error('Dane konta nie są jeszcze gotowe');
+      return;
     }
+
+    me.root.routines.$jazz.push({
+      ...routineData,
+      id: generateRoutineId(),
+      createdAt: new Date().toISOString(),
+    });
+    toast.success('Krok rutyny został dodany');
   };
 
-  const addRoutineStep = async (routineData: Omit<RoutineStep, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const newRoutine = await apiClient.createRoutine(routineData);
-      setRoutines(prev => [...prev, newRoutine]);
-      toast.success('Krok rutyny został dodany');
-    } catch (error) {
-      console.error('Error adding routine:', error);
-      toast.error('Nie udało się dodać kroku rutyny');
-    }
-  };
-
-  const deleteRoutineStep = async (id: string) => {
-    try {
-      await apiClient.deleteRoutine(id);
-      setRoutines(prev => prev.filter(r => r.id !== id));
+  const deleteRoutineStep = (id: string) => {
+    if (!me) return;
+    const removed = me.root.routines.$jazz.remove((routine) => routine?.id === id);
+    if (removed.length > 0) {
       toast.success('Krok rutyny został usunięty');
-    } catch (error) {
-      console.error('Error deleting routine:', error);
-      toast.error('Nie udało się usunąć kroku rutyny');
     }
   };
 
@@ -139,6 +164,22 @@ export function WeeklyRoutine() {
     setSelectedTimeOfDay(timeOfDay);
     setIsAddDialogOpen(true);
   };
+
+  if (!isLoading && !me) {
+    return (
+      <div className="container mx-auto p-4">
+        <Card>
+          <CardContent className="p-6 text-center space-y-4">
+            <CardTitle>Brak danych konta</CardTitle>
+            <p className="text-muted-foreground">
+              Nie możemy wyświetlić rutyn. Spróbuj ponownie po odświeżeniu strony.
+            </p>
+            <Button onClick={() => window.location.reload()}>Odśwież</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

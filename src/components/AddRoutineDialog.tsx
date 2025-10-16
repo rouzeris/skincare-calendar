@@ -6,7 +6,7 @@ import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
 import { Badge } from './ui/badge';
 import { AlertTriangle } from 'lucide-react';
-import { CosmeticProduct, RoutineStep } from '../utils/api';
+import { CosmeticProduct, RoutineStep } from '../jazz/types';
 
 interface AddRoutineDialogProps {
   isOpen: boolean;

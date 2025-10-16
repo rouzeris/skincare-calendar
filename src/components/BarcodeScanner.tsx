@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Camera, X, Scan, Shield } from 'lucide-react';
 import { toast } from 'sonner';
-import { apiClient } from '../utils/api';
 
 interface BarcodeScannerProps {
   isOpen: boolean;
@@ -77,7 +76,7 @@ export function BarcodeScanner({ isOpen, onClose, onScanResult }: BarcodeScanner
     setIsScanning(false);
   };
 
-  const captureFrame = async () => {
+  const captureFrame = () => {
     if (!videoRef.current) return;
 
     const canvas = document.createElement('canvas');
@@ -91,30 +90,15 @@ export function BarcodeScanner({ isOpen, onClose, onScanResult }: BarcodeScanner
     context.drawImage(videoRef.current, 0, 0);
 
     // Symulujemy skanowanie kodu kreskowego
-    const mockBarcode = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const mockBarcode = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-    try {
-      // Wyszukaj produkt w bazie danych po kodzie kreskowym
-      const productData = await apiClient.searchProductByBarcode(mockBarcode);
-
-      onScanResult({
-        name: productData.name,
-        brand: productData.brand,
-        type: productData.type
-      });
-
-      toast.success('Zeskanowano kod produktu!');
-      onClose();
-    } catch (error) {
-      console.error('Error searching product:', error);
-      // Fallback - zwróć podstawowe dane
-      onScanResult({
-        name: `Produkt ${mockBarcode.slice(-6)}`,
-        brand: 'Nieznana marka'
-      });
-      toast.success('Zeskanowano kod kreskowy');
-      onClose();
-    }
+    onScanResult({
+      name: `Produkt demo ${mockBarcode.slice(-4)}`,
+      brand: 'Demo marka',
+      type: 'Krem do twarzy',
+    });
+    toast.success('Zeskanowano kod kreskowy');
+    onClose();
   };
 
   const handleClose = () => {

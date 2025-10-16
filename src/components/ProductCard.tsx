@@ -2,7 +2,7 @@ import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Trash2, Calendar, AlertTriangle } from 'lucide-react';
-import { CosmeticProduct } from '../utils/api';
+import { CosmeticProduct } from '../jazz/types';
 
 interface ProductCardProps {
   product: CosmeticProduct;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Calendar } from './ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -6,103 +6,87 @@ import { Button } from './ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 import { AddProductDialog } from './AddProductDialog';
-import { apiClient, CosmeticProduct } from '../utils/api';
 import { toast } from 'sonner';
+import {
+  CosmeticProduct,
+  calculateStatus,
+  generateProductId,
+} from '../jazz/types';
+import { useAccount } from '../jazz/JazzProvider';
 
 export function CosmeticCalendar() {
-  const [products, setProducts] = useState<CosmeticProduct[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { me } = useAccount();
 
-  // Calculate product status based on expiry date
-  const calculateStatus = (expiryDate: string): 'fresh' | 'warning' | 'expired' => {
-    const now = new Date();
-    const expiry = new Date(expiryDate);
-    const timeDiff = expiry.getTime() - now.getTime();
-    const daysUntilExpiry = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    
-    if (daysUntilExpiry < 0) {
-      return 'expired';
-    } else if (daysUntilExpiry <= 30) {
-      return 'warning';
+  const isLoading = me === undefined;
+
+  const products: CosmeticProduct[] = me
+    ? [...me.root.products].map((product) => {
+        const computedStatus = calculateStatus(product.expiryDate);
+        if (product.status !== computedStatus) {
+          product.$jazz.set('status', computedStatus);
+        }
+
+        return {
+          id: product.id,
+          name: product.name,
+          brand: product.brand,
+          type: product.type,
+          openedDate: product.openedDate,
+          expiryDate: product.expiryDate,
+          createdAt: product.createdAt,
+          status: computedStatus,
+        };
+      }).sort(
+        (a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()
+      )
+    : [];
+
+  const expiringProducts = products.filter(
+    (product) => product.status === 'warning' || product.status === 'expired'
+  );
+  const freshProducts = products.filter((product) => product.status === 'fresh');
+
+  const handleAddProduct = (productData: Omit<CosmeticProduct, 'id' | 'status' | 'createdAt'>) => {
+    if (!me) {
+      toast.error('Dane konta nie są jeszcze gotowe');
+      return;
     }
-    return 'fresh';
+
+    me.root.products.$jazz.push({
+      ...productData,
+      id: generateProductId(),
+      createdAt: new Date().toISOString(),
+      status: calculateStatus(productData.expiryDate),
+    });
+    toast.success('Produkt został dodany');
   };
 
-  // Load products from API
-  const loadProducts = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const fetchedProducts = await apiClient.getProducts();
-      
-      // Update status for each product based on current date
-      const productsWithStatus = fetchedProducts.map(product => ({
-        ...product,
-        status: calculateStatus(product.expiryDate)
-      }));
-      
-      setProducts(productsWithStatus);
-    } catch (err) {
-      console.error('Error loading products:', err);
-      setError('Nie udało się załadować produktów');
-      toast.error('Błąd podczas ładowania produktów');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleDeleteProduct = (id: string) => {
+    if (!me) return;
 
-  // Load products on component mount
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const addProduct = async (productData: Omit<CosmeticProduct, 'id' | 'status' | 'createdAt'>) => {
-    try {
-      const newProduct = await apiClient.createProduct(productData);
-      const productWithStatus = {
-        ...newProduct,
-        status: calculateStatus(newProduct.expiryDate)
-      };
-      
-      setProducts(prev => [...prev, productWithStatus]);
-      toast.success('Produkt został dodany');
-    } catch (err) {
-      console.error('Error adding product:', err);
-      toast.error('Nie udało się dodać produktu');
-    }
-  };
-
-  const deleteProduct = async (id: string) => {
-    try {
-      await apiClient.deleteProduct(id);
-      setProducts(prev => prev.filter(p => p.id !== id));
+    const removed = me.root.products.$jazz.remove((product) => product?.id === id);
+    if (removed.length > 0) {
       toast.success('Produkt został usunięty');
-    } catch (err) {
-      console.error('Error deleting product:', err);
-      toast.error('Nie udało się usunąć produktu');
     }
   };
 
-  if (error) {
+  if (!isLoading && !me) {
     return (
       <div className="container mx-auto p-4">
         <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-destructive mb-4">{error}</p>
-            <Button onClick={loadProducts}>
-              Spróbuj ponownie
-            </Button>
+          <CardContent className="p-6 text-center space-y-4">
+            <CardTitle>Brak danych konta</CardTitle>
+            <p className="text-muted-foreground">
+              Nie udało się wczytać danych. Sprawdź połączenie z Jazz lub odśwież stronę.
+            </p>
+            <Button onClick={() => window.location.reload()}>Odśwież</Button>
           </CardContent>
         </Card>
       </div>
     );
   }
-
-  const expiringProducts = products.filter(p => p.status === 'warning' || p.status === 'expired');
-  const freshProducts = products.filter(p => p.status === 'fresh');
 
   return (
     <div className="space-y-6">
@@ -113,7 +97,10 @@ export function CosmeticCalendar() {
             Śledź daty ważności swoich kosmetyków do twarzy
           </p>
         </div>
-        <Button onClick={() => setIsAddDialogOpen(true)} disabled={isLoading}>
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          disabled={isLoading || !me}
+        >
           <Plus className="w-4 h-4 mr-2" />
           Dodaj produkt
         </Button>
@@ -134,7 +121,7 @@ export function CosmeticCalendar() {
                   <ProductCard
                     key={product.id}
                     product={product}
-                    onDelete={deleteProduct}
+                    onDelete={handleDeleteProduct}
                   />
                 ))}
               </CardContent>
@@ -163,7 +150,7 @@ export function CosmeticCalendar() {
                   <ProductCard
                     key={product.id}
                     product={product}
-                    onDelete={deleteProduct}
+                    onDelete={handleDeleteProduct}
                   />
                 ))
               )}
@@ -215,7 +202,7 @@ export function CosmeticCalendar() {
       <AddProductDialog
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
-        onAdd={addProduct}
+        onAdd={handleAddProduct}
       />
     </div>
   );
