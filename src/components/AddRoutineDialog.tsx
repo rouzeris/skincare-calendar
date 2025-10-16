@@ -27,32 +27,41 @@ const DAY_LABELS = {
   sunday: 'Niedziela'
 } as const;
 
-export function AddRoutineDialog({ 
-  isOpen, 
-  onClose, 
-  onAdd, 
-  day, 
-  timeOfDay, 
-  products 
+type Day = keyof typeof DAY_LABELS;
+
+function assertIsDay(day: string): asserts day is Day {
+  if (!Object.keys(DAY_LABELS).includes(day)) {
+    throw new Error(`Invalid day: ${day}`);
+  }
+}
+
+export function AddRoutineDialog({
+  isOpen,
+  onClose,
+  onAdd,
+  day,
+  timeOfDay,
+  products
 }: AddRoutineDialogProps) {
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (selectedProductIds.length === 0) {
       return;
     }
+
+    assertIsDay(day);
 
     onAdd({
       day,
       timeOfDay,
       productIds: selectedProductIds,
-      notes: notes.trim() || undefined
+      notes: notes.trim()
     });
 
-    // Reset form
     setSelectedProductIds([]);
     setNotes('');
     onClose();
@@ -65,7 +74,7 @@ export function AddRoutineDialog({
   };
 
   const toggleProduct = (productId: string) => {
-    setSelectedProductIds(prev => 
+    setSelectedProductIds(prev =>
       prev.includes(productId)
         ? prev.filter(id => id !== productId)
         : [...prev, productId]
@@ -75,20 +84,20 @@ export function AddRoutineDialog({
   const checkConflicts = () => {
     const selectedProducts = products.filter(p => selectedProductIds.includes(p.id));
     const conflicts: string[] = [];
-    
-    const hasAcid = selectedProducts.some(p => 
-      p.name.toLowerCase().includes('acid') || 
-      p.name.toLowerCase().includes('aha') || 
+
+    const hasAcid = selectedProducts.some(p =>
+      p.name.toLowerCase().includes('acid') ||
+      p.name.toLowerCase().includes('aha') ||
       p.name.toLowerCase().includes('bha') ||
       p.type.toLowerCase().includes('peeling')
     );
-    const hasRetinol = selectedProducts.some(p => 
-      p.name.toLowerCase().includes('retinol') || 
+    const hasRetinol = selectedProducts.some(p =>
+      p.name.toLowerCase().includes('retinol') ||
       p.name.toLowerCase().includes('retinoid') ||
       p.type.toLowerCase().includes('serum') && p.name.toLowerCase().includes('vitamin a')
     );
-    const hasVitaminC = selectedProducts.some(p => 
-      p.name.toLowerCase().includes('vitamin c') || 
+    const hasVitaminC = selectedProducts.some(p =>
+      p.name.toLowerCase().includes('vitamin c') ||
       p.name.toLowerCase().includes('witamina c') ||
       p.name.toLowerCase().includes('l-ascorbic')
     );
@@ -120,7 +129,7 @@ export function AddRoutineDialog({
             Wybierz produkty dla tego kroku rutyny. Sprawdź kompatybilność składników aktywnych.
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-3">
             <Label>Wybierz produkty</Label>
@@ -192,8 +201,8 @@ export function AddRoutineDialog({
             <Button type="button" variant="outline" onClick={handleClose} className="flex-1">
               Anuluj
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="flex-1"
               disabled={selectedProductIds.length === 0}
             >

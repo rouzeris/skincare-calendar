@@ -57,6 +57,25 @@ const cosmeticTypes = [
   { name: 'Spray z filtrem SPF', months: 12 }
 ];
 
+const parseLocalDate = (value: string): Date | null => {
+  const parts = value.split('-');
+  if (parts.length !== 3) {
+    return null;
+  }
+
+  const [yearPart, monthPart, dayPart] = parts;
+  const year = Number(yearPart);
+  const month = Number(monthPart);
+  const day = Number(dayPart);
+
+  if (![year, month, day].every(Number.isFinite)) {
+    return null;
+  }
+
+  const date = new Date(year, month - 1, day, 12);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
 export function AddProductDialog({ isOpen, onClose, onAdd }: AddProductDialogProps) {
   const [formData, setFormData] = useState({
     name: '',
@@ -74,12 +93,18 @@ export function AddProductDialog({ isOpen, onClose, onAdd }: AddProductDialogPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.brand || !formData.type) {
+    if (!formData.name || !formData.brand || !formData.type || !formData.openedDate
+    ) {
       return;
     }
 
     const selectedType = cosmeticTypes.find(t => t.name === formData.type);
-    const openedDate = new Date(formData.openedDate);
+    const openedDate = parseLocalDate(formData.openedDate);
+
+    if (!openedDate) {
+      return;
+    }
+
     const expiryDate = new Date(openedDate);
     expiryDate.setMonth(expiryDate.getMonth() + (selectedType?.months || 12));
 

@@ -12,7 +12,7 @@ import {
   calculateStatus,
   generateProductId,
 } from '../jazz/types';
-import { useAccount } from '../jazz/JazzProvider';
+import {  } from '../jazz/JazzProvider';
 
 export function CosmeticCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
