@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCosmetics, Product } from '@/context/cosmetics';
 import { useTheme } from '@/context/theme';
+import { PageTitleBar } from '@/components/PageTitleBar';
 import { Plus, Trash2, Clock, AlertCircle } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { addMonths, differenceInDays, parseISO } from 'date-fns';
@@ -74,15 +75,17 @@ export default function ShelfScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>My Shelf</Text>
-        <TouchableOpacity 
-          style={[styles.addButton, { backgroundColor: colors.tint }]}
-          onPress={() => router.push('/add-product')}
-        >
-          <Plus size={24} color="#FFF" />
-        </TouchableOpacity>
-      </View>
+      <PageTitleBar 
+        title="My Shelf" 
+        rightElement={
+          <TouchableOpacity 
+            style={[styles.addButton, { backgroundColor: colors.tint }]}
+            onPress={() => router.push('/add-product')}
+          >
+            <Plus size={24} color="#FFF" />
+          </TouchableOpacity>
+        }
+      />
 
       <FlatList
         data={products}
@@ -109,19 +112,6 @@ export default function ShelfScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    fontFamily: 'System',
-    letterSpacing: -0.5,
   },
   addButton: {
     width: 40,

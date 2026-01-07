@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { useRoutine, TimeOfDay } from '@/context/routine';
 import { useCosmetics } from '@/context/cosmetics';
 import { useTheme } from '@/context/theme';
+import { PageTitleBar } from '@/components/PageTitleBar';
 
 export default function RoutineScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -111,9 +112,7 @@ export default function RoutineScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>My Routine</Text>
-      </View>
+      <PageTitleBar title="My Routine" />
 
       <View style={styles.calendarContainer}>
         <ScrollView 
@@ -190,15 +189,6 @@ export default function RoutineScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700' as const,
-    letterSpacing: -0.5,
   },
   calendarContainer: {
     marginBottom: 10,
