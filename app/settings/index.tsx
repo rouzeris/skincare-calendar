@@ -40,7 +40,8 @@ export default function SettingsScreen() {
           <View style={styles.clubContent}>
             <View style={[
               styles.iconContainer, 
-              { backgroundColor: isPro ? 'rgba(255,255,255,0.2)' : colors.background } // Using background as light rose alternative or just plain background
+              styles.clubIconWrapper,
+              { backgroundColor: isPro ? 'rgba(255,255,255,0.2)' : colors.background }
             ]}>
               <Crown size={24} color={isPro ? "#FFF" : colors.tint} />
             </View>
@@ -73,11 +74,13 @@ export default function SettingsScreen() {
             style={[
               styles.option, 
               { backgroundColor: colors.card },
-              themeMode === 'light' && { backgroundColor: colors.border } // Using border color as selection bg
+              themeMode === 'light' && { backgroundColor: colors.border }
             ]}
             onPress={() => setTheme('light')}
           >
-            <Sun size={20} color={themeMode === 'light' ? colors.tint : colors.text} />
+            <View style={styles.optionIcon}>
+              <Sun size={20} color={themeMode === 'light' ? colors.tint : colors.text} />
+            </View>
             <Text style={[
               styles.optionText, 
               { color: colors.text },
@@ -93,7 +96,9 @@ export default function SettingsScreen() {
             ]}
             onPress={() => setTheme('dark')}
           >
-            <Moon size={20} color={themeMode === 'dark' ? colors.tint : colors.text} />
+            <View style={styles.optionIcon}>
+              <Moon size={20} color={themeMode === 'dark' ? colors.tint : colors.text} />
+            </View>
             <Text style={[
               styles.optionText, 
               { color: colors.text },
@@ -109,7 +114,9 @@ export default function SettingsScreen() {
             ]}
             onPress={() => setTheme('auto')}
           >
-            <Monitor size={20} color={themeMode === 'auto' ? colors.tint : colors.text} />
+            <View style={styles.optionIcon}>
+              <Monitor size={20} color={themeMode === 'auto' ? colors.tint : colors.text} />
+            </View>
             <Text style={[
               styles.optionText, 
               { color: colors.text },
@@ -157,7 +164,9 @@ const styles = StyleSheet.create({
   clubContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+  },
+  clubIconWrapper: {
+    marginRight: 16,
   },
   iconContainer: {
     width: 48,
@@ -167,7 +176,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textContainer: {
-    gap: 4,
+  },
+  cardSubtitleSpacing: {
+    marginTop: 4,
   },
   cardTitle: {
     fontSize: 18,
@@ -191,7 +202,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    gap: 12,
+  },
+  optionIcon: {
+    marginRight: 12,
   },
   optionText: {
     fontSize: 16,

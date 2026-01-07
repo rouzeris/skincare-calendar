@@ -117,27 +117,28 @@ export default function PaywallScreen() {
         <View style={styles.features}>
           <FeatureItem text="Sync routine between devices" color={colors.text} tint={colors.tint} />
           <FeatureItem text="Unlimited product history" color={colors.text} tint={colors.tint} />
-          <FeatureItem text="Support independent development" color={colors.text} tint={colors.tint} />
+          <FeatureItem text="Support independent development" color={colors.text} tint={colors.tint} isLast />
         </View>
 
         <View style={styles.packages}>
-          {offerings?.availablePackages.map((pkg) => (
-            <TouchableOpacity
-              key={pkg.identifier}
-              style={[styles.packageCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-              onPress={() => purchaseMutation.mutate(pkg)}
-              disabled={purchaseMutation.isPending}
-            >
+          {offerings?.availablePackages.map((pkg, index) => (
+            <View key={pkg.identifier} style={index < (offerings?.availablePackages.length ?? 0) - 1 ? styles.packageWrapper : undefined}>
+              <TouchableOpacity
+                style={[styles.packageCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+                onPress={() => purchaseMutation.mutate(pkg)}
+                disabled={purchaseMutation.isPending}
+              >
               <View>
                 <Text style={[styles.packageTitle, { color: colors.text }]}>{pkg.product.title}</Text>
                 <Text style={[styles.packagePrice, { color: colors.tint }]}>{pkg.product.priceString}</Text>
               </View>
-              <View style={[styles.priceButton, { backgroundColor: colors.background }]}>
-                 <Text style={[styles.priceButtonText, { color: colors.text }]}>
-                   {purchaseMutation.isPending ? "..." : "Subscribe"}
-                 </Text>
-              </View>
-            </TouchableOpacity>
+                <View style={[styles.priceButton, { backgroundColor: colors.background }]}>
+                   <Text style={[styles.priceButtonText, { color: colors.text }]}>
+                     {purchaseMutation.isPending ? "..." : "Subscribe"}
+                   </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           ))}
         </View>
 
@@ -155,10 +156,10 @@ export default function PaywallScreen() {
   );
 }
 
-function FeatureItem({ text, color, tint }: { text: string, color: string, tint: string }) {
+function FeatureItem({ text, color, tint, isLast }: { text: string, color: string, tint: string, isLast?: boolean }) {
   return (
-    <View style={styles.featureItem}>
-      <View style={[styles.checkCircle, { backgroundColor: tint }]}>
+    <View style={[styles.featureItem, !isLast && styles.featureItemWrapper]}>
+      <View style={[styles.checkCircle, styles.featureCheckCircle, { backgroundColor: tint }]}>
         <Check size={14} color="#FFF" strokeWidth={3} />
       </View>
       <Text style={[styles.featureText, { color: color }]}>{text}</Text>
@@ -202,13 +203,17 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   features: {
-    gap: 16,
     marginBottom: 48,
+  },
+  featureItemWrapper: {
+    marginBottom: 16,
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+  },
+  featureCheckCircle: {
+    marginRight: 12,
   },
   checkCircle: {
     width: 24,
@@ -222,8 +227,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   packages: {
-    gap: 16,
     marginBottom: 24,
+  },
+  packageWrapper: {
+    marginBottom: 16,
   },
   packageCard: {
     padding: 20,

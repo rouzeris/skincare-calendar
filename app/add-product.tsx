@@ -401,7 +401,9 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    gap: 24,
+  },
+  formSection: {
+    marginBottom: 24,
   },
   imageSection: {
     alignItems: 'center',
@@ -427,7 +429,9 @@ const styles = StyleSheet.create({
   },
   placeholderImage: {
     alignItems: 'center',
-    gap: 8,
+  },
+  placeholderText: {
+    marginTop: 8,
   },
   addPhotoText: {
     fontSize: 12,
@@ -442,12 +446,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   formGroup: {
-    gap: 8,
     zIndex: 1,
   },
+  labelSpacing: {
+    marginBottom: 8,
+  },
   sectionContainer: {
-    gap: 12,
     marginTop: 8,
+  },
+  sectionTitleSpacing: {
+    marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 16,
@@ -535,8 +543,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
     paddingVertical: 8,
+  },
+  intervalLabel: {
+    marginHorizontal: 6,
   },
   configLabel: {
     fontSize: 16,
@@ -569,18 +579,22 @@ const styles = StyleSheet.create({
 
   routineOptions: {
     flexDirection: 'row',
-    gap: 12,
+  },
+  routineOptionFirst: {
+    marginRight: 12,
   },
   routineOption: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
     paddingVertical: 14,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'transparent',
+  },
+  routineOptionIcon: {
+    marginLeft: 8,
   },
   routineOptionText: {
     fontSize: 15,
@@ -599,7 +613,12 @@ const styles = StyleSheet.create({
     padding: 24,
     borderRadius: 24,
     alignItems: 'center',
-    gap: 20,
+  },
+  modalTitleSpacing: {
+    marginBottom: 20,
+  },
+  datePickerSpacing: {
+    marginBottom: 20,
   },
   modalTitle: {
     fontSize: 18,

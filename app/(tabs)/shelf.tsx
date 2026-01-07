@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCosmetics, Product } from '@/context/cosmetics';
 import { useTheme } from '@/context/theme';
 import { Plus, Trash2, Clock, AlertCircle } from 'lucide-react-native';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { addMonths, differenceInDays, parseISO } from 'date-fns';
 import { Image } from 'expo-image';
 
@@ -29,9 +29,9 @@ export default function ShelfScreen() {
     const expiration = getExpirationStatus(item);
 
     return (
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
+      <View style={[styles.card, styles.cardWrapper, { backgroundColor: colors.card }]}>
         <View style={styles.cardContent}>
-          <View style={[styles.imagePlaceholder, { backgroundColor: colors.border }]}>
+          <View style={[styles.imagePlaceholder, styles.imageWrapper, { backgroundColor: colors.border }]}>
             {item.image ? (
               <Image source={{ uri: item.image }} style={styles.productImage} contentFit="cover" />
             ) : (
@@ -44,11 +44,13 @@ export default function ShelfScreen() {
             
             {expiration ? (
                <View style={styles.expirationContainer}>
-                 {expiration.status === 'expired' ? (
-                   <AlertCircle size={14} color={expiration.color} />
-                 ) : (
-                   <Clock size={14} color={expiration.color} />
-                 )}
+                 <View style={styles.expirationIcon}>
+                   {expiration.status === 'expired' ? (
+                     <AlertCircle size={14} color={expiration.color} />
+                   ) : (
+                     <Clock size={14} color={expiration.color} />
+                   )}
+                 </View>
                  <Text style={[styles.expirationText, { color: expiration.color }]}>
                    {expiration.label}
                  </Text>
@@ -74,11 +76,12 @@ export default function ShelfScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>My Shelf</Text>
-        <Link href="/add-product" asChild>
-          <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.tint, shadowColor: colors.tint }]}>
-            <Plus size={24} color="#FFF" />
-          </TouchableOpacity>
-        </Link>
+        <TouchableOpacity 
+          style={[styles.addButton, { backgroundColor: colors.tint }]}
+          onPress={() => router.push('/add-product')}
+        >
+          <Plus size={24} color="#FFF" />
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -134,7 +137,9 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 20,
     paddingTop: 10,
-    gap: 16,
+  },
+  cardWrapper: {
+    marginBottom: 16,
   },
   card: {
     flexDirection: 'row',
@@ -151,8 +156,10 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
     flex: 1,
+  },
+  imageWrapper: {
+    marginRight: 16,
   },
   imagePlaceholder: {
     width: 56,
@@ -189,7 +196,9 @@ const styles = StyleSheet.create({
   expirationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+  },
+  expirationIcon: {
+    marginRight: 4,
   },
   expirationText: {
     fontSize: 12,

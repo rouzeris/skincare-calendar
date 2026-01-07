@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { format, addDays, isSameDay, subDays, differenceInDays } from 'date-fns';
 import { Check, Sun, Moon } from 'lucide-react-native';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import { useRoutine, TimeOfDay } from '@/context/routine';
 import { useCosmetics } from '@/context/cosmetics';
@@ -14,8 +14,8 @@ export default function RoutineScreen() {
   const { routineConfig, routineHistory, toggleCompletion } = useRoutine();
   const { products } = useCosmetics();
   const { colors } = useTheme();
+  const router = useRouter();
 
-  // Generate a 2-week calendar window (1 week past, 1 week future roughly)
   const calendarDays = useMemo(() => {
     const today = new Date();
     const start = subDays(today, 7);
@@ -29,25 +29,19 @@ export default function RoutineScreen() {
       const product = getProductDetails(id);
       if (!product) return false;
 
-      // Show if no frequency set (default to daily)
       if (!product.frequency || product.frequency.type === 'daily') return true;
 
-      // Weekly logic
       if (product.frequency.type === 'weekly') {
-        const currentDay = selectedDate.getDay(); // 0 = Sunday
+        const currentDay = selectedDate.getDay();
         return product.frequency.daysOfWeek.includes(currentDay);
       }
 
-      // Interval logic
       if (product.frequency.type === 'interval') {
-        // Use openedAt as the start date, default to today if missing (though it should be there)
         const startDate = product.openedAt ? new Date(product.openedAt) : new Date();
         const diff = differenceInDays(selectedDate, startDate);
         
-        // If selected date is before start date, don't show
         if (diff < 0) return false;
         
-        // Check if falls on interval
         return diff % product.frequency.days === 0;
       }
 
@@ -76,34 +70,36 @@ export default function RoutineScreen() {
     return (
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          {icon}
+          <View style={styles.sectionIcon}>{icon}</View>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
         </View>
         <View style={styles.cardContainer}>
-          {visibleProductIds.map((id) => {
+          {visibleProductIds.map((id, index) => {
             const product = getProductDetails(id);
             if (!product) return null;
             const completed = isCompleted(id, timeOfDay);
+            const isLast = index === visibleProductIds.length - 1;
 
             return (
-              <TouchableOpacity
-                key={id}
-                style={[
-                  styles.taskCard, 
-                  { backgroundColor: colors.card, borderColor: 'transparent' },
-                  completed && { backgroundColor: colors.background, shadowOpacity: 0, elevation: 0 } // "Sunk" into background
-                ]}
-                onPress={() => handleToggle(id, timeOfDay)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.taskContent}>
-                  <Text style={[styles.productBrand, { color: colors.tint }, completed && styles.textCompleted]}>{product.brand}</Text>
-                  <Text style={[styles.productName, { color: colors.text }, completed && styles.textCompleted]}>{product.name}</Text>
-                </View>
-                <View style={[styles.checkbox, { borderColor: colors.border }, completed && { backgroundColor: colors.tint, borderColor: colors.tint }]}>
-                  {completed && <Check size={14} color="#FFF" strokeWidth={3} />}
-                </View>
-              </TouchableOpacity>
+              <View key={id} style={!isLast ? styles.taskCardWrapper : undefined}>
+                <TouchableOpacity
+                  style={[
+                    styles.taskCard, 
+                    { backgroundColor: colors.card, borderColor: 'transparent' },
+                    completed && { backgroundColor: colors.background, shadowOpacity: 0, elevation: 0 }
+                  ]}
+                  onPress={() => handleToggle(id, timeOfDay)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.taskContent}>
+                    <Text style={[styles.productBrand, { color: colors.tint }, completed && styles.textCompleted]}>{product.brand}</Text>
+                    <Text style={[styles.productName, { color: colors.text }, completed && styles.textCompleted]}>{product.name}</Text>
+                  </View>
+                  <View style={[styles.checkbox, { borderColor: colors.border }, completed && { backgroundColor: colors.tint, borderColor: colors.tint }]}>
+                    {completed && <Check size={14} color="#FFF" strokeWidth={3} />}
+                  </View>
+                </TouchableOpacity>
+              </View>
             );
           })}
         </View>
@@ -165,11 +161,12 @@ export default function RoutineScreen() {
           <View style={styles.emptyState}>
             <Text style={[styles.emptyText, { color: colors.text }]}>Your routine is empty.</Text>
             <Text style={[styles.emptySubtext, { color: colors.subtext }]}>Add products to your shelf and assign them to your routine to get started.</Text>
-            <Link href="/(tabs)/shelf" asChild>
-              <TouchableOpacity style={[styles.emptyButton, { backgroundColor: colors.tint }]}>
-                <Text style={styles.emptyButtonText}>Go to Shelf</Text>
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity 
+              style={[styles.emptyButton, { backgroundColor: colors.tint }]}
+              onPress={() => router.push('/(tabs)/shelf')}
+            >
+              <Text style={styles.emptyButtonText}>Go to Shelf</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <>
@@ -200,8 +197,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
-    fontFamily: 'System',
+    fontWeight: '700' as const,
     letterSpacing: -0.5,
   },
   calendarContainer: {
@@ -222,7 +218,7 @@ const styles = StyleSheet.create({
   dayName: {
     fontSize: 12,
     marginBottom: 4,
-    fontWeight: '500',
+    fontWeight: '500' as const,
     textTransform: 'uppercase',
   },
   dayNumberContainer: {
@@ -234,7 +230,7 @@ const styles = StyleSheet.create({
   },
   dayNumber: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   dayTextSelected: {
     color: '#FFFFFF',
@@ -254,14 +250,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
-    gap: 8,
+  },
+  sectionIcon: {
+    marginRight: 8,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   cardContainer: {
-    gap: 12,
+  },
+  taskCardWrapper: {
+    marginBottom: 12,
   },
   taskCard: {
     borderRadius: 16,
@@ -284,14 +284,14 @@ const styles = StyleSheet.create({
   },
   productBrand: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginBottom: 2,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   productName: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   textCompleted: {
     opacity: 0.5,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginBottom: 8,
   },
   emptySubtext: {
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   emptyButtonText: {
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontWeight: '600' as const,
     fontSize: 16,
   },
   footer: {
