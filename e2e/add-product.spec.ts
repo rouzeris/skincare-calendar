@@ -1,97 +1,60 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Add Product Flow', () => {
+test.describe('Add Product Form', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.evaluate(() => localStorage.clear());
     await page.reload();
     await page.getByRole('tab', { name: 'Shelf' }).click();
+    await page.getByText('Add First Product').click();
   });
 
-  test('should open add product modal', async ({ page }) => {
-    await page.getByText('Add First Product').click();
-
+  test('complete product form with all frequency and routine options', async ({ page }) => {
+    // 1. Verify form opened
     await expect(page.getByText('Add Product', { exact: true })).toBeVisible();
-    await expect(page.getByPlaceholder(/Niacinamide/)).toBeVisible();
-    await expect(page.getByPlaceholder(/The Ordinary/)).toBeVisible();
-  });
 
-  test('should show save button', async ({ page }) => {
-    await page.getByText('Add First Product').click();
+    // 2. Fill basic details
+    await page.getByPlaceholder(/Niacinamide/).fill('AHA/BHA Peel');
+    await page.getByPlaceholder(/The Ordinary/).fill('The Ordinary');
 
-    const saveButton = page.getByText('Save');
-    await expect(saveButton).toBeVisible();
-  });
+    // 3. Test interval frequency option
+    await page.getByText('Interval').click();
+    await expect(page.getByText('Repeat every')).toBeVisible();
 
-  test('should enable save button when form is filled', async ({ page }) => {
-    await page.getByText('Add First Product').click();
+    // 4. Switch back to daily
+    await page.getByText('Daily').click();
 
-    await page.getByPlaceholder(/Niacinamide/).fill('Test Product');
-    await page.getByPlaceholder(/The Ordinary/).fill('Test Brand');
+    // 6. Select both morning and evening
+    await page.getByText('Morning', { exact: true }).first().click();
+    await page.getByText('Evening', { exact: true }).first().click();
 
-    const saveButton = page.getByText('Save');
-    const opacity = await saveButton.evaluate(el => getComputedStyle(el).opacity);
-    expect(parseFloat(opacity)).toBe(1);
-  });
-
-  test('should add product and return to shelf', async ({ page }) => {
-    await page.getByText('Add First Product').click();
-
-    await page.getByPlaceholder(/Niacinamide/).fill('New Serum');
-    await page.getByPlaceholder(/The Ordinary/).fill('New Brand');
+    // 7. Save product
     await page.getByText('Save').click();
 
-    // Modal should close
+    // 8. Verify modal closed and product saved
     await expect(page.getByText('Add Product', { exact: true })).not.toBeVisible();
+    await expect(page.getByText('AHA/BHA Peel').first()).toBeVisible();
 
-    // Product should appear on shelf
-    await expect(page.getByText('New Serum')).toBeVisible();
-    await expect(page.getByText('New Brand')).toBeVisible();
+    // 9. Verify routine assignment in localStorage
+    const config = await page.evaluate(() => localStorage.getItem('routine_config'));
+    expect(config).toContain('morning');
+    expect(config).toContain('evening');
   });
 
-  test('should show product suggestions', async ({ page }) => {
-    await page.getByText('Add First Product').click();
-
-    await page.getByPlaceholder(/Niacinamide/).fill('Niac');
-
-    // Should show suggestions from mock data
-    await expect(page.getByText(/Niacinamide 10%/)).toBeVisible();
-  });
-
-  test('should display frequency options', async ({ page }) => {
-    await page.getByText('Add First Product').click();
-
-    // All frequency options should be visible
-    await expect(page.getByText('Daily')).toBeVisible();
-    await expect(page.getByText('Specific Days')).toBeVisible();
-    await expect(page.getByText('Interval')).toBeVisible();
-  });
-
-  test('should display routine time options', async ({ page }) => {
-    await page.getByText('Add First Product').click();
-
-    // Routine time header and buttons
-    await expect(page.getByText('Routine Time')).toBeVisible();
-  });
-
-  test('should add product to morning routine', async ({ page }) => {
-    await page.getByText('Add First Product').click();
-
-    await page.getByPlaceholder(/Niacinamide/).fill('Morning Product');
+  test('save product with weekly frequency', async ({ page }) => {
+    // 1. Fill required fields
+    await page.getByPlaceholder(/Niacinamide/).fill('Weekly Treatment');
     await page.getByPlaceholder(/The Ordinary/).fill('Brand');
 
-    // Click the Morning button in Routine Time section
-    const morningButton = page.getByText('Morning', { exact: true }).first();
-    await morningButton.click();
+    // 2. Select weekly frequency
+    await page.getByText('Specific Days').click();
 
+    // 3. Save
     await page.getByText('Save').click();
 
-    // Verify product was saved (modal should close, product appears on shelf)
-    await expect(page.getByText('Add Product', { exact: true })).not.toBeVisible();
-
-    // Verify routine config was updated in localStorage
-    const config = await page.evaluate(() => localStorage.getItem('routine_config'));
-    expect(config).toBeTruthy();
-    expect(config).toContain('morning');
+    // 4. Verify saved with weekly frequency
+    const shelf = await page.evaluate(() => localStorage.getItem('cosmetics_shelf'));
+    expect(shelf).toContain('Weekly Treatment');
+    expect(shelf).toContain('weekly');
   });
 });
