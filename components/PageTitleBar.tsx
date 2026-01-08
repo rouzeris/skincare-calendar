@@ -1,4 +1,4 @@
-import { XStack, Text } from 'tamagui';
+import { XStack, Text, YStack } from 'tamagui';
 import { useTheme } from '@/context/theme';
 
 type Props = {
@@ -15,6 +15,7 @@ export function PageTitleBar({ title, rightElement }: Props) {
       justifyContent="space-between"
       paddingHorizontal={20}
       paddingVertical={15}
+      minHeight={70}
     >
       <Text
         fontSize={28}
@@ -24,7 +25,9 @@ export function PageTitleBar({ title, rightElement }: Props) {
       >
         {title}
       </Text>
-      {rightElement}
+      <YStack width={40} height={40} alignItems="center" justifyContent="center">
+        {rightElement}
+      </YStack>
     </XStack>
   );
 }

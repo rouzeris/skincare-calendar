@@ -5,6 +5,18 @@ import { Platform } from "react-native";
 
 import { useTheme } from "@/context/theme";
 
+const getTabBarHeight = () => {
+  if (Platform.OS === 'ios') return 88;
+  if (Platform.OS === 'web') return 70;
+  return 60;
+};
+
+const getTabBarPaddingBottom = () => {
+  if (Platform.OS === 'ios') return 28;
+  if (Platform.OS === 'web') return 12;
+  return 8;
+};
+
 export default function TabLayout() {
   const { colors } = useTheme();
 
@@ -19,12 +31,12 @@ export default function TabLayout() {
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          height: Platform.OS === 'ios' ? 88 : 60,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+          height: getTabBarHeight(),
+          paddingBottom: getTabBarPaddingBottom(),
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontFamily: Platform.select({ ios: "System", android: "Roboto" }),
+          fontFamily: Platform.select({ ios: "System", android: "Roboto", web: "system-ui" }),
           fontSize: 12,
           fontWeight: "500",
         },
