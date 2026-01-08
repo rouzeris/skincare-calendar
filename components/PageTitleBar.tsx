@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { XStack, Text } from 'tamagui';
 import { useTheme } from '@/context/theme';
 
 type Props = {
@@ -10,25 +10,21 @@ export function PageTitleBar({ title, rightElement }: Props) {
   const { colors } = useTheme();
 
   return (
-    <View style={styles.header}>
-      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+    <XStack
+      alignItems="center"
+      justifyContent="space-between"
+      paddingHorizontal={20}
+      paddingVertical={15}
+    >
+      <Text
+        fontSize={28}
+        fontWeight="bold"
+        letterSpacing={-0.5}
+        color={colors.text}
+      >
+        {title}
+      </Text>
       {rightElement}
-    </View>
+    </XStack>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-  },
-});
-

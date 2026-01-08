@@ -1,5 +1,6 @@
 import React, { Component, ReactNode } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { Animated } from 'react-native';
+import { YStack, XStack, Text } from 'tamagui';
 import { AlertTriangle, RefreshCw } from 'lucide-react-native';
 
 interface Props {
@@ -65,123 +66,94 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <View style={styles.container}>
-          <View style={styles.content}>
-            <Animated.View 
-              style={[
-                styles.iconContainer,
-                { transform: [{ scale: this.pulseAnim }] }
-              ]}
+        <YStack
+          flex={1}
+          backgroundColor="#FFFBFA"
+          justifyContent="center"
+          alignItems="center"
+          padding={24}
+        >
+          <YStack alignItems="center" maxWidth={320}>
+            <Animated.View
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: 50,
+                backgroundColor: '#FEE2E2',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 24,
+                transform: [{ scale: this.pulseAnim }],
+              }}
             >
               <AlertTriangle size={48} color="#E11D48" />
             </Animated.View>
-            
-            <Text style={styles.title}>Oops!</Text>
-            <Text style={styles.subtitle}>Something went wrong</Text>
-            
-            <Text style={styles.errorMessage}>
+
+            <Text
+              fontSize={32}
+              fontWeight="800"
+              color="#1C1917"
+              marginBottom={8}
+              letterSpacing={-0.5}
+            >
+              Oops!
+            </Text>
+            <Text fontSize={18} fontWeight="500" color="#78716C" marginBottom={16}>
+              Something went wrong
+            </Text>
+
+            <Text
+              fontSize={14}
+              color="#A8A29E"
+              textAlign="center"
+              lineHeight={20}
+              marginBottom={32}
+              paddingHorizontal={16}
+            >
               {this.state.error?.message || 'An unexpected error occurred'}
             </Text>
 
-            <View style={styles.actions}>
-              <TouchableOpacity 
-                style={styles.primaryButton}
+            <XStack>
+              <XStack
+                alignItems="center"
+                justifyContent="center"
+                backgroundColor="#E11D48"
+                paddingHorizontal={24}
+                paddingVertical={14}
+                borderRadius={16}
+                shadowColor="#E11D48"
+                shadowOffset={{ width: 0, height: 4 }}
+                shadowOpacity={0.3}
+                shadowRadius={8}
+                elevation={4}
+                pressStyle={{ opacity: 0.8 }}
                 onPress={this.handleReset}
-                activeOpacity={0.8}
               >
-                <View style={styles.buttonIcon}>
+                <YStack marginRight={8}>
                   <RefreshCw size={18} color="#FFF" />
-                </View>
-                <Text style={styles.primaryButtonText}>Try Again</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          
-          <Text style={styles.hint}>
+                </YStack>
+                <Text color="#FFFFFF" fontSize={16} fontWeight="600">
+                  Try Again
+                </Text>
+              </XStack>
+            </XStack>
+          </YStack>
+
+          <Text
+            position="absolute"
+            bottom={48}
+            fontSize={12}
+            color="#A8A29E"
+            textAlign="center"
+          >
             If this keeps happening, try restarting the app
           </Text>
-        </View>
+        </YStack>
       );
     }
 
     return this.props.children;
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFBFA',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  content: {
-    alignItems: 'center',
-    maxWidth: 320,
-  },
-  iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#FEE2E2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#1C1917',
-    marginBottom: 8,
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#78716C',
-    marginBottom: 16,
-  },
-  errorMessage: {
-    fontSize: 14,
-    color: '#A8A29E',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 32,
-    paddingHorizontal: 16,
-  },
-  actions: {
-    flexDirection: 'row',
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E11D48',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 16,
-    shadowColor: '#E11D48',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  buttonIcon: {
-    marginRight: 8,
-  },
-  primaryButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  hint: {
-    position: 'absolute',
-    bottom: 48,
-    fontSize: 12,
-    color: '#A8A29E',
-    textAlign: 'center',
-  },
-});
 
 export default ErrorBoundary;

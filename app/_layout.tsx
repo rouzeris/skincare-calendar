@@ -8,8 +8,12 @@ import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Purchases from "react-native-purchases";
-import { Platform } from "react-native";
+import { Platform, useColorScheme } from "react-native";
+import { TamaguiProvider } from "tamagui";
 import { StatusBar } from "expo-status-bar";
+import { tamaguiConfig } from "../tamagui.config";
+
+import "../tamagui-web.css";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,20 +44,20 @@ function RootNavigator() {
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen 
-          name="paywall" 
-          options={{ 
+        <Stack.Screen
+          name="paywall"
+          options={{
             presentation: "modal",
             headerShown: false,
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="add-product" 
-          options={{ 
+        <Stack.Screen
+          name="add-product"
+          options={{
             presentation: "modal",
             title: "Add Product",
             headerShown: false
-          }} 
+          }}
         />
         <Stack.Screen name="+not-found" options={{ title: "Oops!" }} />
       </Stack>
@@ -63,6 +67,7 @@ function RootNavigator() {
 
 export default function RootLayout() {
   const [errorKey, setErrorKey] = useState(0);
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     SplashScreen.hideAsync();
@@ -100,15 +105,17 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary key={errorKey} onReset={handleErrorReset}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <CosmeticsProvider>
-            <RoutineProvider>
-              <RootNavigator />
-            </RoutineProvider>
-          </CosmeticsProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? "light"}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <CosmeticsProvider>
+              <RoutineProvider>
+                <RootNavigator />
+              </RoutineProvider>
+            </CosmeticsProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </TamaguiProvider>
     </ErrorBoundary>
   );
 }

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
+import { YStack, XStack, Text, ScrollView, Spinner } from 'tamagui';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/theme';
 import Purchases, { PurchasesPackage } from 'react-native-purchases';
@@ -68,89 +69,145 @@ export default function PaywallScreen() {
 
   if (Platform.OS === 'web') {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={[styles.closeButton, { backgroundColor: colors.card }]}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <XStack padding={16} justifyContent="flex-end">
+          <YStack
+            padding={8}
+            borderRadius={20}
+            backgroundColor={colors.card}
+            onPress={() => router.back()}
+          >
             <X size={24} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-        <View style={[styles.loadingContainer, { paddingHorizontal: 24 }]}> 
-          <Text style={[styles.title, { color: colors.text, textAlign: 'left', alignSelf: 'stretch' }]}>Club</Text>
-          <Text style={[styles.subtitle, { color: colors.subtext, textAlign: 'left', alignSelf: 'stretch' }]}>Subskrypcje działają tylko w aplikacji mobilnej (iOS/Android). Na webie nie da się kupić ani przywrócić zakupów.</Text>
-        </View>
+          </YStack>
+        </XStack>
+        <YStack flex={1} justifyContent="center" alignItems="center" paddingHorizontal={24}>
+          <Text
+            fontSize={32}
+            fontWeight="800"
+            marginBottom={12}
+            textAlign="left"
+            alignSelf="stretch"
+            color={colors.text}
+          >
+            Club
+          </Text>
+          <Text
+            fontSize={16}
+            textAlign="left"
+            alignSelf="stretch"
+            lineHeight={24}
+            color={colors.subtext}
+          >
+            Subskrypcje działają tylko w aplikacji mobilnej (iOS/Android). Na webie nie da się kupić ani przywrócić zakupów.
+          </Text>
+        </YStack>
       </SafeAreaView>
     );
   }
 
   if (isLoading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.tint} />
-      </View>
+      <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor={colors.background}>
+        <Spinner size="large" color={colors.tint} />
+      </YStack>
     );
   }
 
   if (error) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.errorText, { color: colors.error }]}>Failed to load offerings</Text>
-      </View>
+      <YStack flex={1} backgroundColor={colors.background}>
+        <Text fontSize={16} textAlign="center" color={colors.error}>Failed to load offerings</Text>
+      </YStack>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={[styles.closeButton, { backgroundColor: colors.card }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <XStack padding={16} justifyContent="flex-end">
+        <YStack
+          padding={8}
+          borderRadius={20}
+          backgroundColor={colors.card}
+          onPress={() => router.back()}
+        >
           <X size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
+        </YStack>
+      </XStack>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.hero}>
-          <Text style={[styles.title, { color: colors.text }]}>Join the Club</Text>
-          <Text style={[styles.subtitle, { color: colors.subtext }]}>
+      <ScrollView contentContainerStyle={{ padding: 24 }}>
+        <YStack marginBottom={40} alignItems="center">
+          <Text
+            fontSize={32}
+            fontWeight="800"
+            marginBottom={12}
+            textAlign="center"
+            color={colors.text}
+          >
+            Join the Club
+          </Text>
+          <Text fontSize={16} textAlign="center" lineHeight={24} color={colors.subtext}>
             Unlock premium features and sync your routine across devices.
           </Text>
-        </View>
+        </YStack>
 
-        <View style={styles.features}>
+        <YStack marginBottom={48}>
           <FeatureItem text="Sync routine between devices" color={colors.text} tint={colors.tint} />
           <FeatureItem text="Unlimited product history" color={colors.text} tint={colors.tint} />
           <FeatureItem text="Support independent development" color={colors.text} tint={colors.tint} isLast />
-        </View>
+        </YStack>
 
-        <View style={styles.packages}>
+        <YStack marginBottom={24}>
           {offerings?.availablePackages.map((pkg, index) => (
-            <View key={pkg.identifier} style={index < (offerings?.availablePackages.length ?? 0) - 1 ? styles.packageWrapper : undefined}>
-              <TouchableOpacity
-                style={[styles.packageCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            <YStack
+              key={pkg.identifier}
+              marginBottom={index < (offerings?.availablePackages.length ?? 0) - 1 ? 16 : 0}
+            >
+              <XStack
+                padding={20}
+                borderRadius={20}
+                borderWidth={1}
+                alignItems="center"
+                justifyContent="space-between"
+                backgroundColor={colors.card}
+                borderColor={colors.border}
+                shadowColor="#000"
+                shadowOffset={{ width: 0, height: 2 }}
+                shadowOpacity={0.05}
+                shadowRadius={8}
+                elevation={2}
+                opacity={purchaseMutation.isPending ? 0.7 : 1}
                 onPress={() => purchaseMutation.mutate(pkg)}
                 disabled={purchaseMutation.isPending}
               >
-              <View>
-                <Text style={[styles.packageTitle, { color: colors.text }]}>{pkg.product.title}</Text>
-                <Text style={[styles.packagePrice, { color: colors.tint }]}>{pkg.product.priceString}</Text>
-              </View>
-                <View style={[styles.priceButton, { backgroundColor: colors.background }]}>
-                   <Text style={[styles.priceButtonText, { color: colors.text }]}>
-                     {purchaseMutation.isPending ? "..." : "Subscribe"}
-                   </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+                <YStack>
+                  <Text fontSize={16} fontWeight="600" marginBottom={4} color={colors.text}>
+                    {pkg.product.title}
+                  </Text>
+                  <Text fontSize={20} fontWeight="bold" color={colors.tint}>
+                    {pkg.product.priceString}
+                  </Text>
+                </YStack>
+                <YStack paddingHorizontal={16} paddingVertical={8} borderRadius={12} backgroundColor={colors.background}>
+                  <Text fontSize={14} fontWeight="600" color={colors.text}>
+                    {purchaseMutation.isPending ? "..." : "Subscribe"}
+                  </Text>
+                </YStack>
+              </XStack>
+            </YStack>
           ))}
-        </View>
+        </YStack>
 
-        <TouchableOpacity 
-          style={styles.restoreButton} 
+        <YStack
+          alignItems="center"
+          padding={16}
+          opacity={restoreMutation.isPending ? 0.7 : 1}
           onPress={() => restoreMutation.mutate()}
           disabled={restoreMutation.isPending}
         >
-          <Text style={[styles.restoreText, { color: colors.subtext }]}>
-             {restoreMutation.isPending ? "Restoring..." : "Restore Purchases"}
+          <Text fontSize={14} fontWeight="500" color={colors.subtext}>
+            {restoreMutation.isPending ? "Restoring..." : "Restore Purchases"}
           </Text>
-        </TouchableOpacity>
+        </YStack>
       </ScrollView>
     </SafeAreaView>
   );
@@ -158,121 +215,19 @@ export default function PaywallScreen() {
 
 function FeatureItem({ text, color, tint, isLast }: { text: string, color: string, tint: string, isLast?: boolean }) {
   return (
-    <View style={[styles.featureItem, !isLast && styles.featureItemWrapper]}>
-      <View style={[styles.checkCircle, styles.featureCheckCircle, { backgroundColor: tint }]}>
+    <XStack alignItems="center" marginBottom={isLast ? 0 : 16}>
+      <YStack
+        width={24}
+        height={24}
+        borderRadius={12}
+        alignItems="center"
+        justifyContent="center"
+        marginRight={12}
+        backgroundColor={tint}
+      >
         <Check size={14} color="#FFF" strokeWidth={3} />
-      </View>
-      <Text style={[styles.featureText, { color: color }]}>{text}</Text>
-    </View>
+      </YStack>
+      <Text fontSize={16} fontWeight="500" color={color}>{text}</Text>
+    </XStack>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    padding: 16,
-    alignItems: 'flex-end',
-  },
-  closeButton: {
-    padding: 8,
-    borderRadius: 20,
-  },
-  content: {
-    padding: 24,
-  },
-  hero: {
-    marginBottom: 40,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  features: {
-    marginBottom: 48,
-  },
-  featureItemWrapper: {
-    marginBottom: 16,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  featureCheckCircle: {
-    marginRight: 12,
-  },
-  checkCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  featureText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  packages: {
-    marginBottom: 24,
-  },
-  packageWrapper: {
-    marginBottom: 16,
-  },
-  packageCard: {
-    padding: 20,
-    borderRadius: 20,
-    borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  packageTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  packagePrice: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  priceButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  priceButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  restoreButton: {
-    alignItems: 'center',
-    padding: 16,
-  },
-  restoreText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  errorText: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-});
