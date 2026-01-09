@@ -19,12 +19,22 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
-function getRevenueCatApiKey(): string | null {
-  if (Platform.OS === "ios") return process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY ?? null;
-  if (Platform.OS === "android") return process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY ?? null;
-  if (Platform.OS === "web") return process.env.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY ?? null;
+function getRevenueCatApiKey(): { apiKey: string | null; useTestStore: boolean } {
+  const testApiKey = process.env.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY ?? null;
+  
+  if (Platform.OS === "web") {
+    return { apiKey: testApiKey, useTestStore: true };
+  }
+  
+  if (Platform.OS === "ios") {
+    return { apiKey: process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY ?? testApiKey, useTestStore: false };
+  }
+  
+  if (Platform.OS === "android") {
+    return { apiKey: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY ?? testApiKey, useTestStore: false };
+  }
 
-  return null;
+  return { apiKey: null, useTestStore: false };
 }
 
 function RootNavigator() {
@@ -79,11 +89,12 @@ export default function RootLayout() {
       return;
     }
 
-    const apiKey = getRevenueCatApiKey();
+    const { apiKey, useTestStore } = getRevenueCatApiKey();
 
     console.log("[RevenueCat] init", {
       platform: Platform.OS,
       hasApiKey: Boolean(apiKey),
+      useTestStore,
     });
 
     if (!apiKey) {
@@ -91,12 +102,26 @@ export default function RootLayout() {
       return;
     }
 
-    try {
-      Purchases.configure({ apiKey });
-      console.log("[RevenueCat] configured");
-    } catch (e) {
-      console.log("[RevenueCat] configure failed", e);
-    }
+    const configureRevenueCat = async () => {
+      try {
+        await Purchases.configure({ apiKey });
+        console.log("[RevenueCat] configured successfully");
+      } catch (e: any) {
+        console.log("[RevenueCat] configure failed, trying test store", e?.message);
+        
+        const testKey = process.env.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY;
+        if (testKey && testKey !== apiKey) {
+          try {
+            await Purchases.configure({ apiKey: testKey });
+            console.log("[RevenueCat] configured with test store key");
+          } catch (e2: any) {
+            console.log("[RevenueCat] test store configure also failed", e2?.message);
+          }
+        }
+      }
+    };
+
+    configureRevenueCat();
   }, []);
 
   const handleErrorReset = () => {
