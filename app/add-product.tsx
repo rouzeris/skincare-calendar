@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Modal, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { YStack, XStack, Text, Input, ScrollView } from 'tamagui';
 import { useTheme } from '@/context/theme';
 import { useCosmetics, Frequency } from '@/context/cosmetics';
@@ -124,19 +125,20 @@ export default function AddProductScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: colors.background }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <XStack
-        alignItems="center"
-        justifyContent="space-between"
-        paddingHorizontal={20}
-        paddingTop={20}
-        paddingBottom={15}
-        borderBottomWidth={1}
-        borderBottomColor={colors.border}
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
+        <XStack
+          alignItems="center"
+          justifyContent="space-between"
+          paddingHorizontal={20}
+          paddingTop={12}
+          paddingBottom={15}
+          borderBottomWidth={1}
+          borderBottomColor={colors.border}
+        >
         <YStack padding={8} marginLeft={-8} onPress={() => router.back()}>
           <X size={24} color={colors.text} />
         </YStack>
@@ -469,8 +471,9 @@ export default function AddProductScreen() {
           </Pressable>
         </Modal>
 
-        <YStack height={40} />
-      </ScrollView>
-    </KeyboardAvoidingView>
+          <YStack height={40} />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

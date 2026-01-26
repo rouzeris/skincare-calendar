@@ -55,6 +55,14 @@ function RootNavigator() {
             headerShown: false
           }}
         />
+        <Stack.Screen
+          name="calendar"
+          options={{
+            presentation: "modal",
+            title: "Calendar",
+            headerShown: false
+          }}
+        />
         <Stack.Screen name="+not-found" options={{ title: "Oops!" }} />
       </Stack>
     </GestureHandlerRootView>

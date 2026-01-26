@@ -3,7 +3,7 @@ import { ScrollView as RNScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { YStack, XStack, Text, ScrollView } from 'tamagui';
 import { format, addDays, isSameDay, subDays, differenceInDays } from 'date-fns';
-import { Check, Sun, Moon } from 'lucide-react-native';
+import { Check, Sun, Moon, CalendarDays } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
 import { useRoutine, TimeOfDay } from '@/context/routine';
@@ -148,7 +148,22 @@ export default function RoutineScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
-      <PageTitleBar title="My Routine" />
+      <PageTitleBar
+        title="My Routine"
+        rightElement={
+          <YStack
+            width={40}
+            height={40}
+            borderRadius={20}
+            justifyContent="center"
+            alignItems="center"
+            backgroundColor={colors.card}
+            onPress={() => router.push('/calendar')}
+          >
+            <CalendarDays size={20} color={colors.tint} />
+          </YStack>
+        }
+      />
 
       <YStack marginBottom={10}>
         <RNScrollView
