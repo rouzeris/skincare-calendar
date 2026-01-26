@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Modal, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { KeyboardAvoidingView, Platform, Modal, Pressable, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { YStack, XStack, Text, Input, ScrollView } from 'tamagui';
 import { useTheme } from '@/context/theme';
 import { useCosmetics, Frequency } from '@/context/cosmetics';
@@ -124,8 +124,10 @@ export default function AddProductScreen() {
     });
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -134,7 +136,7 @@ export default function AddProductScreen() {
           alignItems="center"
           justifyContent="space-between"
           paddingHorizontal={20}
-          paddingTop={12}
+          paddingTop={Math.max(insets.top, 12) + 8}
           paddingBottom={15}
           borderBottomWidth={1}
           borderBottomColor={colors.border}
@@ -474,6 +476,6 @@ export default function AddProductScreen() {
           <YStack height={40} />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

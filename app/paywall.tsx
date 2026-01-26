@@ -1,16 +1,17 @@
 import React from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 import { YStack, XStack, Text, ScrollView, Spinner } from 'tamagui';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/theme';
 import Purchases, { PurchasesPackage } from 'react-native-purchases';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function PaywallScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const { data: offerings, isLoading, error } = useQuery({
     queryKey: ['offerings'],
@@ -69,8 +70,8 @@ export default function PaywallScreen() {
 
   if (Platform.OS === 'web') {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <XStack padding={16} justifyContent="flex-end">
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <XStack paddingHorizontal={16} paddingTop={Math.max(insets.top, 16)} justifyContent="flex-end">
           <YStack
             padding={8}
             borderRadius={20}
@@ -101,7 +102,7 @@ export default function PaywallScreen() {
             Subskrypcje działają tylko w aplikacji mobilnej (iOS/Android). Na webie nie da się kupić ani przywrócić zakupów.
           </Text>
         </YStack>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -122,8 +123,8 @@ export default function PaywallScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <XStack padding={16} justifyContent="flex-end">
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <XStack paddingHorizontal={16} paddingTop={Math.max(insets.top, 16)} justifyContent="flex-end">
         <YStack
           padding={8}
           borderRadius={20}
@@ -209,7 +210,7 @@ export default function PaywallScreen() {
           </Text>
         </YStack>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Modal, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { YStack, XStack, Text, ScrollView } from 'tamagui';
 import { useRouter } from 'expo-router';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
 import { X, ChevronLeft, ChevronRight, Sun, Moon, Check } from 'lucide-react-native';
 
 import { useRoutine } from '@/context/routine';
@@ -15,6 +15,7 @@ export default function CalendarScreen() {
   const { colors } = useTheme();
   const { routineHistory } = useRoutine();
   const { products } = useCosmetics();
+  const insets = useSafeAreaInsets();
   
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -62,12 +63,12 @@ export default function CalendarScreen() {
   }, [selectedDate, routineHistory]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <XStack
         alignItems="center"
         justifyContent="space-between"
         paddingHorizontal={20}
-        paddingTop={12}
+        paddingTop={Math.max(insets.top, 12) + 8}
         paddingBottom={15}
         borderBottomWidth={1}
         borderBottomColor={colors.border}
@@ -256,6 +257,6 @@ export default function CalendarScreen() {
 
         <YStack height={40} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
