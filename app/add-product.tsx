@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { KeyboardAvoidingView, Platform, Modal, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { YStack, XStack, Text, Input, ScrollView } from 'tamagui';
@@ -6,8 +6,8 @@ import { useTheme } from '@/context/theme';
 import { useCosmetics, Frequency } from '@/context/cosmetics';
 import { useRoutine, TimeOfDay } from '@/context/routine';
 import { useRouter } from 'expo-router';
-import { X, ChevronLeft, ChevronRight, Check, Camera, Image as ImageIcon, Calendar, RotateCcw } from 'lucide-react-native';
-import { format } from 'date-fns';
+import { X, Check, Camera, Image as ImageIcon, RotateCcw, ChevronLeft, ChevronRight, Infinity as InfinityIcon } from 'lucide-react-native';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isAfter } from 'date-fns';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 
@@ -23,6 +23,7 @@ const MOCK_SUGGESTIONS = [
 ];
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEKDAY_HEADERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export default function AddProductScreen() {
   const router = useRouter();
@@ -35,6 +36,11 @@ export default function AddProductScreen() {
   const [pao, setPao] = useState('12');
   const [openedAt, setOpenedAt] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [calendarViewMonth, setCalendarViewMonth] = useState(new Date());
+  const [noEndDate, setNoEndDate] = useState(true);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [endCalendarViewMonth, setEndCalendarViewMonth] = useState(new Date());
   const [selectedRoutine, setSelectedRoutine] = useState<TimeOfDay[]>([]);
   const [imageUri, setImageUri] = useState<string | null>(null);
 
@@ -43,6 +49,22 @@ export default function AddProductScreen() {
   const [selectedWeekDays, setSelectedWeekDays] = useState<number[]>([]);
 
   const [suggestions, setSuggestions] = useState<typeof MOCK_SUGGESTIONS>([]);
+
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(calendarViewMonth);
+    const monthEnd = endOfMonth(calendarViewMonth);
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+    const startPadding = getDay(monthStart);
+    return { days, startPadding };
+  }, [calendarViewMonth]);
+
+  const endCalendarDays = useMemo(() => {
+    const monthStart = startOfMonth(endCalendarViewMonth);
+    const monthEnd = endOfMonth(endCalendarViewMonth);
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+    const startPadding = getDay(monthStart);
+    return { days, startPadding };
+  }, [endCalendarViewMonth]);
 
   const handleNameChange = (text: string) => {
     setName(text);
@@ -110,7 +132,8 @@ export default function AddProductScreen() {
       openedAt: openedAt.toISOString(),
       periodAfterOpening: parseInt(pao) || 12,
       image: imageUri || undefined,
-      frequency
+      frequency,
+      endDate: noEndDate ? undefined : endDate?.toISOString(),
     };
 
     addProduct(newProduct, {
@@ -125,6 +148,77 @@ export default function AddProductScreen() {
   };
 
   const insets = useSafeAreaInsets();
+
+  const renderCalendarGrid = (
+    days: Date[],
+    startPadding: number,
+    selectedDate: Date,
+    onSelectDate: (date: Date) => void,
+    minDate?: Date,
+  ) => {
+    const rows: React.ReactNode[] = [];
+
+    rows.push(
+      <XStack key="header" justifyContent="space-between" marginBottom={8}>
+        {WEEKDAY_HEADERS.map((d, i) => (
+          <YStack key={i} width={38} height={28} justifyContent="center" alignItems="center">
+            <Text fontSize={12} fontWeight="600" color={colors.subtext}>{d}</Text>
+          </YStack>
+        ))}
+      </XStack>
+    );
+
+    const cells: React.ReactNode[] = [];
+    for (let i = 0; i < startPadding; i++) {
+      cells.push(<YStack key={`pad-${i}`} width={38} height={38} />);
+    }
+
+    days.forEach((day) => {
+      const isSelected = isSameDay(day, selectedDate);
+      const isToday = isSameDay(day, new Date());
+      const isDisabled = minDate ? isAfter(minDate, day) : false;
+
+      cells.push(
+        <YStack
+          key={day.toISOString()}
+          width={38}
+          height={38}
+          borderRadius={19}
+          justifyContent="center"
+          alignItems="center"
+          backgroundColor={isSelected ? colors.tint : 'transparent'}
+          borderWidth={isToday && !isSelected ? 1 : 0}
+          borderColor={colors.tint}
+          opacity={isDisabled ? 0.3 : 1}
+          onPress={() => !isDisabled && onSelectDate(day)}
+        >
+          <Text
+            fontSize={14}
+            fontWeight={isSelected || isToday ? '600' : '400'}
+            color={isSelected ? '#FFFFFF' : isToday ? colors.tint : colors.text}
+          >
+            {day.getDate()}
+          </Text>
+        </YStack>
+      );
+    });
+
+    const totalCells = cells.length;
+    const remainingCells = (7 - (totalCells % 7)) % 7;
+    for (let i = 0; i < remainingCells; i++) {
+      cells.push(<YStack key={`end-pad-${i}`} width={38} height={38} />);
+    }
+
+    for (let i = 0; i < cells.length; i += 7) {
+      rows.push(
+        <XStack key={`row-${i}`} justifyContent="space-between" marginBottom={4}>
+          {cells.slice(i, i + 7)}
+        </XStack>
+      );
+    }
+
+    return rows;
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -161,7 +255,6 @@ export default function AddProductScreen() {
       </XStack>
 
       <ScrollView contentContainerStyle={{ padding: 20 }}>
-        {/* Image Picker */}
         <YStack alignItems="center" marginBottom={8}>
           <YStack
             width={120}
@@ -203,7 +296,6 @@ export default function AddProductScreen() {
           </YStack>
         </YStack>
 
-        {/* Inputs */}
         <YStack zIndex={10}>
           <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>Product Name</Text>
           <Input
@@ -273,20 +365,22 @@ export default function AddProductScreen() {
 
         <XStack zIndex={0}>
           <YStack flex={1} marginRight={10}>
-            <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>Opened Date</Text>
+            <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>Start Date</Text>
             <XStack
               borderRadius={16}
               padding={16}
               alignItems="center"
               backgroundColor={colors.card}
-              onPress={() => setShowDatePicker(true)}
+              onPress={() => {
+                setCalendarViewMonth(openedAt);
+                setShowDatePicker(true);
+              }}
             >
-              <Calendar size={16} color={colors.subtext} style={{ marginRight: 8 }} />
-              <Text fontSize={16} color={colors.text}>{format(openedAt, 'MMM dd, yyyy')}</Text>
+              <Text fontSize={15} fontWeight="500" color={colors.text}>{format(openedAt, 'MMM dd, yyyy')}</Text>
             </XStack>
           </YStack>
 
-          <YStack flex={1} marginRight={10}>
+          <YStack flex={1}>
             <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>PAO (Months)</Text>
             <XStack
               borderRadius={16}
@@ -313,7 +407,49 @@ export default function AddProductScreen() {
           </YStack>
         </XStack>
 
-        {/* Frequency Settings */}
+        <YStack zIndex={0} marginTop={4}>
+          <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>End Date</Text>
+          <XStack alignItems="center" gap={10}>
+            <XStack
+              flex={1}
+              borderRadius={16}
+              padding={16}
+              alignItems="center"
+              justifyContent="space-between"
+              backgroundColor={colors.card}
+              opacity={noEndDate ? 0.5 : 1}
+              onPress={() => {
+                if (!noEndDate) {
+                  setEndCalendarViewMonth(endDate || new Date());
+                  setShowEndDatePicker(true);
+                }
+              }}
+            >
+              <Text fontSize={15} fontWeight="500" color={noEndDate ? colors.subtext : colors.text}>
+                {noEndDate ? 'No end date' : endDate ? format(endDate, 'MMM dd, yyyy') : 'Select date'}
+              </Text>
+            </XStack>
+            <XStack
+              borderRadius={16}
+              padding={14}
+              alignItems="center"
+              gap={8}
+              backgroundColor={noEndDate ? colors.tint : colors.card}
+              onPress={() => {
+                setNoEndDate(!noEndDate);
+                if (noEndDate) {
+                  setEndDate(null);
+                }
+              }}
+            >
+              <InfinityIcon size={18} color={noEndDate ? '#FFF' : colors.subtext} />
+              <Text fontSize={13} fontWeight="600" color={noEndDate ? '#FFF' : colors.subtext}>
+                Indefinite
+              </Text>
+            </XStack>
+          </XStack>
+        </YStack>
+
         <YStack marginTop={8}>
           <Text fontSize={16} fontWeight="600" color={colors.text}>Frequency</Text>
 
@@ -441,40 +577,152 @@ export default function AddProductScreen() {
           </XStack>
         </YStack>
 
-        {/* Date Picker Modal */}
-        <Modal visible={showDatePicker} transparent animationType="fade">
-          <Pressable
-            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}
-            onPress={() => setShowDatePicker(false)}
-          >
-            <YStack width="80%" padding={24} borderRadius={24} alignItems="center" backgroundColor={colors.background}>
-              <Text fontSize={18} fontWeight="600" color={colors.text}>Select Date</Text>
-              <XStack alignItems="center" justifyContent="space-between" width="100%">
-                <YStack onPress={() => setOpenedAt(prev => new Date(prev.setDate(prev.getDate() - 1)))}>
-                  <ChevronLeft size={24} color={colors.text} />
-                </YStack>
-                <Text fontSize={18} fontWeight="500" color={colors.text}>{format(openedAt, 'MMMM dd, yyyy')}</Text>
-                <YStack onPress={() => setOpenedAt(prev => new Date(prev.setDate(prev.getDate() + 1)))}>
-                  <ChevronRight size={24} color={colors.text} />
+        <YStack height={40} />
+      </ScrollView>
+
+      <Modal visible={showDatePicker} transparent animationType="fade">
+        <Pressable
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+          onPress={() => {}}
+        >
+          <Pressable onPress={() => {}}>
+            <YStack
+              backgroundColor={colors.background}
+              borderTopLeftRadius={28}
+              borderTopRightRadius={28}
+              padding={20}
+              paddingBottom={Math.max(insets.bottom, 20)}
+              shadowColor="#000"
+              shadowOffset={{ width: 0, height: -4 }}
+              shadowOpacity={0.1}
+              shadowRadius={16}
+              elevation={10}
+            >
+              <XStack alignItems="center" justifyContent="space-between" marginBottom={20}>
+                <Text fontSize={18} fontWeight="700" color={colors.text}>Start Date</Text>
+                <YStack
+                  paddingHorizontal={16}
+                  paddingVertical={8}
+                  borderRadius={20}
+                  backgroundColor={colors.tint}
+                  onPress={() => setShowDatePicker(false)}
+                >
+                  <Text fontSize={14} fontWeight="600" color="#FFFFFF">Done</Text>
                 </YStack>
               </XStack>
-              <YStack
-                paddingHorizontal={32}
-                paddingVertical={12}
-                borderRadius={20}
-                width="100%"
-                alignItems="center"
-                backgroundColor={colors.tint}
-                onPress={() => setShowDatePicker(false)}
-              >
-                <Text color="#FFFFFF" fontSize={16} fontWeight="600">Confirm</Text>
-              </YStack>
+
+              <XStack alignItems="center" justifyContent="space-between" marginBottom={16}>
+                <YStack
+                  padding={8}
+                  borderRadius={12}
+                  backgroundColor={colors.card}
+                  onPress={() => setCalendarViewMonth(subMonths(calendarViewMonth, 1))}
+                >
+                  <ChevronLeft size={20} color={colors.text} />
+                </YStack>
+                <Text fontSize={16} fontWeight="600" color={colors.text}>
+                  {format(calendarViewMonth, 'MMMM yyyy')}
+                </Text>
+                <YStack
+                  padding={8}
+                  borderRadius={12}
+                  backgroundColor={colors.card}
+                  onPress={() => setCalendarViewMonth(addMonths(calendarViewMonth, 1))}
+                >
+                  <ChevronRight size={20} color={colors.text} />
+                </YStack>
+              </XStack>
+
+              {renderCalendarGrid(
+                calendarDays.days,
+                calendarDays.startPadding,
+                openedAt,
+                (day) => setOpenedAt(day),
+              )}
+
+              <XStack justifyContent="center" marginTop={12}>
+                <YStack
+                  paddingHorizontal={20}
+                  paddingVertical={10}
+                  borderRadius={16}
+                  backgroundColor={colors.card}
+                  onPress={() => {
+                    setOpenedAt(new Date());
+                    setCalendarViewMonth(new Date());
+                  }}
+                >
+                  <Text fontSize={13} fontWeight="600" color={colors.tint}>Today</Text>
+                </YStack>
+              </XStack>
             </YStack>
           </Pressable>
-        </Modal>
+        </Pressable>
+      </Modal>
 
-          <YStack height={40} />
-        </ScrollView>
+      <Modal visible={showEndDatePicker} transparent animationType="fade">
+        <Pressable
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+          onPress={() => {}}
+        >
+          <Pressable onPress={() => {}}>
+            <YStack
+              backgroundColor={colors.background}
+              borderTopLeftRadius={28}
+              borderTopRightRadius={28}
+              padding={20}
+              paddingBottom={Math.max(insets.bottom, 20)}
+              shadowColor="#000"
+              shadowOffset={{ width: 0, height: -4 }}
+              shadowOpacity={0.1}
+              shadowRadius={16}
+              elevation={10}
+            >
+              <XStack alignItems="center" justifyContent="space-between" marginBottom={20}>
+                <Text fontSize={18} fontWeight="700" color={colors.text}>End Date</Text>
+                <YStack
+                  paddingHorizontal={16}
+                  paddingVertical={8}
+                  borderRadius={20}
+                  backgroundColor={colors.tint}
+                  onPress={() => setShowEndDatePicker(false)}
+                >
+                  <Text fontSize={14} fontWeight="600" color="#FFFFFF">Done</Text>
+                </YStack>
+              </XStack>
+
+              <XStack alignItems="center" justifyContent="space-between" marginBottom={16}>
+                <YStack
+                  padding={8}
+                  borderRadius={12}
+                  backgroundColor={colors.card}
+                  onPress={() => setEndCalendarViewMonth(subMonths(endCalendarViewMonth, 1))}
+                >
+                  <ChevronLeft size={20} color={colors.text} />
+                </YStack>
+                <Text fontSize={16} fontWeight="600" color={colors.text}>
+                  {format(endCalendarViewMonth, 'MMMM yyyy')}
+                </Text>
+                <YStack
+                  padding={8}
+                  borderRadius={12}
+                  backgroundColor={colors.card}
+                  onPress={() => setEndCalendarViewMonth(addMonths(endCalendarViewMonth, 1))}
+                >
+                  <ChevronRight size={20} color={colors.text} />
+                </YStack>
+              </XStack>
+
+              {renderCalendarGrid(
+                endCalendarDays.days,
+                endCalendarDays.startPadding,
+                endDate || new Date(),
+                (day) => setEndDate(day),
+                openedAt,
+              )}
+            </YStack>
+          </Pressable>
+        </Pressable>
+      </Modal>
       </KeyboardAvoidingView>
     </View>
   );

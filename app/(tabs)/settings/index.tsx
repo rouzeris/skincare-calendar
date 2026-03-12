@@ -16,6 +16,7 @@ import {
   Star,
   Download,
   Trash2,
+  FlaskConical,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import Purchases from 'react-native-purchases';
@@ -39,10 +40,10 @@ const useIsDeveloper = () => {
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { themeMode, setTheme, colors } = useTheme();
+  const { themeMode, setTheme, colors, showDetailedConflicts, setAppSettings } = useTheme();
   const { products } = useCosmetics();
   const { routineConfig, routineHistory } = useRoutine();
-  const [isExporting, setIsExporting] = useState(false);
+  const [_isExporting, setIsExporting] = useState(false);
   const isDeveloper = useIsDeveloper();
 
   const { data: customerInfo } = useQuery({
@@ -69,14 +70,14 @@ export default function SettingsScreen() {
   const handleContactSupport = () => {
     const subject = encodeURIComponent('Skincare Calendar Support');
     const body = encodeURIComponent(`\n\n---\nApp Version: 1.0.0\nPlatform: ${Platform.OS}`);
-    Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`);
+    void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`);
   };
 
   const handleRateApp = () => {
     if (Platform.OS === 'ios') {
-      Linking.openURL(APP_STORE_URL);
+      void Linking.openURL(APP_STORE_URL);
     } else if (Platform.OS === 'android') {
-      Linking.openURL('market://details?id=app.rork.kalendarz_kosmetykow_twarz');
+      void Linking.openURL('market://details?id=app.rork.kalendarz_kosmetykow_twarz');
     } else {
       Alert.alert('Rate Us', 'Thank you for your interest! Rating is available on mobile apps.');
     }
@@ -109,7 +110,7 @@ export default function SettingsScreen() {
           title: 'Skincare Calendar Backup',
         });
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Export Failed', 'Could not export your data. Please try again.');
     } finally {
       setIsExporting(false);
@@ -242,6 +243,66 @@ export default function SettingsScreen() {
             </XStack>
             {!isPro && <ChevronRight size={20} color={colors.subtext} />}
           </XStack>
+        </YStack>
+
+        {/* Ingredient Analysis Section */}
+        <YStack marginBottom={32}>
+          <Text
+            fontSize={14}
+            fontWeight="600"
+            marginBottom={12}
+            textTransform="uppercase"
+            letterSpacing={0.5}
+            color={colors.subtext}
+          >
+            Ingredient Analysis
+          </Text>
+          <YStack
+            borderRadius={16}
+            borderWidth={1}
+            overflow="hidden"
+            backgroundColor={colors.card}
+            borderColor={colors.border}
+          >
+            <XStack
+              alignItems="center"
+              padding={16}
+              onPress={() => setAppSettings({ showDetailedConflicts: !showDetailedConflicts })}
+            >
+              <YStack marginRight={12}>
+                <FlaskConical size={20} color={colors.text} />
+              </YStack>
+              <YStack flex={1}>
+                <Text fontSize={16} color={colors.text} fontWeight="500">
+                  Detailed Explanations
+                </Text>
+                <Text fontSize={13} color={colors.subtext} marginTop={2}>
+                  Show why ingredients conflict. Warnings are always visible.
+                </Text>
+              </YStack>
+              <YStack
+                width={50}
+                height={30}
+                borderRadius={15}
+                justifyContent="center"
+                paddingHorizontal={3}
+                backgroundColor={showDetailedConflicts ? colors.tint : colors.border}
+              >
+                <YStack
+                  width={24}
+                  height={24}
+                  borderRadius={12}
+                  backgroundColor="#FFFFFF"
+                  alignSelf={showDetailedConflicts ? 'flex-end' : 'flex-start'}
+                  shadowColor="#000"
+                  shadowOffset={{ width: 0, height: 1 }}
+                  shadowOpacity={0.15}
+                  shadowRadius={2}
+                  elevation={2}
+                />
+              </YStack>
+            </XStack>
+          </YStack>
         </YStack>
 
         {/* Appearance Section */}
