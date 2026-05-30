@@ -1,6 +1,10 @@
 const { getDefaultConfig } = require("expo/metro-config");
-const { withRorkMetro } = require("@rork-ai/toolkit-sdk/metro");
+const { withTamagui } = require("@tamagui/metro-plugin");
 
-const config = getDefaultConfig(__dirname);
+const config = getDefaultConfig(__dirname, { isCSSEnabled: true });
 
-module.exports = withRorkMetro(config);
+module.exports = withTamagui(config, {
+  components: ["tamagui"],
+  config: "./tamagui.config.ts",
+  outputCSS: "./tamagui-web.css",
+});

@@ -5,7 +5,6 @@ import { useTheme } from '@/context/theme';
 import { useCosmetics } from '@/context/cosmetics';
 import { useRoutine } from '@/context/routine';
 import {
-  Crown,
   Moon,
   Sun,
   Monitor,
@@ -18,9 +17,6 @@ import {
   Trash2,
   FlaskConical,
 } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
-import Purchases from 'react-native-purchases';
-import { useQuery } from '@tanstack/react-query';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,25 +35,11 @@ const useIsDeveloper = () => {
 };
 
 export default function SettingsScreen() {
-  const router = useRouter();
   const { themeMode, setTheme, colors, showDetailedConflicts, setAppSettings } = useTheme();
   const { products } = useCosmetics();
   const { routineConfig, routineHistory } = useRoutine();
   const [_isExporting, setIsExporting] = useState(false);
   const isDeveloper = useIsDeveloper();
-
-  const { data: customerInfo } = useQuery({
-    queryKey: ['customerInfo'],
-    queryFn: async () => {
-      if (Platform.OS === 'web') {
-        console.log('[Settings] getCustomerInfo skipped on web');
-        return null;
-      }
-      return await Purchases.getCustomerInfo();
-    },
-  });
-
-  const isPro = customerInfo?.entitlements.active['club'] !== undefined;
 
   const handleOpenURL = async (url: string) => {
     if (Platform.OS === 'web') {
@@ -185,66 +167,6 @@ export default function SettingsScreen() {
   return (
     <ScrollView flex={1} backgroundColor={colors.background}>
       <YStack padding={20} paddingBottom={40}>
-        {/* Club Section */}
-        <YStack marginBottom={32}>
-          <Text
-            fontSize={14}
-            fontWeight="600"
-            marginBottom={12}
-            textTransform="uppercase"
-            letterSpacing={0.5}
-            color={colors.subtext}
-          >
-            Membership
-          </Text>
-          <XStack
-            borderRadius={20}
-            padding={20}
-            alignItems="center"
-            justifyContent="space-between"
-            borderWidth={1}
-            backgroundColor={isPro ? colors.tint : colors.card}
-            borderColor={isPro ? colors.tint : colors.border}
-            shadowColor="#000"
-            shadowOffset={{ width: 0, height: 2 }}
-            shadowOpacity={0.05}
-            shadowRadius={8}
-            elevation={2}
-            pressStyle={{ opacity: isPro ? 1 : 0.7 }}
-            onPress={() => !isPro && router.push('/paywall')}
-          >
-            <XStack alignItems="center">
-              <YStack
-                width={48}
-                height={48}
-                borderRadius={24}
-                alignItems="center"
-                justifyContent="center"
-                marginRight={16}
-                backgroundColor={isPro ? 'rgba(255,255,255,0.2)' : colors.background}
-              >
-                <Crown size={24} color={isPro ? '#FFF' : colors.tint} />
-              </YStack>
-              <YStack>
-                <Text
-                  fontSize={18}
-                  fontWeight="bold"
-                  color={isPro ? '#FFFFFF' : colors.text}
-                >
-                  {isPro ? 'You are a Club Member' : 'Join the Club'}
-                </Text>
-                <Text
-                  fontSize={14}
-                  color={isPro ? 'rgba(255,255,255,0.9)' : colors.subtext}
-                >
-                  {isPro ? 'Thank you for your support!' : 'Unlock sync & unlimited history'}
-                </Text>
-              </YStack>
-            </XStack>
-            {!isPro && <ChevronRight size={20} color={colors.subtext} />}
-          </XStack>
-        </YStack>
-
         {/* Ingredient Analysis Section */}
         <YStack marginBottom={32}>
           <Text
