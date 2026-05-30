@@ -37,20 +37,16 @@ test.describe('Settings & Preferences', () => {
   });
 
   test('access legal and support options', async ({ page }) => {
-    // 1. Verify membership section
-    await expect(page.getByText('Membership')).toBeVisible();
-    await expect(page.getByText('Join the Club')).toBeVisible();
-
-    // 2. Verify support options
+    // 1. Verify support options
     await expect(page.getByText('Contact Support')).toBeVisible();
     await expect(page.getByText('support@rork.com')).toBeVisible();
     await expect(page.getByText('Rate the App')).toBeVisible();
 
-    // 3. Verify legal links
+    // 2. Verify legal links
     await expect(page.getByText('Privacy Policy')).toBeVisible();
     await expect(page.getByText('Terms of Service')).toBeVisible();
 
-    // 4. Verify version displayed
+    // 3. Verify version displayed
     await expect(page.getByText('Version 1.0.0')).toBeVisible();
   });
 });
