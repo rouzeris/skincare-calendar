@@ -21,9 +21,9 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const PRIVACY_POLICY_URL = 'https://rork.com/privacy';
-const TERMS_URL = 'https://rork.com/terms';
-const SUPPORT_EMAIL = 'support@rork.com';
+const PRIVACY_POLICY_URL = 'https://cera.love/privacy';
+const TERMS_URL = 'https://cera.love/terms';
+const SUPPORT_EMAIL = 'help@cera.love';
 const APP_STORE_URL = 'https://apps.apple.com/app/id0000000000'; // Replace with actual ID
 
 // TODO: Replace with actual feature flag from backend/auth system

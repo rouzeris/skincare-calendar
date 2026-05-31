@@ -39,7 +39,7 @@ test.describe('Settings & Preferences', () => {
   test('access legal and support options', async ({ page }) => {
     // 1. Verify support options
     await expect(page.getByText('Contact Support')).toBeVisible();
-    await expect(page.getByText('support@rork.com')).toBeVisible();
+    await expect(page.getByText('help@cera.love')).toBeVisible();
     await expect(page.getByText('Rate the App')).toBeVisible();
 
     // 2. Verify legal links
