@@ -7,6 +7,13 @@ interface Props {
   children: ReactNode;
   fallback?: ReactNode;
   onReset?: () => void;
+  labels?: {
+    title: string;
+    message: string;
+    unexpected: string;
+    tryAgain: string;
+    restart: string;
+  };
 }
 
 interface State {
@@ -61,6 +68,14 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const labels = this.props.labels ?? {
+        title: 'Oops!',
+        message: 'Something went wrong',
+        unexpected: 'An unexpected error occurred',
+        tryAgain: 'Try Again',
+        restart: 'If this keeps happening, try restarting the app',
+      };
+
       if (this.props.fallback) {
         return this.props.fallback;
       }
@@ -96,10 +111,10 @@ export class ErrorBoundary extends Component<Props, State> {
               marginBottom={8}
               letterSpacing={-0.5}
             >
-              Oops!
+              {labels.title}
             </Text>
             <Text fontSize={18} fontWeight="500" color="#78716C" marginBottom={16}>
-              Something went wrong
+              {labels.message}
             </Text>
 
             <Text
@@ -110,7 +125,7 @@ export class ErrorBoundary extends Component<Props, State> {
               marginBottom={32}
               paddingHorizontal={16}
             >
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {this.state.error?.message || labels.unexpected}
             </Text>
 
             <XStack>
@@ -133,7 +148,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   <RefreshCw size={18} color="#FFF" />
                 </YStack>
                 <Text color="#FFFFFF" fontSize={16} fontWeight="600">
-                  Try Again
+                  {labels.tryAgain}
                 </Text>
               </XStack>
             </XStack>
@@ -146,7 +161,7 @@ export class ErrorBoundary extends Component<Props, State> {
             color="#A8A29E"
             textAlign="center"
           >
-            If this keeps happening, try restarting the app
+            {labels.restart}
           </Text>
         </YStack>
       );

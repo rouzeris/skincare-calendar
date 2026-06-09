@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Platform, Alert, Share } from 'react-native';
 import { YStack, XStack, Text, Separator, ScrollView } from 'tamagui';
 import { useTheme } from '@/context/theme';
+import { useIntl, type AppLocale } from '@/context/intl';
 import { useCosmetics } from '@/context/cosmetics';
 import { useRoutine } from '@/context/routine';
 import {
@@ -16,6 +17,7 @@ import {
   Download,
   Trash2,
   FlaskConical,
+  Check,
 } from 'lucide-react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
@@ -25,6 +27,16 @@ const PRIVACY_POLICY_URL = 'https://cera.love/privacy';
 const TERMS_URL = 'https://cera.love/terms';
 const SUPPORT_EMAIL = 'help@cera.love';
 const APP_STORE_URL = 'https://apps.apple.com/app/id0000000000'; // Replace with actual ID
+const LANGUAGE_LABEL_KEYS = {
+  en: 'language.en',
+  pl: 'language.pl',
+  ua: 'language.ua',
+} as const satisfies Record<AppLocale, Parameters<ReturnType<typeof useIntl>['t']>[0]>;
+const LANGUAGE_FLAGS = {
+  en: '🇬🇧',
+  pl: '🇵🇱',
+  ua: '🇺🇦',
+} as const satisfies Record<AppLocale, string>;
 
 // TODO: Replace with actual feature flag from backend/auth system
 const useIsDeveloper = () => {
@@ -36,9 +48,10 @@ const useIsDeveloper = () => {
 
 export default function SettingsScreen() {
   const { themeMode, setTheme, colors, showDetailedConflicts, setAppSettings } = useTheme();
+  const { locale, locales, setLocale, t } = useIntl();
   const { products } = useCosmetics();
   const { routineConfig, routineHistory } = useRoutine();
-  const [_isExporting, setIsExporting] = useState(false);
+  const [, setIsExporting] = useState(false);
   const isDeveloper = useIsDeveloper();
 
   const handleOpenURL = async (url: string) => {
@@ -50,7 +63,7 @@ export default function SettingsScreen() {
   };
 
   const handleContactSupport = () => {
-    const subject = encodeURIComponent('Skincare Calendar Support');
+    const subject = encodeURIComponent(t('settings.supportSubject'));
     const body = encodeURIComponent(`\n\n---\nApp Version: 1.0.0\nPlatform: ${Platform.OS}`);
     void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`);
   };
@@ -61,7 +74,7 @@ export default function SettingsScreen() {
     } else if (Platform.OS === 'android') {
       void Linking.openURL('market://details?id=app.rork.kalendarz_kosmetykow_twarz');
     } else {
-      Alert.alert('Rate Us', 'Thank you for your interest! Rating is available on mobile apps.');
+      Alert.alert(t('settings.rateTitle'), t('settings.rateBody'));
     }
   };
 
@@ -89,11 +102,11 @@ export default function SettingsScreen() {
       } else {
         await Share.share({
           message: jsonString,
-          title: 'Skincare Calendar Backup',
+          title: t('settings.exportData'),
         });
       }
     } catch {
-      Alert.alert('Export Failed', 'Could not export your data. Please try again.');
+      Alert.alert(t('settings.exportFailed'), t('settings.exportFailedBody'));
     } finally {
       setIsExporting(false);
     }
@@ -101,12 +114,12 @@ export default function SettingsScreen() {
 
   const handleDeleteAllData = () => {
     Alert.alert(
-      'Delete All Data',
-      'This will permanently delete all your products, routines, and history. This action cannot be undone.',
+      t('settings.deleteAllData'),
+      t('settings.deleteAllDataBody'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             await AsyncStorage.multiRemove([
@@ -164,6 +177,32 @@ export default function SettingsScreen() {
     </XStack>
   );
 
+  const LanguageRow = ({ language }: { language: AppLocale }) => {
+    const selected = locale === language;
+
+    return (
+      <XStack
+        alignItems="center"
+        padding={16}
+        backgroundColor={selected ? colors.border : colors.card}
+        onPress={() => void setLocale(language)}
+      >
+        <YStack width={24} marginRight={12} alignItems="center">
+          <Text fontSize={20}>{LANGUAGE_FLAGS[language]}</Text>
+        </YStack>
+        <Text
+          flex={1}
+          fontSize={16}
+          color={selected ? colors.tint : colors.text}
+          fontWeight={selected ? '600' : '500'}
+        >
+          {t(LANGUAGE_LABEL_KEYS[language])}
+        </Text>
+        {selected && <Check size={18} color={colors.tint} />}
+      </XStack>
+    );
+  };
+
   return (
     <ScrollView flex={1} backgroundColor={colors.background}>
       <YStack padding={20} paddingBottom={40}>
@@ -177,7 +216,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            Ingredient Analysis
+            {t('settings.ingredientAnalysis')}
           </Text>
           <YStack
             borderRadius={16}
@@ -196,10 +235,10 @@ export default function SettingsScreen() {
               </YStack>
               <YStack flex={1}>
                 <Text fontSize={16} color={colors.text} fontWeight="500">
-                  Detailed Explanations
+                  {t('settings.detailedExplanations')}
                 </Text>
                 <Text fontSize={13} color={colors.subtext} marginTop={2}>
-                  Show why ingredients conflict. Warnings are always visible.
+                  {t('settings.detailedExplanationsBody')}
                 </Text>
               </YStack>
               <YStack
@@ -227,6 +266,33 @@ export default function SettingsScreen() {
           </YStack>
         </YStack>
 
+        <YStack marginBottom={32}>
+          <Text
+            fontSize={14}
+            fontWeight="600"
+            marginBottom={12}
+            textTransform="uppercase"
+            letterSpacing={0.5}
+            color={colors.subtext}
+          >
+            {t('language.section')}
+          </Text>
+          <YStack
+            borderRadius={16}
+            borderWidth={1}
+            overflow="hidden"
+            backgroundColor={colors.card}
+            borderColor={colors.border}
+          >
+            {locales.map((language, index) => (
+              <React.Fragment key={language}>
+                <LanguageRow language={language} />
+                {index < locales.length - 1 && <Separator marginLeft={48} backgroundColor={colors.border} />}
+              </React.Fragment>
+            ))}
+          </YStack>
+        </YStack>
+
         {/* Appearance Section */}
         <YStack marginBottom={32}>
           <Text
@@ -237,7 +303,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            Appearance
+            {t('settings.appearance')}
           </Text>
           <YStack
             borderRadius={16}
@@ -260,7 +326,7 @@ export default function SettingsScreen() {
                 color={themeMode === 'light' ? colors.tint : colors.text}
                 fontWeight={themeMode === 'light' ? '600' : '500'}
               >
-                Light
+                {t('settings.light')}
               </Text>
             </XStack>
             <Separator marginLeft={48} backgroundColor={colors.border} />
@@ -278,7 +344,7 @@ export default function SettingsScreen() {
                 color={themeMode === 'dark' ? colors.tint : colors.text}
                 fontWeight={themeMode === 'dark' ? '600' : '500'}
               >
-                Dark
+                {t('settings.dark')}
               </Text>
             </XStack>
             <Separator marginLeft={48} backgroundColor={colors.border} />
@@ -296,7 +362,7 @@ export default function SettingsScreen() {
                 color={themeMode === 'auto' ? colors.tint : colors.text}
                 fontWeight={themeMode === 'auto' ? '600' : '500'}
               >
-                Auto
+                {t('settings.auto')}
               </Text>
             </XStack>
           </YStack>
@@ -313,7 +379,7 @@ export default function SettingsScreen() {
               letterSpacing={0.5}
               color={colors.subtext}
             >
-              Developer
+              {t('settings.developer')}
             </Text>
             <YStack
               borderRadius={16}
@@ -324,14 +390,14 @@ export default function SettingsScreen() {
             >
               <SettingsRow
                 icon={<Download size={20} color={colors.text} />}
-                label="Export Data"
-                subtitle={`${products.length} products`}
+                label={t('settings.exportData')}
+                subtitle={t('settings.productsCount', { count: products.length })}
                 onPress={handleExportData}
               />
               <Separator marginLeft={48} backgroundColor={colors.border} />
               <SettingsRow
                 icon={<Trash2 size={20} color={colors.error} />}
-                label="Delete All Data"
+                label={t('settings.deleteAllData')}
                 onPress={handleDeleteAllData}
                 showChevron={false}
                 danger
@@ -350,7 +416,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            Support
+            {t('settings.support')}
           </Text>
           <YStack
             borderRadius={16}
@@ -361,14 +427,14 @@ export default function SettingsScreen() {
           >
             <SettingsRow
               icon={<Mail size={20} color={colors.text} />}
-              label="Contact Support"
+              label={t('settings.contactSupport')}
               subtitle={SUPPORT_EMAIL}
               onPress={handleContactSupport}
             />
             <Separator marginLeft={48} backgroundColor={colors.border} />
             <SettingsRow
               icon={<Star size={20} color={colors.text} />}
-              label="Rate the App"
+              label={t('settings.rateApp')}
               onPress={handleRateApp}
             />
           </YStack>
@@ -384,7 +450,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            Legal
+            {t('settings.legal')}
           </Text>
           <YStack
             borderRadius={16}
@@ -395,13 +461,13 @@ export default function SettingsScreen() {
           >
             <SettingsRow
               icon={<Shield size={20} color={colors.text} />}
-              label="Privacy Policy"
+              label={t('settings.privacyPolicy')}
               onPress={() => handleOpenURL(PRIVACY_POLICY_URL)}
             />
             <Separator marginLeft={48} backgroundColor={colors.border} />
             <SettingsRow
               icon={<FileText size={20} color={colors.text} />}
-              label="Terms of Service"
+              label={t('settings.terms')}
               onPress={() => handleOpenURL(TERMS_URL)}
             />
           </YStack>
@@ -410,7 +476,7 @@ export default function SettingsScreen() {
         {/* Version */}
         <YStack alignItems="center" marginTop={20}>
           <Text fontSize={12} color={colors.subtext}>
-            Version 1.0.0
+            {t('common.version', { version: '1.0.0' })}
           </Text>
         </YStack>
       </YStack>

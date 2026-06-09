@@ -1,8 +1,10 @@
 import { Stack } from "expo-router";
 import { useTheme } from "@/context/theme";
+import { useIntl } from "@/context/intl";
 
 export default function SettingsLayout() {
   const { colors } = useTheme();
+  const { t } = useIntl();
   
   return (
     <Stack
@@ -13,7 +15,7 @@ export default function SettingsLayout() {
         headerTintColor: colors.text,
         headerShadowVisible: false,
         contentStyle: { backgroundColor: colors.background },
-        title: "Settings",
+        title: t('tabs.settings'),
       }}
     >
       <Stack.Screen name="index" />

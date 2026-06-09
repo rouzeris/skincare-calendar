@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import { useRoutine, TimeOfDay } from '@/context/routine';
 import { useCosmetics } from '@/context/cosmetics';
 import { useTheme } from '@/context/theme';
+import { useIntl } from '@/context/intl';
 import { PageTitleBar } from '@/components/PageTitleBar';
 
 export default function RoutineScreen() {
@@ -16,6 +17,7 @@ export default function RoutineScreen() {
   const { routineConfig, routineHistory, toggleCompletion } = useRoutine();
   const { products } = useCosmetics();
   const { colors } = useTheme();
+  const { t, formatDate } = useIntl();
   const router = useRouter();
 
   const calendarDays = useMemo(() => {
@@ -149,7 +151,7 @@ export default function RoutineScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <PageTitleBar
-        title="My Routine"
+        title={t('routine.title')}
         rightElement={
           <YStack
             width={40}
@@ -194,7 +196,7 @@ export default function RoutineScreen() {
                   textTransform="uppercase"
                   color={isSelected ? '#FFFFFF' : colors.subtext}
                 >
-                  {format(date, 'EEE')}
+                  {formatDate(date, 'weekdayShort')}
                 </Text>
                 <YStack
                   width={32}
@@ -222,7 +224,7 @@ export default function RoutineScreen() {
         {isEmpty ? (
           <YStack alignItems="center" justifyContent="center" paddingTop={60}>
             <Text fontSize={18} fontWeight="600" marginBottom={8} color={colors.text}>
-              Your routine is empty.
+              {t('routine.emptyTitle')}
             </Text>
             <Text
               fontSize={14}
@@ -231,7 +233,7 @@ export default function RoutineScreen() {
               paddingHorizontal={40}
               color={colors.subtext}
             >
-              Add products to your shelf and assign them to your routine to get started.
+              {t('routine.emptyBody')}
             </Text>
             <YStack
               paddingHorizontal={24}
@@ -241,19 +243,19 @@ export default function RoutineScreen() {
               onPress={() => router.push('/(tabs)/shelf')}
             >
               <Text color="#FFFFFF" fontWeight="600" fontSize={16}>
-                Go to Shelf
+                {t('routine.goToShelf')}
               </Text>
             </YStack>
           </YStack>
         ) : (
           <>
-            {renderRoutineSection('Morning', <Sun size={20} color={colors.tint} />, routineConfig.morning, 'morning')}
-            {renderRoutineSection('Evening', <Moon size={20} color={colors.text} />, routineConfig.evening, 'evening')}
+            {renderRoutineSection(t('routine.morning'), <Sun size={20} color={colors.tint} />, routineConfig.morning, 'morning')}
+            {renderRoutineSection(t('routine.evening'), <Moon size={20} color={colors.text} />, routineConfig.evening, 'evening')}
 
             {(routineConfig.morning.length > 0 || routineConfig.evening.length > 0) && (
               <YStack marginTop={20} alignItems="center">
                 <Text fontSize={13} color={colors.subtext}>
-                  {format(selectedDate, 'EEEE, MMMM do')}
+                  {formatDate(selectedDate, 'longDayMonth')}
                 </Text>
               </YStack>
             )}

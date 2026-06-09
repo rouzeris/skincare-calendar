@@ -4,6 +4,7 @@ import React from "react";
 import { Platform } from "react-native";
 
 import { useTheme } from "@/context/theme";
+import { useIntl } from "@/context/intl";
 
 const getTabBarHeight = () => {
   if (Platform.OS === 'ios') return 88;
@@ -19,6 +20,7 @@ const getTabBarPaddingBottom = () => {
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const { t } = useIntl();
 
   return (
     <Tabs
@@ -45,21 +47,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Routine",
+          title: t('tabs.routine'),
           tabBarIcon: ({ color }) => <Calendar color={color} size={24} />,
         }}
       />
       <Tabs.Screen
         name="shelf"
         options={{
-          title: "Shelf",
+          title: t('tabs.shelf'),
           tabBarIcon: ({ color }) => <SprayCan color={color} size={24} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
+          title: t('tabs.settings'),
           tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
         }}
       />
