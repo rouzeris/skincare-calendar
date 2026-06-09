@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { YStack, XStack, Text } from 'tamagui';
 import { useCosmetics, Product } from '@/context/cosmetics';
 import { useTheme } from '@/context/theme';
+import { useIntl } from '@/context/intl';
 import { PageTitleBar } from '@/components/PageTitleBar';
 import { Plus, Trash2, Clock, AlertCircle, ShieldAlert, AlertTriangle, ChevronDown, ChevronUp, Zap } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -15,6 +16,7 @@ export default function ShelfScreen() {
   const { products, removeProduct } = useCosmetics();
   const router = useRouter();
   const { colors, showDetailedConflicts } = useTheme();
+  const { t } = useIntl();
   const [expandedConflict, setExpandedConflict] = useState<number | null>(null);
   const [showAllConflicts, setShowAllConflicts] = useState(false);
 
@@ -30,9 +32,9 @@ export default function ShelfScreen() {
     const expirationDate = addMonths(openedDate, product.periodAfterOpening);
     const daysLeft = differenceInDays(expirationDate, new Date());
 
-    if (daysLeft < 0) return { status: 'expired' as const, label: `Expired ${Math.abs(daysLeft)} days ago`, color: colors.error };
-    if (daysLeft <= 30) return { status: 'warning' as const, label: `${daysLeft} days left`, color: '#F59E0B' };
-    return { status: 'good' as const, label: `${daysLeft} days left`, color: colors.success };
+    if (daysLeft < 0) return { status: 'expired' as const, label: t('shelf.expired', { count: Math.abs(daysLeft) }), color: colors.error };
+    if (daysLeft <= 30) return { status: 'warning' as const, label: t('shelf.daysLeft', { count: daysLeft }), color: '#F59E0B' };
+    return { status: 'good' as const, label: t('shelf.daysLeft', { count: daysLeft }), color: colors.success };
   };
 
   const getProductIngredientTags = (product: Product) => {
@@ -194,7 +196,7 @@ export default function ShelfScreen() {
                 </Text>
               </XStack>
             ) : (
-              <Text fontSize={12} color={colors.subtext}>Not opened yet</Text>
+              <Text fontSize={12} color={colors.subtext}>{t('shelf.notOpened')}</Text>
             )}
           </YStack>
         </XStack>
@@ -236,12 +238,12 @@ export default function ShelfScreen() {
             </YStack>
             <YStack flex={1}>
               <Text fontSize={15} fontWeight="700" color={colors.text}>
-                {conflicts.length} Ingredient {conflicts.length === 1 ? 'Conflict' : 'Conflicts'} Detected
+                {t('ingredients.conflictsDetected', { count: conflicts.length })}
               </Text>
               <Text fontSize={12} color={colors.subtext}>
                 {highSeverityCount > 0
-                  ? `${highSeverityCount} high severity`
-                  : 'Review your product combinations'
+                  ? t('ingredients.highSeverity', { count: highSeverityCount })
+                  : t('ingredients.reviewCombinations')
                 }
               </Text>
             </YStack>
@@ -256,7 +258,7 @@ export default function ShelfScreen() {
               onPress={() => setShowAllConflicts(!showAllConflicts)}
             >
               <Text fontSize={13} fontWeight="600" color={colors.tint}>
-                {showAllConflicts ? 'Show Less' : `Show ${conflicts.length - 3} More`}
+                {showAllConflicts ? t('ingredients.showLess') : t('ingredients.showMore', { count: conflicts.length - 3 })}
               </Text>
             </YStack>
           )}
@@ -290,8 +292,8 @@ export default function ShelfScreen() {
             <Zap size={16} color={colors.success} />
           </YStack>
           <YStack flex={1}>
-            <Text fontSize={14} fontWeight="600" color={colors.success}>No Conflicts Found</Text>
-            <Text fontSize={12} color={colors.subtext}>Your products are compatible with each other</Text>
+            <Text fontSize={14} fontWeight="600" color={colors.success}>{t('ingredients.compatibleTitle')}</Text>
+            <Text fontSize={12} color={colors.subtext}>{t('ingredients.compatibleBody')}</Text>
           </YStack>
         </XStack>
       </YStack>
@@ -301,7 +303,7 @@ export default function ShelfScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <PageTitleBar
-        title="My Shelf"
+        title={t('shelf.title')}
         rightElement={
           <YStack
             width={40}
@@ -335,7 +337,7 @@ export default function ShelfScreen() {
         ListEmptyComponent={
           <YStack alignItems="center" justifyContent="center" paddingTop={60}>
             <Text fontSize={18} fontWeight="600" marginBottom={8} color={colors.text}>
-              Your shelf is empty
+              {t('shelf.emptyTitle')}
             </Text>
             <Text
               fontSize={14}
@@ -345,7 +347,7 @@ export default function ShelfScreen() {
               lineHeight={20}
               color={colors.subtext}
             >
-              Add your skincare products to track expiration dates and build your routine.
+              {t('shelf.emptyBody')}
             </Text>
             <YStack
               paddingHorizontal={24}
@@ -355,7 +357,7 @@ export default function ShelfScreen() {
               onPress={() => router.push('/add-product')}
             >
               <Text color="#FFFFFF" fontWeight="600" fontSize={16}>
-                Add First Product
+                {t('shelf.addFirst')}
               </Text>
             </YStack>
           </YStack>

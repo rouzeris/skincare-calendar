@@ -9,10 +9,14 @@ import { X, ChevronLeft, ChevronRight, Sun, Moon, Check } from 'lucide-react-nat
 import { useRoutine } from '@/context/routine';
 import { useCosmetics } from '@/context/cosmetics';
 import { useTheme } from '@/context/theme';
+import { useIntl } from '@/context/intl';
+
+const WEEKDAY_INDEXES = [0, 1, 2, 3, 4, 5, 6];
 
 export default function CalendarScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { t, formatDate } = useIntl();
   const { routineHistory } = useRoutine();
   const { products } = useCosmetics();
   const insets = useSafeAreaInsets();
@@ -45,7 +49,7 @@ export default function CalendarScreen() {
 
   const getProductName = (id: string) => {
     const product = products.find(p => p.id === id);
-    return product ? `${product.brand} - ${product.name}` : 'Unknown Product';
+    return product ? `${product.brand} - ${product.name}` : t('unknownProduct');
   };
 
   const selectedDateUsage = useMemo(() => {
@@ -76,7 +80,7 @@ export default function CalendarScreen() {
         <YStack padding={8} marginLeft={-8} onPress={() => router.back()}>
           <X size={24} color={colors.text} />
         </YStack>
-        <Text fontSize={18} fontWeight="600" color={colors.text}>Usage Calendar</Text>
+        <Text fontSize={18} fontWeight="600" color={colors.text}>{t('calendar.title')}</Text>
         <YStack width={40} />
       </XStack>
 
@@ -92,7 +96,7 @@ export default function CalendarScreen() {
           </YStack>
           
           <Text fontSize={20} fontWeight="600" color={colors.text}>
-            {format(currentMonth, 'MMMM yyyy')}
+            {formatDate(currentMonth, 'monthYear')}
           </Text>
           
           <YStack
@@ -106,9 +110,11 @@ export default function CalendarScreen() {
         </XStack>
 
         <XStack marginBottom={10}>
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-            <YStack key={index} flex={1} alignItems="center" paddingVertical={8}>
-              <Text fontSize={12} fontWeight="600" color={colors.subtext}>{day}</Text>
+          {WEEKDAY_INDEXES.map((dayIndex) => (
+            <YStack key={dayIndex} flex={1} alignItems="center" paddingVertical={8}>
+              <Text fontSize={12} fontWeight="600" color={colors.subtext}>
+                {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort').charAt(0)}
+              </Text>
             </YStack>
           ))}
         </XStack>
@@ -177,25 +183,25 @@ export default function CalendarScreen() {
         <XStack marginTop={16} justifyContent="center" gap={20}>
           <XStack alignItems="center" gap={6}>
             <YStack width={10} height={10} borderRadius={5} backgroundColor="#FFA726" />
-            <Text fontSize={12} color={colors.subtext}>Morning</Text>
+            <Text fontSize={12} color={colors.subtext}>{t('time.morning')}</Text>
           </XStack>
           <XStack alignItems="center" gap={6}>
             <YStack width={10} height={10} borderRadius={5} backgroundColor="#5C6BC0" />
-            <Text fontSize={12} color={colors.subtext}>Evening</Text>
+            <Text fontSize={12} color={colors.subtext}>{t('time.evening')}</Text>
           </XStack>
         </XStack>
 
         {selectedDate && selectedDateUsage && (
           <YStack marginTop={24}>
             <Text fontSize={16} fontWeight="600" marginBottom={12} color={colors.text}>
-              {format(selectedDate, 'EEEE, MMMM d')}
+              {formatDate(selectedDate, 'longDayMonth')}
             </Text>
 
             {selectedDateUsage.morning.length > 0 && (
               <YStack marginBottom={16}>
                 <XStack alignItems="center" marginBottom={8} gap={6}>
                   <Sun size={16} color="#FFA726" />
-                  <Text fontSize={14} fontWeight="600" color={colors.text}>Morning</Text>
+                  <Text fontSize={14} fontWeight="600" color={colors.text}>{t('time.morning')}</Text>
                 </XStack>
                 {selectedDateUsage.morning.map((productId, index) => (
                   <XStack
@@ -219,7 +225,7 @@ export default function CalendarScreen() {
               <YStack>
                 <XStack alignItems="center" marginBottom={8} gap={6}>
                   <Moon size={16} color="#5C6BC0" />
-                  <Text fontSize={14} fontWeight="600" color={colors.text}>Evening</Text>
+                  <Text fontSize={14} fontWeight="600" color={colors.text}>{t('time.evening')}</Text>
                 </XStack>
                 {selectedDateUsage.evening.map((productId, index) => (
                   <XStack
@@ -241,7 +247,7 @@ export default function CalendarScreen() {
 
             {selectedDateUsage.morning.length === 0 && selectedDateUsage.evening.length === 0 && (
               <Text fontSize={14} textAlign="center" color={colors.subtext}>
-                No products used on this day
+                {t('calendar.noProductsUsed')}
               </Text>
             )}
           </YStack>
@@ -250,7 +256,7 @@ export default function CalendarScreen() {
         {selectedDate && !selectedDateUsage && (
           <YStack marginTop={24} alignItems="center">
             <Text fontSize={14} color={colors.subtext}>
-              No routine data for {format(selectedDate, 'MMMM d, yyyy')}
+              {t('calendar.noRoutineData', { date: formatDate(selectedDate, 'dayMonth') })}
             </Text>
           </YStack>
         )}

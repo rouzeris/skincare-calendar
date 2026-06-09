@@ -1,10 +1,11 @@
 import { CosmeticsProvider } from "@/context/cosmetics";
+import { IntlProvider, useIntl } from "@/context/intl";
 import { RoutineProvider } from "@/context/routine";
 import { ThemeProvider, useTheme } from "@/context/theme";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useColorScheme } from "react-native";
@@ -20,6 +21,7 @@ const queryClient = new QueryClient();
 
 function RootNavigator() {
   const { colors, colorScheme } = useTheme();
+  const { t } = useIntl();
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -39,7 +41,7 @@ function RootNavigator() {
           name="add-product"
           options={{
             presentation: "modal",
-            title: "Add Product",
+            title: t('add.title'),
             headerShown: false
           }}
         />
@@ -47,41 +49,59 @@ function RootNavigator() {
           name="calendar"
           options={{
             presentation: "modal",
-            title: "Calendar",
+            title: t('calendar.title'),
             headerShown: false
           }}
         />
-        <Stack.Screen name="+not-found" options={{ title: "Oops!" }} />
+        <Stack.Screen name="+not-found" options={{ title: t('common.oops') }} />
       </Stack>
     </GestureHandlerRootView>
   );
 }
 
-export default function RootLayout() {
+function AppProviders() {
   const [errorKey, setErrorKey] = useState(0);
+  const { t } = useIntl();
+
+  const handleErrorReset = () => {
+    setErrorKey(prev => prev + 1);
+  };
+
+  const errorLabels = useMemo(() => ({
+    title: t('common.oops'),
+    message: t('error.message'),
+    unexpected: t('error.subtitle'),
+    tryAgain: t('error.tryAgain'),
+    restart: t('error.restart'),
+  }), [t]);
+
+  return (
+    <ErrorBoundary key={errorKey} onReset={handleErrorReset} labels={errorLabels}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <CosmeticsProvider>
+            <RoutineProvider>
+              <RootNavigator />
+            </RoutineProvider>
+          </CosmeticsProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
+}
+
+export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);
 
-  const handleErrorReset = () => {
-    setErrorKey(prev => prev + 1);
-  };
-
   return (
-    <ErrorBoundary key={errorKey} onReset={handleErrorReset}>
-      <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? "light"}>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            <CosmeticsProvider>
-              <RoutineProvider>
-                <RootNavigator />
-              </RoutineProvider>
-            </CosmeticsProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </TamaguiProvider>
-    </ErrorBoundary>
+    <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? "light"}>
+      <IntlProvider>
+        <AppProviders />
+      </IntlProvider>
+    </TamaguiProvider>
   );
 }

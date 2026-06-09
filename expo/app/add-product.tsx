@@ -3,11 +3,12 @@ import { KeyboardAvoidingView, Platform, Modal, Pressable, View } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { YStack, XStack, Text, Input, ScrollView } from 'tamagui';
 import { useTheme } from '@/context/theme';
+import { useIntl } from '@/context/intl';
 import { useCosmetics, Frequency } from '@/context/cosmetics';
 import { useRoutine, TimeOfDay } from '@/context/routine';
 import { useRouter } from 'expo-router';
 import { X, Check, Camera, Image as ImageIcon, RotateCcw, ChevronLeft, ChevronRight, Infinity as InfinityIcon } from 'lucide-react-native';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isAfter } from 'date-fns';
+import { startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isAfter } from 'date-fns';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 
@@ -22,14 +23,14 @@ const MOCK_SUGGESTIONS = [
   { brand: 'Cosrx', name: 'Advanced Snail 96 Mucin Power Essence' },
 ];
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const WEEKDAY_HEADERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const WEEKDAY_INDEXES = [0, 1, 2, 3, 4, 5, 6];
 
 export default function AddProductScreen() {
   const router = useRouter();
   const { addProduct } = useCosmetics();
   const { addToRoutine } = useRoutine();
   const { colors } = useTheme();
+  const { t, formatDate } = useIntl();
 
   const [brand, setBrand] = useState('');
   const [name, setName] = useState('');
@@ -160,9 +161,11 @@ export default function AddProductScreen() {
 
     rows.push(
       <XStack key="header" justifyContent="space-between" marginBottom={8}>
-        {WEEKDAY_HEADERS.map((d, i) => (
-          <YStack key={i} width={38} height={28} justifyContent="center" alignItems="center">
-            <Text fontSize={12} fontWeight="600" color={colors.subtext}>{d}</Text>
+        {WEEKDAY_INDEXES.map((dayIndex) => (
+          <YStack key={dayIndex} width={38} height={28} justifyContent="center" alignItems="center">
+            <Text fontSize={12} fontWeight="600" color={colors.subtext}>
+              {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort').charAt(0)}
+            </Text>
           </YStack>
         ))}
       </XStack>
@@ -238,7 +241,7 @@ export default function AddProductScreen() {
         <YStack padding={8} marginLeft={-8} onPress={() => router.back()}>
           <X size={24} color={colors.text} />
         </YStack>
-        <Text fontSize={18} fontWeight="600" color={colors.text}>Add Product</Text>
+        <Text fontSize={18} fontWeight="600" color={colors.text}>{t('add.title')}</Text>
         <YStack
           paddingHorizontal={16}
           paddingVertical={8}
@@ -249,7 +252,7 @@ export default function AddProductScreen() {
           disabled={!name || !brand}
         >
           <Text fontWeight="600" fontSize={14} color={(!name || !brand) ? colors.subtext : '#FFF'}>
-            Save
+            {t('common.save')}
           </Text>
         </YStack>
       </XStack>
@@ -276,7 +279,7 @@ export default function AddProductScreen() {
             ) : (
               <YStack alignItems="center">
                 <Camera size={32} color={colors.tabIconDefault} />
-                <Text fontSize={12} fontWeight="500" color={colors.subtext}>Add Photo</Text>
+                <Text fontSize={12} fontWeight="500" color={colors.subtext}>{t('add.addPhoto')}</Text>
               </YStack>
             )}
             {imageUri && (
@@ -297,7 +300,7 @@ export default function AddProductScreen() {
         </YStack>
 
         <YStack zIndex={10}>
-          <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>Product Name</Text>
+          <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>{t('add.productName')}</Text>
           <Input
             borderRadius={16}
             padding={16}
@@ -306,7 +309,7 @@ export default function AddProductScreen() {
             borderColor="transparent"
             backgroundColor={colors.card}
             color={colors.text}
-            placeholder="e.g. Niacinamide 10% + Zinc 1%"
+            placeholder={t('add.productNamePlaceholder')}
             value={name}
             onChangeText={handleNameChange}
             placeholderTextColor={colors.subtext}
@@ -347,7 +350,7 @@ export default function AddProductScreen() {
         </YStack>
 
         <YStack zIndex={10}>
-          <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>Brand</Text>
+          <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>{t('add.brand')}</Text>
           <Input
             borderRadius={16}
             padding={16}
@@ -356,7 +359,7 @@ export default function AddProductScreen() {
             borderColor="transparent"
             backgroundColor={colors.card}
             color={colors.text}
-            placeholder="e.g. The Ordinary"
+            placeholder={t('add.brandPlaceholder')}
             value={brand}
             onChangeText={setBrand}
             placeholderTextColor={colors.subtext}
@@ -365,7 +368,7 @@ export default function AddProductScreen() {
 
         <XStack zIndex={0}>
           <YStack flex={1} marginRight={10}>
-            <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>Start Date</Text>
+            <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>{t('add.startDate')}</Text>
             <XStack
               borderRadius={16}
               padding={16}
@@ -376,12 +379,12 @@ export default function AddProductScreen() {
                 setShowDatePicker(true);
               }}
             >
-              <Text fontSize={15} fontWeight="500" color={colors.text}>{format(openedAt, 'MMM dd, yyyy')}</Text>
+              <Text fontSize={15} fontWeight="500" color={colors.text}>{formatDate(openedAt, 'productDate')}</Text>
             </XStack>
           </YStack>
 
           <YStack flex={1}>
-            <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>PAO (Months)</Text>
+            <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>{t('add.paoMonths')}</Text>
             <XStack
               borderRadius={16}
               paddingHorizontal={16}
@@ -408,7 +411,7 @@ export default function AddProductScreen() {
         </XStack>
 
         <YStack zIndex={0} marginTop={4}>
-          <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>End Date</Text>
+          <Text fontSize={14} fontWeight="500" marginLeft={4} color={colors.subtext}>{t('add.endDate')}</Text>
           <XStack alignItems="center" gap={10}>
             <XStack
               flex={1}
@@ -426,7 +429,7 @@ export default function AddProductScreen() {
               }}
             >
               <Text fontSize={15} fontWeight="500" color={noEndDate ? colors.subtext : colors.text}>
-                {noEndDate ? 'No end date' : endDate ? format(endDate, 'MMM dd, yyyy') : 'Select date'}
+                {noEndDate ? t('add.noEndDate') : endDate ? formatDate(endDate, 'productDate') : t('add.selectDate')}
               </Text>
             </XStack>
             <XStack
@@ -444,14 +447,14 @@ export default function AddProductScreen() {
             >
               <InfinityIcon size={18} color={noEndDate ? '#FFF' : colors.subtext} />
               <Text fontSize={13} fontWeight="600" color={noEndDate ? '#FFF' : colors.subtext}>
-                Indefinite
+                {t('add.indefinite')}
               </Text>
             </XStack>
           </XStack>
         </YStack>
 
         <YStack marginTop={8}>
-          <Text fontSize={16} fontWeight="600" color={colors.text}>Frequency</Text>
+          <Text fontSize={16} fontWeight="600" color={colors.text}>{t('add.frequency')}</Text>
 
           <XStack borderRadius={16} padding={4} marginBottom={8} backgroundColor={colors.border}>
             <YStack
@@ -463,7 +466,7 @@ export default function AddProductScreen() {
               onPress={() => setFreqType('daily')}
             >
               <Text fontSize={13} color={freqType === 'daily' ? colors.text : colors.subtext} fontWeight={freqType === 'daily' ? '600' : '500'}>
-                Daily
+                {t('add.daily')}
               </Text>
             </YStack>
             <YStack
@@ -475,7 +478,7 @@ export default function AddProductScreen() {
               onPress={() => setFreqType('weekly')}
             >
               <Text fontSize={13} color={freqType === 'weekly' ? colors.text : colors.subtext} fontWeight={freqType === 'weekly' ? '600' : '500'}>
-                Specific Days
+                {t('add.specificDays')}
               </Text>
             </YStack>
             <YStack
@@ -487,14 +490,14 @@ export default function AddProductScreen() {
               onPress={() => setFreqType('interval')}
             >
               <Text fontSize={13} color={freqType === 'interval' ? colors.text : colors.subtext} fontWeight={freqType === 'interval' ? '600' : '500'}>
-                Interval
+                {t('add.interval')}
               </Text>
             </YStack>
           </XStack>
 
           {freqType === 'interval' && (
             <XStack alignItems="center" justifyContent="center" paddingVertical={8}>
-              <Text fontSize={16} color={colors.text}>Repeat every</Text>
+              <Text fontSize={16} color={colors.text}>{t('add.repeatEvery')}</Text>
               <Input
                 width={60}
                 height={44}
@@ -510,15 +513,15 @@ export default function AddProductScreen() {
                 onChangeText={setIntervalDays}
                 keyboardType="numeric"
               />
-              <Text fontSize={16} color={colors.text}>days</Text>
+              <Text fontSize={16} color={colors.text}>{t('common.days')}</Text>
             </XStack>
           )}
 
           {freqType === 'weekly' && (
             <XStack justifyContent="space-between" paddingVertical={8}>
-              {WEEKDAYS.map((day, index) => (
+              {WEEKDAY_INDEXES.map((dayIndex) => (
                 <YStack
-                  key={day}
+                  key={dayIndex}
                   width={36}
                   height={36}
                   borderRadius={18}
@@ -526,11 +529,11 @@ export default function AddProductScreen() {
                   alignItems="center"
                   borderWidth={1}
                   borderColor="transparent"
-                  backgroundColor={selectedWeekDays.includes(index) ? colors.tint : colors.card}
-                  onPress={() => toggleWeekDay(index)}
+                  backgroundColor={selectedWeekDays.includes(dayIndex) ? colors.tint : colors.card}
+                  onPress={() => toggleWeekDay(dayIndex)}
                 >
-                  <Text fontSize={12} fontWeight="600" color={selectedWeekDays.includes(index) ? '#FFF' : colors.subtext}>
-                    {day.charAt(0)}
+                  <Text fontSize={12} fontWeight="600" color={selectedWeekDays.includes(dayIndex) ? '#FFF' : colors.subtext}>
+                    {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort').charAt(0)}
                   </Text>
                 </YStack>
               ))}
@@ -539,7 +542,7 @@ export default function AddProductScreen() {
         </YStack>
 
         <YStack marginTop={8}>
-          <Text fontSize={16} fontWeight="600" color={colors.text}>Routine Time</Text>
+          <Text fontSize={16} fontWeight="600" color={colors.text}>{t('add.routineTime')}</Text>
           <XStack gap={12}>
             <XStack
               flex={1}
@@ -553,7 +556,7 @@ export default function AddProductScreen() {
               onPress={() => toggleRoutine('morning')}
             >
               <Text fontSize={15} fontWeight="500" color={selectedRoutine.includes('morning') ? '#FFF' : colors.text}>
-                Morning
+                {t('time.morning')}
               </Text>
               {selectedRoutine.includes('morning') && <Check size={16} color="#FFF" style={{ marginLeft: 8 }} />}
             </XStack>
@@ -570,7 +573,7 @@ export default function AddProductScreen() {
               onPress={() => toggleRoutine('evening')}
             >
               <Text fontSize={15} fontWeight="500" color={selectedRoutine.includes('evening') ? '#FFF' : colors.text}>
-                Evening
+                {t('time.evening')}
               </Text>
               {selectedRoutine.includes('evening') && <Check size={16} color="#FFF" style={{ marginLeft: 8 }} />}
             </XStack>
@@ -599,7 +602,7 @@ export default function AddProductScreen() {
               elevation={10}
             >
               <XStack alignItems="center" justifyContent="space-between" marginBottom={20}>
-                <Text fontSize={18} fontWeight="700" color={colors.text}>Start Date</Text>
+                <Text fontSize={18} fontWeight="700" color={colors.text}>{t('add.startDate')}</Text>
                 <YStack
                   paddingHorizontal={16}
                   paddingVertical={8}
@@ -607,7 +610,7 @@ export default function AddProductScreen() {
                   backgroundColor={colors.tint}
                   onPress={() => setShowDatePicker(false)}
                 >
-                  <Text fontSize={14} fontWeight="600" color="#FFFFFF">Done</Text>
+                  <Text fontSize={14} fontWeight="600" color="#FFFFFF">{t('common.done')}</Text>
                 </YStack>
               </XStack>
 
@@ -621,7 +624,7 @@ export default function AddProductScreen() {
                   <ChevronLeft size={20} color={colors.text} />
                 </YStack>
                 <Text fontSize={16} fontWeight="600" color={colors.text}>
-                  {format(calendarViewMonth, 'MMMM yyyy')}
+                  {formatDate(calendarViewMonth, 'monthYear')}
                 </Text>
                 <YStack
                   padding={8}
@@ -651,7 +654,7 @@ export default function AddProductScreen() {
                     setCalendarViewMonth(new Date());
                   }}
                 >
-                  <Text fontSize={13} fontWeight="600" color={colors.tint}>Today</Text>
+                  <Text fontSize={13} fontWeight="600" color={colors.tint}>{t('common.today')}</Text>
                 </YStack>
               </XStack>
             </YStack>
@@ -678,7 +681,7 @@ export default function AddProductScreen() {
               elevation={10}
             >
               <XStack alignItems="center" justifyContent="space-between" marginBottom={20}>
-                <Text fontSize={18} fontWeight="700" color={colors.text}>End Date</Text>
+                <Text fontSize={18} fontWeight="700" color={colors.text}>{t('add.endDate')}</Text>
                 <YStack
                   paddingHorizontal={16}
                   paddingVertical={8}
@@ -686,7 +689,7 @@ export default function AddProductScreen() {
                   backgroundColor={colors.tint}
                   onPress={() => setShowEndDatePicker(false)}
                 >
-                  <Text fontSize={14} fontWeight="600" color="#FFFFFF">Done</Text>
+                  <Text fontSize={14} fontWeight="600" color="#FFFFFF">{t('common.done')}</Text>
                 </YStack>
               </XStack>
 
@@ -700,7 +703,7 @@ export default function AddProductScreen() {
                   <ChevronLeft size={20} color={colors.text} />
                 </YStack>
                 <Text fontSize={16} fontWeight="600" color={colors.text}>
-                  {format(endCalendarViewMonth, 'MMMM yyyy')}
+                  {formatDate(endCalendarViewMonth, 'monthYear')}
                 </Text>
                 <YStack
                   padding={8}
