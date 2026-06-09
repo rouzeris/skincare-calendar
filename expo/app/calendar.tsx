@@ -113,7 +113,7 @@ export default function CalendarScreen() {
           {WEEKDAY_INDEXES.map((dayIndex) => (
             <YStack key={dayIndex} flex={1} alignItems="center" paddingVertical={8}>
               <Text fontSize={12} fontWeight="600" color={colors.subtext}>
-                {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort').charAt(0)}
+                {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort')}
               </Text>
             </YStack>
           ))}

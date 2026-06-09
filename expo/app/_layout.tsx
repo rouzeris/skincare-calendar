@@ -61,7 +61,13 @@ function RootNavigator() {
 
 function AppProviders() {
   const [errorKey, setErrorKey] = useState(0);
-  const { t } = useIntl();
+  const { t, isLocaleReady } = useIntl();
+
+  useEffect(() => {
+    if (isLocaleReady) {
+      void SplashScreen.hideAsync();
+    }
+  }, [isLocaleReady]);
 
   const handleErrorReset = () => {
     setErrorKey(prev => prev + 1);
@@ -92,10 +98,6 @@ function AppProviders() {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-
-  useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
 
   return (
     <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? "light"}>

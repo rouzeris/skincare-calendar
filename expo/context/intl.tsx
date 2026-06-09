@@ -9,97 +9,101 @@ type TranslationParams = Record<string, string | number>;
 const STORAGE_KEY = 'app_locale';
 const SUPPORTED_LOCALES: AppLocale[] = ['en', 'pl', 'ua'];
 
+const enTranslations = {
+  'add.addPhoto': 'Add Photo',
+  'add.brand': 'Brand',
+  'add.brandPlaceholder': 'e.g. The Ordinary',
+  'add.daily': 'Daily',
+  'add.endDate': 'End Date',
+  'add.frequency': 'Frequency',
+  'add.indefinite': 'Indefinite',
+  'add.interval': 'Interval',
+  'add.noEndDate': 'No end date',
+  'add.paoMonths': 'PAO (Months)',
+  'add.productName': 'Product Name',
+  'add.productNamePlaceholder': 'e.g. Niacinamide 10% + Zinc 1%',
+  'add.repeatEvery': 'Repeat every',
+  'add.routineTime': 'Routine Time',
+  'add.selectDate': 'Select date',
+  'add.specificDays': 'Specific Days',
+  'add.startDate': 'Start Date',
+  'add.title': 'Add Product',
+  'calendar.noRoutineData': 'No routine data for {date}',
+  'calendar.noProductsUsed': 'No products used on this day',
+  'calendar.title': 'Usage Calendar',
+  'common.cancel': 'Cancel',
+  'common.days': 'days',
+  'common.delete': 'Delete',
+  'common.done': 'Done',
+  'common.oops': 'Oops!',
+  'common.save': 'Save',
+  'common.today': 'Today',
+  'common.version': 'Version {version}',
+  'error.message': 'Something went wrong',
+  'error.subtitle': 'An unexpected error occurred',
+  'error.tryAgain': 'Try Again',
+  'error.restart': 'If this keeps happening, try restarting the app',
+  'ingredients.compatibleBody': 'Your products are compatible with each other',
+  'ingredients.compatibleTitle': 'No Conflicts Found',
+  'ingredients.conflictsDetected': '{count} ingredient conflicts detected',
+  'ingredients.highSeverity': '{count} high severity',
+  'ingredients.reviewCombinations': 'Review your product combinations',
+  'ingredients.showLess': 'Show Less',
+  'ingredients.showMore': 'Show {count} More',
+  'language.en': 'English',
+  'language.pl': 'Polski',
+  'language.ua': 'Українська',
+  'language.section': 'Language',
+  'notFound.body': "This screen doesn't exist.",
+  'notFound.home': 'Go to home screen!',
+  'routine.emptyBody': 'Add products to your shelf and assign them to your routine to get started.',
+  'routine.emptyTitle': 'Your routine is empty.',
+  'routine.evening': 'Evening',
+  'routine.goToShelf': 'Go to Shelf',
+  'routine.morning': 'Morning',
+  'routine.title': 'My Routine',
+  'settings.appearance': 'Appearance',
+  'settings.auto': 'Auto',
+  'settings.contactSupport': 'Contact Support',
+  'settings.deleteAllData': 'Delete All Data',
+  'settings.deleteAllDataBody': 'This will permanently delete all your products, routines, and history. This action cannot be undone.',
+  'settings.detailedExplanations': 'Detailed Explanations',
+  'settings.detailedExplanationsBody': 'Show why ingredients conflict. Warnings are always visible.',
+  'settings.developer': 'Developer',
+  'settings.exportData': 'Export Data',
+  'settings.exportFailed': 'Export Failed',
+  'settings.exportFailedBody': 'Could not export your data. Please try again.',
+  'settings.ingredientAnalysis': 'Ingredient Analysis',
+  'settings.legal': 'Legal',
+  'settings.dark': 'Dark',
+  'settings.light': 'Light',
+  'settings.privacyPolicy': 'Privacy Policy',
+  'settings.productsCount': '{count} products',
+  'settings.rateApp': 'Rate the App',
+  'settings.rateBody': 'Thank you for your interest! Rating is available on mobile apps.',
+  'settings.rateTitle': 'Rate Us',
+  'settings.support': 'Support',
+  'settings.supportSubject': 'Skincare Calendar Support',
+  'settings.terms': 'Terms of Service',
+  'shelf.addFirst': 'Add First Product',
+  'shelf.daysLeft': '{count} days left',
+  'shelf.emptyBody': 'Add your skincare products to track expiration dates and build your routine.',
+  'shelf.emptyTitle': 'Your shelf is empty',
+  'shelf.expired': 'Expired {count} days ago',
+  'shelf.notOpened': 'Not opened yet',
+  'shelf.title': 'My Shelf',
+  'tabs.routine': 'Routine',
+  'tabs.settings': 'Settings',
+  'tabs.shelf': 'Shelf',
+  'time.evening': 'Evening',
+  'time.morning': 'Morning',
+  'unknownProduct': 'Unknown Product',
+} as const;
+
+export type TranslationKey = keyof typeof enTranslations;
+
 const translations = {
-  en: {
-    'add.addPhoto': 'Add Photo',
-    'add.brand': 'Brand',
-    'add.brandPlaceholder': 'e.g. The Ordinary',
-    'add.daily': 'Daily',
-    'add.endDate': 'End Date',
-    'add.frequency': 'Frequency',
-    'add.indefinite': 'Indefinite',
-    'add.interval': 'Interval',
-    'add.noEndDate': 'No end date',
-    'add.paoMonths': 'PAO (Months)',
-    'add.productName': 'Product Name',
-    'add.productNamePlaceholder': 'e.g. Niacinamide 10% + Zinc 1%',
-    'add.repeatEvery': 'Repeat every',
-    'add.routineTime': 'Routine Time',
-    'add.selectDate': 'Select date',
-    'add.specificDays': 'Specific Days',
-    'add.startDate': 'Start Date',
-    'add.title': 'Add Product',
-    'calendar.noRoutineData': 'No routine data for {date}',
-    'calendar.noProductsUsed': 'No products used on this day',
-    'calendar.title': 'Usage Calendar',
-    'common.cancel': 'Cancel',
-    'common.days': 'days',
-    'common.delete': 'Delete',
-    'common.done': 'Done',
-    'common.oops': 'Oops!',
-    'common.save': 'Save',
-    'common.today': 'Today',
-    'common.version': 'Version {version}',
-    'error.message': 'Something went wrong',
-    'error.subtitle': 'An unexpected error occurred',
-    'error.tryAgain': 'Try Again',
-    'error.restart': 'If this keeps happening, try restarting the app',
-    'ingredients.compatibleBody': 'Your products are compatible with each other',
-    'ingredients.compatibleTitle': 'No Conflicts Found',
-    'ingredients.conflictsDetected': '{count} ingredient conflicts detected',
-    'ingredients.highSeverity': '{count} high severity',
-    'ingredients.reviewCombinations': 'Review your product combinations',
-    'ingredients.showLess': 'Show Less',
-    'ingredients.showMore': 'Show {count} More',
-    'language.en': 'English',
-    'language.pl': 'Polski',
-    'language.ua': 'Українська',
-    'language.section': 'Language',
-    'notFound.body': "This screen doesn't exist.",
-    'notFound.home': 'Go to home screen!',
-    'routine.emptyBody': 'Add products to your shelf and assign them to your routine to get started.',
-    'routine.emptyTitle': 'Your routine is empty.',
-    'routine.evening': 'Evening',
-    'routine.goToShelf': 'Go to Shelf',
-    'routine.morning': 'Morning',
-    'routine.title': 'My Routine',
-    'settings.appearance': 'Appearance',
-    'settings.auto': 'Auto',
-    'settings.contactSupport': 'Contact Support',
-    'settings.deleteAllData': 'Delete All Data',
-    'settings.deleteAllDataBody': 'This will permanently delete all your products, routines, and history. This action cannot be undone.',
-    'settings.detailedExplanations': 'Detailed Explanations',
-    'settings.detailedExplanationsBody': 'Show why ingredients conflict. Warnings are always visible.',
-    'settings.developer': 'Developer',
-    'settings.exportData': 'Export Data',
-    'settings.exportFailed': 'Export Failed',
-    'settings.exportFailedBody': 'Could not export your data. Please try again.',
-    'settings.ingredientAnalysis': 'Ingredient Analysis',
-    'settings.legal': 'Legal',
-    'settings.dark': 'Dark',
-    'settings.light': 'Light',
-    'settings.privacyPolicy': 'Privacy Policy',
-    'settings.productsCount': '{count} products',
-    'settings.rateApp': 'Rate the App',
-    'settings.rateBody': 'Thank you for your interest! Rating is available on mobile apps.',
-    'settings.rateTitle': 'Rate Us',
-    'settings.support': 'Support',
-    'settings.supportSubject': 'Skincare Calendar Support',
-    'settings.terms': 'Terms of Service',
-    'shelf.addFirst': 'Add First Product',
-    'shelf.daysLeft': '{count} days left',
-    'shelf.emptyBody': 'Add your skincare products to track expiration dates and build your routine.',
-    'shelf.emptyTitle': 'Your shelf is empty',
-    'shelf.expired': 'Expired {count} days ago',
-    'shelf.notOpened': 'Not opened yet',
-    'shelf.title': 'My Shelf',
-    'tabs.routine': 'Routine',
-    'tabs.settings': 'Settings',
-    'tabs.shelf': 'Shelf',
-    'time.evening': 'Evening',
-    'time.morning': 'Morning',
-    'unknownProduct': 'Unknown Product',
-  },
+  en: enTranslations,
   pl: {
     'add.addPhoto': 'Dodaj zdjęcie',
     'add.brand': 'Marka',
@@ -280,7 +284,7 @@ const translations = {
     'time.morning': 'Ранок',
     'unknownProduct': 'Невідомий продукт',
   },
-} satisfies Record<AppLocale, Record<string, string>>;
+} satisfies Record<AppLocale, Record<TranslationKey, string>>;
 
 const intlLocaleTags = {
   en: 'en-US',
@@ -296,7 +300,6 @@ const dateFormatOptions = {
   weekdayShort: { weekday: 'short' },
 } satisfies Record<string, Intl.DateTimeFormatOptions>;
 
-export type TranslationKey = keyof typeof translations.en;
 export type DateFormatKey = keyof typeof dateFormatOptions;
 
 const normalizeLocale = (value?: string | null): AppLocale | null => {
@@ -327,19 +330,31 @@ const interpolate = (template: string, params?: TranslationParams) => {
 
 export const [IntlProvider, useIntl] = createContextHook(() => {
   const [locale, setLocaleState] = useState<AppLocale>(getSystemLocale);
+  const [isLocaleReady, setIsLocaleReady] = useState(false);
 
   useEffect(() => {
-    void AsyncStorage.getItem(STORAGE_KEY).then((storedLocale) => {
-      const normalizedLocale = normalizeLocale(storedLocale);
-      if (normalizedLocale) {
-        setLocaleState(normalizedLocale);
+    void (async () => {
+      try {
+        const storedLocale = await AsyncStorage.getItem(STORAGE_KEY);
+        const normalizedLocale = normalizeLocale(storedLocale);
+        if (normalizedLocale) {
+          setLocaleState(normalizedLocale);
+        }
+      } catch (err) {
+        console.error('Failed to read locale from AsyncStorage', err);
+      } finally {
+        setIsLocaleReady(true);
       }
-    });
+    })();
   }, []);
 
   const setLocale = useCallback(async (nextLocale: AppLocale) => {
     setLocaleState(nextLocale);
-    await AsyncStorage.setItem(STORAGE_KEY, nextLocale);
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, nextLocale);
+    } catch (err) {
+      console.error('Failed to save locale to AsyncStorage', err);
+    }
   }, []);
 
   const t = useCallback((key: TranslationKey, params?: TranslationParams) => {
@@ -360,9 +375,10 @@ export const [IntlProvider, useIntl] = createContextHook(() => {
 
   return useMemo(() => ({
     locale,
+    isLocaleReady,
     locales: SUPPORTED_LOCALES,
     setLocale,
     t,
     formatDate,
-  }), [locale, setLocale, t, formatDate]);
+  }), [locale, isLocaleReady, setLocale, t, formatDate]);
 });

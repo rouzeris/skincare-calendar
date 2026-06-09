@@ -162,9 +162,9 @@ export default function AddProductScreen() {
     rows.push(
       <XStack key="header" justifyContent="space-between" marginBottom={8}>
         {WEEKDAY_INDEXES.map((dayIndex) => (
-          <YStack key={dayIndex} width={38} height={28} justifyContent="center" alignItems="center">
+          <YStack key={dayIndex} width={44} height={28} justifyContent="center" alignItems="center">
             <Text fontSize={12} fontWeight="600" color={colors.subtext}>
-              {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort').charAt(0)}
+              {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort')}
             </Text>
           </YStack>
         ))}
@@ -173,7 +173,7 @@ export default function AddProductScreen() {
 
     const cells: React.ReactNode[] = [];
     for (let i = 0; i < startPadding; i++) {
-      cells.push(<YStack key={`pad-${i}`} width={38} height={38} />);
+      cells.push(<YStack key={`pad-${i}`} width={44} height={38} />);
     }
 
     days.forEach((day) => {
@@ -184,7 +184,7 @@ export default function AddProductScreen() {
       cells.push(
         <YStack
           key={day.toISOString()}
-          width={38}
+          width={44}
           height={38}
           borderRadius={19}
           justifyContent="center"
@@ -209,7 +209,7 @@ export default function AddProductScreen() {
     const totalCells = cells.length;
     const remainingCells = (7 - (totalCells % 7)) % 7;
     for (let i = 0; i < remainingCells; i++) {
-      cells.push(<YStack key={`end-pad-${i}`} width={38} height={38} />);
+      cells.push(<YStack key={`end-pad-${i}`} width={44} height={38} />);
     }
 
     for (let i = 0; i < cells.length; i += 7) {
@@ -533,7 +533,7 @@ export default function AddProductScreen() {
                   onPress={() => toggleWeekDay(dayIndex)}
                 >
                   <Text fontSize={12} fontWeight="600" color={selectedWeekDays.includes(dayIndex) ? '#FFF' : colors.subtext}>
-                    {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort').charAt(0)}
+                    {formatDate(new Date(2020, 5, 7 + dayIndex), 'weekdayShort')}
                   </Text>
                 </YStack>
               ))}
