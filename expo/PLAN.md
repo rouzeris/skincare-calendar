@@ -3,7 +3,7 @@
 ## Current State
 
 **Version:** 1.0.0
-**Stack:** Expo 54, React Native 0.81, Tamagui, TypeScript, RevenueCat
+**Stack:** Expo 54, React Native 0.81, Tamagui, TypeScript
 **Status:** Core features complete, needs polish for production release
 
 ### What Works
@@ -11,14 +11,30 @@
 - Product shelf with expiration tracking (PAO calculation)
 - Add product flow with frequency options (daily, specific days, interval)
 - Theme switching (light/dark/auto)
-- Basic RevenueCat integration structure
 - Cross-platform support (iOS, Android, Web)
+- Playwright E2E tests (11 passing, web)
 
 ### What's Missing
-- RevenueCat not testable (needs EAS build)
-- No tests
+- Subscriptions (RevenueCat removed — re-add if monetizing)
 - Settings screen incomplete
 - App Store metadata missing
+
+---
+
+## TODO — cleanup po migracji z Rork (2026-05-31)
+
+Rork i RevenueCat usunięte; appka startuje na czystym Expo (`bun start` / `bun start-web`).
+Zostały artefakty i drobiazgi:
+
+- [ ] Rebranding identyfikatorów na cera.love (świadomie nieruszane — wpływa na podpisywanie/store/deep linki):
+  - [ ] `app.json` `scheme: "rork-app"`
+  - [ ] `app.json` `ios.bundleIdentifier: app.rork.kalendarz-kosmetykow-twarz`
+  - [ ] `app.json` `android.package: app.rork.kalendarz_kosmetykow_twarz`
+  - [ ] android market URL w `app/(tabs)/settings/index.tsx` (`market://details?id=app.rork...`) — musi pasować do `android.package`
+  - [ ] `README.md` — cała dokumentacja Rorka
+- [ ] Hostować strony privacy/terms pod `cera.love/privacy` i `cera.love/terms` (już linkowane w ustawieniach)
+- [ ] `bun test` nie działa (Bun próbuje sam uruchamiać pliki Playwrighta) — naprawić skrypt `test` lub udokumentować `bunx playwright test`
+- [ ] Deprecated `ImagePicker.MediaTypeOptions` → `ImagePicker.MediaType` (warn przy starcie)
 
 ---
 
