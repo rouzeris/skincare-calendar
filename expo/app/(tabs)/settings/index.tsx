@@ -17,7 +17,6 @@ import {
   Download,
   Trash2,
   FlaskConical,
-  Globe2,
   Check,
 } from 'lucide-react-native';
 import * as WebBrowser from 'expo-web-browser';
@@ -33,6 +32,11 @@ const LANGUAGE_LABEL_KEYS = {
   pl: 'language.pl',
   ua: 'language.ua',
 } as const satisfies Record<AppLocale, Parameters<ReturnType<typeof useIntl>['t']>[0]>;
+const LANGUAGE_FLAGS = {
+  en: '🇬🇧',
+  pl: '🇵🇱',
+  ua: '🇺🇦',
+} as const satisfies Record<AppLocale, string>;
 
 // TODO: Replace with actual feature flag from backend/auth system
 const useIsDeveloper = () => {
@@ -183,8 +187,8 @@ export default function SettingsScreen() {
         backgroundColor={selected ? colors.border : colors.card}
         onPress={() => void setLocale(language)}
       >
-        <YStack marginRight={12}>
-          <Globe2 size={20} color={selected ? colors.tint : colors.text} />
+        <YStack width={24} marginRight={12} alignItems="center">
+          <Text fontSize={20}>{LANGUAGE_FLAGS[language]}</Text>
         </YStack>
         <Text
           flex={1}
