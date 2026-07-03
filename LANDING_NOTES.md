@@ -93,7 +93,7 @@ Direction picked: scroll-day choreography + playable ritual widget (no WebGL sha
 
 - Leaf shadows drift up + dim as the hero scrolls away (scroll-driven, `@supports` guarded).
 - Lamp glow in the dusk section drifts with scroll.
-- Night CTA: the phone **falls asleep** — light theme crossfades to dark (screen bg + screenshot) as it enters the viewport; scrubbing back wakes it.
+- ~~Night CTA sleeping phone~~ — cut same day: third device frame on one page was redundant. The moon glow + copy carry the night scene.
 - Rhythm viz is now `RhythmPlayground.tsx`: pointer trail blooms dots with staggered glow, tapping a day opens a routine-preview card (`startViewTransition` + `@starting-style`, Esc closes). SSR'd so dots render before JS.
 - All effects transform/opacity/bg-color only, reduced-motion safe, static fallbacks.
 
