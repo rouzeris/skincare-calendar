@@ -22,6 +22,7 @@ import {
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQueryClient } from "@tanstack/react-query";
 
 const PRIVACY_POLICY_URL = "https://cera.love/privacy";
 const TERMS_URL = "https://cera.love/terms";
@@ -55,6 +56,7 @@ export default function SettingsScreen() {
   const { locale, locales, setLocale, t } = useIntl();
   const { products } = useCosmetics();
   const { routineConfig, routineHistory } = useRoutine();
+  const queryClient = useQueryClient();
   const [, setIsExporting] = useState(false);
   const isDeveloper = useIsDeveloper();
 
@@ -134,9 +136,10 @@ export default function SettingsScreen() {
             "routine_config",
             "routine_history",
           ]);
-          // Reload the app
           if (Platform.OS === "web") {
             window.location.reload();
+          } else {
+            await queryClient.resetQueries();
           }
         },
       },

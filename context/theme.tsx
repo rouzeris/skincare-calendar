@@ -18,28 +18,35 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
   });
 
   useEffect(() => {
-    void Promise.all([
-      AsyncStorage.getItem("themeMode"),
-      AsyncStorage.getItem("appSettings"),
-    ]).then(([storedTheme, storedSettings]) => {
-      if (
-        storedTheme &&
-        (storedTheme === "light" ||
-          storedTheme === "dark" ||
-          storedTheme === "auto")
-      ) {
-        setThemeMode(storedTheme as ThemeMode);
-      }
-      if (storedSettings) {
-        try {
-          const parsed = JSON.parse(storedSettings) as Partial<AppSettings>;
-          setAppSettingsState((prev) => ({ ...prev, ...parsed }));
-        } catch (e) {
-          console.log("[Theme] failed to parse appSettings", e);
+    const load = async () => {
+      try {
+        const [storedTheme, storedSettings] = await Promise.all([
+          AsyncStorage.getItem("themeMode"),
+          AsyncStorage.getItem("appSettings"),
+        ]);
+        if (
+          storedTheme &&
+          (storedTheme === "light" ||
+            storedTheme === "dark" ||
+            storedTheme === "auto")
+        ) {
+          setThemeMode(storedTheme as ThemeMode);
         }
+        if (storedSettings) {
+          try {
+            const parsed = JSON.parse(storedSettings) as Partial<AppSettings>;
+            setAppSettingsState((prev) => ({ ...prev, ...parsed }));
+          } catch (e) {
+            console.log("[Theme] failed to parse appSettings", e);
+          }
+        }
+      } catch (e) {
+        console.error("[Theme] failed to load stored settings", e);
+      } finally {
+        setIsLoaded(true);
       }
-      setIsLoaded(true);
-    });
+    };
+    void load();
   }, []);
 
   const setTheme = useCallback(async (mode: ThemeMode) => {

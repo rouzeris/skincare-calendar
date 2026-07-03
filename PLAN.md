@@ -25,7 +25,7 @@ hooks, mise.toml, GitHub Actions CI (closes #9).
 
 ### 1. Domain & identity — blocks store submission and legal
 
-- [ ] Buy domain (#1): cera.love vs cera.quest — decide
+- [x] Buy domain (#1): **cera.love** (bought 2026-07-03)
 - [ ] Rebrand identifiers **before first store upload** (irreversible after):
       `app.json` `scheme`, `ios.bundleIdentifier`, `android.package`,
       market URL in `app/(tabs)/settings/index.tsx`, README
@@ -81,6 +81,5 @@ hooks, mise.toml, GitHub Actions CI (closes #9).
 
 ## Open questions
 
-- Domain: cera.love vs cera.quest
 - Monetization: free forever vs subscription (determines RevenueCat return)
 - Archiwum moderation: who approves user-submitted products?
