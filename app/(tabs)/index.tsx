@@ -1,16 +1,22 @@
-import React, { useState, useMemo } from 'react';
-import { ScrollView as RNScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { YStack, XStack, Text, ScrollView } from 'tamagui';
-import { format, addDays, isSameDay, subDays, differenceInDays } from 'date-fns';
-import { Check, Sun, Moon, CalendarDays } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import React, { useState, useMemo } from "react";
+import { ScrollView as RNScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { YStack, XStack, Text, ScrollView } from "tamagui";
+import {
+  format,
+  addDays,
+  isSameDay,
+  subDays,
+  differenceInDays,
+} from "date-fns";
+import { Check, Sun, Moon, CalendarDays } from "lucide-react-native";
+import { useRouter } from "expo-router";
 
-import { useRoutine, TimeOfDay } from '@/context/routine';
-import { useCosmetics } from '@/context/cosmetics';
-import { useTheme } from '@/context/theme';
-import { useIntl } from '@/context/intl';
-import { PageTitleBar } from '@/components/PageTitleBar';
+import { useRoutine, TimeOfDay } from "@/context/routine";
+import { useCosmetics } from "@/context/cosmetics";
+import { useTheme } from "@/context/theme";
+import { useIntl } from "@/context/intl";
+import { PageTitleBar } from "@/components/PageTitleBar";
 
 export default function RoutineScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -33,15 +39,17 @@ export default function RoutineScreen() {
       const product = getProductDetails(id);
       if (!product) return false;
 
-      if (!product.frequency || product.frequency.type === 'daily') return true;
+      if (!product.frequency || product.frequency.type === "daily") return true;
 
-      if (product.frequency.type === 'weekly') {
+      if (product.frequency.type === "weekly") {
         const currentDay = selectedDate.getDay();
         return product.frequency.daysOfWeek.includes(currentDay);
       }
 
-      if (product.frequency.type === 'interval') {
-        const startDate = product.openedAt ? new Date(product.openedAt) : new Date();
+      if (product.frequency.type === "interval") {
+        const startDate = product.openedAt
+          ? new Date(product.openedAt)
+          : new Date();
         const diff = differenceInDays(selectedDate, startDate);
 
         if (diff < 0) return false;
@@ -54,20 +62,25 @@ export default function RoutineScreen() {
   };
 
   const isCompleted = (productId: string, timeOfDay: TimeOfDay) => {
-    const dateKey = format(selectedDate, 'yyyy-MM-dd');
+    const dateKey = format(selectedDate, "yyyy-MM-dd");
     const dayHistory = routineHistory[dateKey];
     return dayHistory?.[timeOfDay]?.includes(productId) ?? false;
   };
 
   const handleToggle = (productId: string, timeOfDay: TimeOfDay) => {
     toggleCompletion({
-      date: format(selectedDate, 'yyyy-MM-dd'),
+      date: format(selectedDate, "yyyy-MM-dd"),
       timeOfDay,
       productId,
     });
   };
 
-  const renderRoutineSection = (title: string, icon: React.ReactNode, productIds: string[], timeOfDay: TimeOfDay) => {
+  const renderRoutineSection = (
+    title: string,
+    icon: React.ReactNode,
+    productIds: string[],
+    timeOfDay: TimeOfDay,
+  ) => {
     const visibleProductIds = getVisibleProducts(productIds);
     if (visibleProductIds.length === 0) return null;
 
@@ -75,7 +88,9 @@ export default function RoutineScreen() {
       <YStack marginBottom={30}>
         <XStack alignItems="center" marginBottom={15}>
           <YStack marginRight={8}>{icon}</YStack>
-          <Text fontSize={18} fontWeight="600" color={colors.text}>{title}</Text>
+          <Text fontSize={18} fontWeight="600" color={colors.text}>
+            {title}
+          </Text>
         </XStack>
         <YStack>
           {visibleProductIds.map((id, index) => {
@@ -111,7 +126,7 @@ export default function RoutineScreen() {
                       letterSpacing={0.5}
                       color={colors.tint}
                       opacity={completed ? 0.5 : 1}
-                      textDecorationLine={completed ? 'line-through' : 'none'}
+                      textDecorationLine={completed ? "line-through" : "none"}
                     >
                       {product.brand}
                     </Text>
@@ -120,7 +135,7 @@ export default function RoutineScreen() {
                       fontWeight="500"
                       color={colors.text}
                       opacity={completed ? 0.5 : 1}
-                      textDecorationLine={completed ? 'line-through' : 'none'}
+                      textDecorationLine={completed ? "line-through" : "none"}
                     >
                       {product.name}
                     </Text>
@@ -133,9 +148,11 @@ export default function RoutineScreen() {
                     justifyContent="center"
                     alignItems="center"
                     borderColor={completed ? colors.tint : colors.border}
-                    backgroundColor={completed ? colors.tint : 'transparent'}
+                    backgroundColor={completed ? colors.tint : "transparent"}
                   >
-                    {completed && <Check size={14} color="#FFF" strokeWidth={3} />}
+                    {completed && (
+                      <Check size={14} color="#FFF" strokeWidth={3} />
+                    )}
                   </YStack>
                 </XStack>
               </YStack>
@@ -146,12 +163,16 @@ export default function RoutineScreen() {
     );
   };
 
-  const isEmpty = routineConfig.morning.length === 0 && routineConfig.evening.length === 0;
+  const isEmpty =
+    routineConfig.morning.length === 0 && routineConfig.evening.length === 0;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={["top"]}
+    >
       <PageTitleBar
-        title={t('routine.title')}
+        title={t("routine.title")}
         rightElement={
           <YStack
             width={40}
@@ -160,7 +181,7 @@ export default function RoutineScreen() {
             justifyContent="center"
             alignItems="center"
             backgroundColor={colors.card}
-            onPress={() => router.push('/calendar')}
+            onPress={() => router.push("/calendar")}
           >
             <CalendarDays size={20} color={colors.tint} />
           </YStack>
@@ -186,7 +207,7 @@ export default function RoutineScreen() {
                 alignItems="center"
                 marginHorizontal={5}
                 borderRadius={16}
-                backgroundColor={isSelected ? colors.tint : 'transparent'}
+                backgroundColor={isSelected ? colors.tint : "transparent"}
                 onPress={() => setSelectedDate(date)}
               >
                 <Text
@@ -194,9 +215,9 @@ export default function RoutineScreen() {
                   marginBottom={4}
                   fontWeight="500"
                   textTransform="uppercase"
-                  color={isSelected ? '#FFFFFF' : colors.subtext}
+                  color={isSelected ? "#FFFFFF" : colors.subtext}
                 >
-                  {formatDate(date, 'weekdayShort')}
+                  {formatDate(date, "weekdayShort")}
                 </Text>
                 <YStack
                   width={32}
@@ -204,14 +225,16 @@ export default function RoutineScreen() {
                   justifyContent="center"
                   alignItems="center"
                   borderRadius={16}
-                  backgroundColor={isToday && !isSelected ? colors.border : 'transparent'}
+                  backgroundColor={
+                    isToday && !isSelected ? colors.border : "transparent"
+                  }
                 >
                   <Text
                     fontSize={16}
                     fontWeight="600"
-                    color={isSelected ? '#FFFFFF' : colors.text}
+                    color={isSelected ? "#FFFFFF" : colors.text}
                   >
-                    {format(date, 'd')}
+                    {format(date, "d")}
                   </Text>
                 </YStack>
               </YStack>
@@ -220,11 +243,23 @@ export default function RoutineScreen() {
         </RNScrollView>
       </YStack>
 
-      <ScrollView flex={1} contentContainerStyle={{ padding: 20, paddingTop: 10, paddingBottom: 40 }}>
+      <ScrollView
+        flex={1}
+        contentContainerStyle={{
+          padding: 20,
+          paddingTop: 10,
+          paddingBottom: 40,
+        }}
+      >
         {isEmpty ? (
           <YStack alignItems="center" justifyContent="center" paddingTop={60}>
-            <Text fontSize={18} fontWeight="600" marginBottom={8} color={colors.text}>
-              {t('routine.emptyTitle')}
+            <Text
+              fontSize={18}
+              fontWeight="600"
+              marginBottom={8}
+              color={colors.text}
+            >
+              {t("routine.emptyTitle")}
             </Text>
             <Text
               fontSize={14}
@@ -233,29 +268,40 @@ export default function RoutineScreen() {
               paddingHorizontal={40}
               color={colors.subtext}
             >
-              {t('routine.emptyBody')}
+              {t("routine.emptyBody")}
             </Text>
             <YStack
               paddingHorizontal={24}
               paddingVertical={12}
               borderRadius={24}
               backgroundColor={colors.tint}
-              onPress={() => router.push('/(tabs)/shelf')}
+              onPress={() => router.push("/(tabs)/shelf")}
             >
               <Text color="#FFFFFF" fontWeight="600" fontSize={16}>
-                {t('routine.goToShelf')}
+                {t("routine.goToShelf")}
               </Text>
             </YStack>
           </YStack>
         ) : (
           <>
-            {renderRoutineSection(t('routine.morning'), <Sun size={20} color={colors.tint} />, routineConfig.morning, 'morning')}
-            {renderRoutineSection(t('routine.evening'), <Moon size={20} color={colors.text} />, routineConfig.evening, 'evening')}
+            {renderRoutineSection(
+              t("routine.morning"),
+              <Sun size={20} color={colors.tint} />,
+              routineConfig.morning,
+              "morning",
+            )}
+            {renderRoutineSection(
+              t("routine.evening"),
+              <Moon size={20} color={colors.text} />,
+              routineConfig.evening,
+              "evening",
+            )}
 
-            {(routineConfig.morning.length > 0 || routineConfig.evening.length > 0) && (
+            {(routineConfig.morning.length > 0 ||
+              routineConfig.evening.length > 0) && (
               <YStack marginTop={20} alignItems="center">
                 <Text fontSize={13} color={colors.subtext}>
-                  {formatDate(selectedDate, 'longDayMonth')}
+                  {formatDate(selectedDate, "longDayMonth")}
                 </Text>
               </YStack>
             )}

@@ -1,11 +1,11 @@
-import createContextHook from '@nkzw/create-context-hook';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import createContextHook from "@nkzw/create-context-hook";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export type Frequency = 
-  | { type: 'daily' }
-  | { type: 'interval'; days: number } // Every X days
-  | { type: 'weekly'; daysOfWeek: number[] }; // 0=Sun, 1=Mon, etc.
+export type Frequency =
+  | { type: "daily" }
+  | { type: "interval"; days: number } // Every X days
+  | { type: "weekly"; daysOfWeek: number[] }; // 0=Sun, 1=Mon, etc.
 
 export type Product = {
   id: string;
@@ -19,13 +19,13 @@ export type Product = {
   frequency?: Frequency;
 };
 
-const STORAGE_KEY = 'cosmetics_shelf';
+const STORAGE_KEY = "cosmetics_shelf";
 
 export const [CosmeticsProvider, useCosmetics] = createContextHook(() => {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['cosmetics'],
+    queryKey: ["cosmetics"],
     queryFn: async () => {
       const stored = await AsyncStorage.getItem(STORAGE_KEY);
       return stored ? (JSON.parse(stored) as Product[]) : [];
@@ -40,7 +40,7 @@ export const [CosmeticsProvider, useCosmetics] = createContextHook(() => {
       return updated;
     },
     onSuccess: (updated) => {
-      queryClient.setQueryData(['cosmetics'], updated);
+      queryClient.setQueryData(["cosmetics"], updated);
     },
   });
 
@@ -52,7 +52,7 @@ export const [CosmeticsProvider, useCosmetics] = createContextHook(() => {
       return updated;
     },
     onSuccess: (updated) => {
-      queryClient.setQueryData(['cosmetics'], updated);
+      queryClient.setQueryData(["cosmetics"], updated);
     },
   });
 

@@ -24,8 +24,10 @@ function RootNavigator() {
   const { t } = useIntl();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+    <GestureHandlerRootView
+      style={{ flex: 1, backgroundColor: colors.background }}
+    >
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <Stack
         screenOptions={{
           headerStyle: {
@@ -41,19 +43,19 @@ function RootNavigator() {
           name="add-product"
           options={{
             presentation: "modal",
-            title: t('add.title'),
-            headerShown: false
+            title: t("add.title"),
+            headerShown: false,
           }}
         />
         <Stack.Screen
           name="calendar"
           options={{
             presentation: "modal",
-            title: t('calendar.title'),
-            headerShown: false
+            title: t("calendar.title"),
+            headerShown: false,
           }}
         />
-        <Stack.Screen name="+not-found" options={{ title: t('common.oops') }} />
+        <Stack.Screen name="+not-found" options={{ title: t("common.oops") }} />
       </Stack>
     </GestureHandlerRootView>
   );
@@ -70,19 +72,26 @@ function AppProviders() {
   }, [isLocaleReady]);
 
   const handleErrorReset = () => {
-    setErrorKey(prev => prev + 1);
+    setErrorKey((prev) => prev + 1);
   };
 
-  const errorLabels = useMemo(() => ({
-    title: t('common.oops'),
-    message: t('error.message'),
-    unexpected: t('error.subtitle'),
-    tryAgain: t('error.tryAgain'),
-    restart: t('error.restart'),
-  }), [t]);
+  const errorLabels = useMemo(
+    () => ({
+      title: t("common.oops"),
+      message: t("error.message"),
+      unexpected: t("error.subtitle"),
+      tryAgain: t("error.tryAgain"),
+      restart: t("error.restart"),
+    }),
+    [t],
+  );
 
   return (
-    <ErrorBoundary key={errorKey} onReset={handleErrorReset} labels={errorLabels}>
+    <ErrorBoundary
+      key={errorKey}
+      onReset={handleErrorReset}
+      labels={errorLabels}
+    >
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <CosmeticsProvider>
@@ -100,7 +109,10 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? "light"}>
+    <TamaguiProvider
+      config={tamaguiConfig}
+      defaultTheme={colorScheme ?? "light"}
+    >
       <IntlProvider>
         <AppProviders />
       </IntlProvider>

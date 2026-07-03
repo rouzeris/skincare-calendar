@@ -1,7 +1,7 @@
-import React, { Component, ReactNode } from 'react';
-import { Animated } from 'react-native';
-import { YStack, XStack, Text } from 'tamagui';
-import { AlertTriangle, RefreshCw } from 'lucide-react-native';
+import React, { Component, ReactNode } from "react";
+import { Animated } from "react-native";
+import { YStack, XStack, Text } from "tamagui";
+import { AlertTriangle, RefreshCw } from "lucide-react-native";
 
 interface Props {
   children: ReactNode;
@@ -34,8 +34,8 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.log('[ErrorBoundary] Caught error:', error);
-    console.log('[ErrorBoundary] Error info:', errorInfo.componentStack);
+    console.log("[ErrorBoundary] Caught error:", error);
+    console.log("[ErrorBoundary] Error info:", errorInfo.componentStack);
   }
 
   componentDidUpdate(_: Props, prevState: State) {
@@ -57,7 +57,7 @@ export class ErrorBoundary extends Component<Props, State> {
           duration: 1000,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
   };
 
@@ -69,11 +69,11 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       const labels = this.props.labels ?? {
-        title: 'Oops!',
-        message: 'Something went wrong',
-        unexpected: 'An unexpected error occurred',
-        tryAgain: 'Try Again',
-        restart: 'If this keeps happening, try restarting the app',
+        title: "Oops!",
+        message: "Something went wrong",
+        unexpected: "An unexpected error occurred",
+        tryAgain: "Try Again",
+        restart: "If this keeps happening, try restarting the app",
       };
 
       if (this.props.fallback) {
@@ -94,9 +94,9 @@ export class ErrorBoundary extends Component<Props, State> {
                 width: 100,
                 height: 100,
                 borderRadius: 50,
-                backgroundColor: '#FEE2E2',
-                justifyContent: 'center',
-                alignItems: 'center',
+                backgroundColor: "#FEE2E2",
+                justifyContent: "center",
+                alignItems: "center",
                 marginBottom: 24,
                 transform: [{ scale: this.pulseAnim }],
               }}
@@ -113,7 +113,12 @@ export class ErrorBoundary extends Component<Props, State> {
             >
               {labels.title}
             </Text>
-            <Text fontSize={18} fontWeight="500" color="#78716C" marginBottom={16}>
+            <Text
+              fontSize={18}
+              fontWeight="500"
+              color="#78716C"
+              marginBottom={16}
+            >
               {labels.message}
             </Text>
 

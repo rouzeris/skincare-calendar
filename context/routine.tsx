@@ -1,28 +1,33 @@
-import createContextHook from '@nkzw/create-context-hook';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import createContextHook from "@nkzw/create-context-hook";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export type TimeOfDay = 'morning' | 'evening';
+export type TimeOfDay = "morning" | "evening";
 
 export type RoutineConfig = {
   morning: string[]; // Product IDs
   evening: string[]; // Product IDs
 };
 
-export type RoutineHistory = Record<string, { morning: string[]; evening: string[] }>;
+export type RoutineHistory = Record<
+  string,
+  { morning: string[]; evening: string[] }
+>;
 
-const CONFIG_KEY = 'routine_config';
-const HISTORY_KEY = 'routine_history';
+const CONFIG_KEY = "routine_config";
+const HISTORY_KEY = "routine_history";
 
 export const [RoutineProvider, useRoutine] = createContextHook(() => {
   const queryClient = useQueryClient();
 
   // --- Configuration (Which products are in the routine) ---
   const configQuery = useQuery({
-    queryKey: ['routineConfig'],
+    queryKey: ["routineConfig"],
     queryFn: async () => {
       const stored = await AsyncStorage.getItem(CONFIG_KEY);
-      return stored ? (JSON.parse(stored) as RoutineConfig) : { morning: [], evening: [] };
+      return stored
+        ? (JSON.parse(stored) as RoutineConfig)
+        : { morning: [], evening: [] };
     },
   });
 
@@ -32,13 +37,13 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
       return newConfig;
     },
     onSuccess: (updated) => {
-      queryClient.setQueryData(['routineConfig'], updated);
+      queryClient.setQueryData(["routineConfig"], updated);
     },
   });
 
   // --- History (Which products were completed on a given date) ---
   const historyQuery = useQuery({
-    queryKey: ['routineHistory'],
+    queryKey: ["routineHistory"],
     queryFn: async () => {
       const stored = await AsyncStorage.getItem(HISTORY_KEY);
       return stored ? (JSON.parse(stored) as RoutineHistory) : {};
@@ -46,7 +51,15 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
   });
 
   const toggleCompletionMutation = useMutation({
-    mutationFn: async ({ date, timeOfDay, productId }: { date: string; timeOfDay: TimeOfDay; productId: string }) => {
+    mutationFn: async ({
+      date,
+      timeOfDay,
+      productId,
+    }: {
+      date: string;
+      timeOfDay: TimeOfDay;
+      productId: string;
+    }) => {
       const currentHistory = historyQuery.data || {};
       const dayEntry = currentHistory[date] || { morning: [], evening: [] };
       const completedList = dayEntry[timeOfDay] || [];
@@ -70,41 +83,53 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
       return updatedHistory;
     },
     onSuccess: (updated) => {
-      queryClient.setQueryData(['routineHistory'], updated);
+      queryClient.setQueryData(["routineHistory"], updated);
     },
   });
-  
+
   const addToRoutineMutation = useMutation({
-      mutationFn: async ({ productId, timeOfDay }: { productId: string, timeOfDay: TimeOfDay }) => {
-          const currentConfig = configQuery.data || { morning: [], evening: [] };
-          if (currentConfig[timeOfDay].includes(productId)) return currentConfig;
-          
-          const newConfig = {
-              ...currentConfig,
-              [timeOfDay]: [...currentConfig[timeOfDay], productId]
-          };
-          await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
-          return newConfig;
-      },
-      onSuccess: (updated) => {
-          queryClient.setQueryData(['routineConfig'], updated);
-      }
+    mutationFn: async ({
+      productId,
+      timeOfDay,
+    }: {
+      productId: string;
+      timeOfDay: TimeOfDay;
+    }) => {
+      const currentConfig = configQuery.data || { morning: [], evening: [] };
+      if (currentConfig[timeOfDay].includes(productId)) return currentConfig;
+
+      const newConfig = {
+        ...currentConfig,
+        [timeOfDay]: [...currentConfig[timeOfDay], productId],
+      };
+      await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
+      return newConfig;
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData(["routineConfig"], updated);
+    },
   });
 
   const removeFromRoutineMutation = useMutation({
-      mutationFn: async ({ productId, timeOfDay }: { productId: string, timeOfDay: TimeOfDay }) => {
-          const currentConfig = configQuery.data || { morning: [], evening: [] };
-          
-          const newConfig = {
-              ...currentConfig,
-              [timeOfDay]: currentConfig[timeOfDay].filter(id => id !== productId)
-          };
-          await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
-          return newConfig;
-      },
-      onSuccess: (updated) => {
-          queryClient.setQueryData(['routineConfig'], updated);
-      }
+    mutationFn: async ({
+      productId,
+      timeOfDay,
+    }: {
+      productId: string;
+      timeOfDay: TimeOfDay;
+    }) => {
+      const currentConfig = configQuery.data || { morning: [], evening: [] };
+
+      const newConfig = {
+        ...currentConfig,
+        [timeOfDay]: currentConfig[timeOfDay].filter((id) => id !== productId),
+      };
+      await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
+      return newConfig;
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData(["routineConfig"], updated);
+    },
   });
 
   return {

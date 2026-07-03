@@ -7,6 +7,7 @@
 **Status:** Core features complete, needs polish for production release
 
 ### What Works
+
 - 14-day calendar with routine tracking (morning/evening)
 - Product shelf with expiration tracking (PAO calculation)
 - Add product flow with frequency options (daily, specific days, interval)
@@ -15,6 +16,7 @@
 - Playwright E2E tests (11 passing, web)
 
 ### What's Missing
+
 - Subscriptions (RevenueCat removed — re-add if monetizing)
 - Settings screen incomplete
 - App Store metadata missing
@@ -165,17 +167,17 @@ bunx playwright install
 **File:** `playwright.config.ts`
 
 ```typescript
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: "./e2e",
   webServer: {
-    command: 'bun start-web',
+    command: "bun start-web",
     port: 8081,
     reuseExistingServer: !process.env.CI,
   },
   use: {
-    baseURL: 'http://localhost:8081',
+    baseURL: "http://localhost:8081",
   },
 });
 ```
@@ -192,13 +194,13 @@ export default defineConfig({
 
 ```typescript
 // e2e/routine.spec.ts
-test('can navigate between days', async ({ page }) => {
-  await page.goto('/');
+test("can navigate between days", async ({ page }) => {
+  await page.goto("/");
   // Select a different day
   // Verify day is selected
 });
 
-test('can mark product as complete', async ({ page }) => {
+test("can mark product as complete", async ({ page }) => {
   // Add a product first
   // Navigate to routine
   // Click checkbox
@@ -297,6 +299,7 @@ bun add @react-native-firebase/analytics
 ### 5.3 Localization
 
 Current app has Polish text in places. Decide:
+
 - [ ] Polish-only launch
 - [ ] English + Polish launch
 - [ ] Extract all strings to i18n system
@@ -313,21 +316,21 @@ Current app has Polish text in places. Decide:
 
 ## Implementation Order
 
-| Priority | Task | Effort | Blocking |
-|----------|------|--------|----------|
-| P0 | Settings: Privacy Policy link | 1h | App Store |
-| P0 | Create & host Privacy Policy | 2h | App Store |
-| P0 | EAS build configuration | 2h | RevenueCat testing |
-| P1 | RevenueCat API keys setup | 1h | Subscriptions |
-| P1 | Test subscription flow | 2h | Launch |
-| P1 | Playwright test setup | 2h | CI/CD |
-| P1 | Core E2E tests (5 files) | 4h | Quality |
-| P2 | Settings completion | 4h | Polish |
-| P2 | Subscription management UI | 3h | Polish |
-| P2 | Sentry integration | 2h | Production |
-| P3 | Analytics integration | 2h | Growth |
-| P3 | Onboarding flow | 4h | Conversion |
-| P3 | Accessibility audit | 3h | Quality |
+| Priority | Task                          | Effort | Blocking           |
+| -------- | ----------------------------- | ------ | ------------------ |
+| P0       | Settings: Privacy Policy link | 1h     | App Store          |
+| P0       | Create & host Privacy Policy  | 2h     | App Store          |
+| P0       | EAS build configuration       | 2h     | RevenueCat testing |
+| P1       | RevenueCat API keys setup     | 1h     | Subscriptions      |
+| P1       | Test subscription flow        | 2h     | Launch             |
+| P1       | Playwright test setup         | 2h     | CI/CD              |
+| P1       | Core E2E tests (5 files)      | 4h     | Quality            |
+| P2       | Settings completion           | 4h     | Polish             |
+| P2       | Subscription management UI    | 3h     | Polish             |
+| P2       | Sentry integration            | 2h     | Production         |
+| P3       | Analytics integration         | 2h     | Growth             |
+| P3       | Onboarding flow               | 4h     | Conversion         |
+| P3       | Accessibility audit           | 3h     | Quality            |
 
 ---
 

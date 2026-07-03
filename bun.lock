@@ -54,6 +54,7 @@
         "@types/react": "~19.1.10",
         "eslint": "^9.31.0",
         "eslint-config-expo": "~10.0.0",
+        "prettier": "3.8.5",
         "typescript": "~5.9.2",
       },
     },
@@ -1834,6 +1835,8 @@
     "postcss-value-parser": ["postcss-value-parser@4.2.0", "", {}, "sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ=="],
 
     "prelude-ls": ["prelude-ls@1.2.1", "", {}, "sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g=="],
+
+    "prettier": ["prettier@3.8.5", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-zxcTTCedNGJM4R8sj/Cq/F0W/c4iE0afWBcBwMTRtw4WHYP9TWkYjdiH3npPRUYsXQCPR0hTU9yjovOu+E6EQA=="],
 
     "pretty-bytes": ["pretty-bytes@5.6.0", "", {}, "sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg=="],
 

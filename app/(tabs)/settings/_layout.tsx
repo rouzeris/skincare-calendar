@@ -5,7 +5,7 @@ import { useIntl } from "@/context/intl";
 export default function SettingsLayout() {
   const { colors } = useTheme();
   const { t } = useIntl();
-  
+
   return (
     <Stack
       screenOptions={{
@@ -15,7 +15,7 @@ export default function SettingsLayout() {
         headerTintColor: colors.text,
         headerShadowVisible: false,
         contentStyle: { backgroundColor: colors.background },
-        title: t('tabs.settings'),
+        title: t("tabs.settings"),
       }}
     >
       <Stack.Screen name="index" />

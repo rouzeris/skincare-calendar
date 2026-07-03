@@ -4,5 +4,3 @@
 ## Development Commands
 
 `bun start-web`, `bun start`, `bun typecheck`, `bun lint`
-
-

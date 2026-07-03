@@ -104,4 +104,4 @@ If you have questions about these Terms, please contact us at:
 
 ---
 
-*These Terms of Service are effective as of January 8, 2026.*
+_These Terms of Service are effective as of January 8, 2026._

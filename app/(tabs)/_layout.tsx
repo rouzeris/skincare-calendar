@@ -7,14 +7,14 @@ import { useTheme } from "@/context/theme";
 import { useIntl } from "@/context/intl";
 
 const getTabBarHeight = () => {
-  if (Platform.OS === 'ios') return 88;
-  if (Platform.OS === 'web') return 70;
+  if (Platform.OS === "ios") return 88;
+  if (Platform.OS === "web") return 70;
   return 60;
 };
 
 const getTabBarPaddingBottom = () => {
-  if (Platform.OS === 'ios') return 28;
-  if (Platform.OS === 'web') return 12;
+  if (Platform.OS === "ios") return 28;
+  if (Platform.OS === "web") return 12;
   return 8;
 };
 
@@ -38,7 +38,11 @@ export default function TabLayout() {
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontFamily: Platform.select({ ios: "System", android: "Roboto", web: "system-ui" }),
+          fontFamily: Platform.select({
+            ios: "System",
+            android: "Roboto",
+            web: "system-ui",
+          }),
           fontSize: 12,
           fontWeight: "500",
         },
@@ -47,21 +51,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t('tabs.routine'),
+          title: t("tabs.routine"),
           tabBarIcon: ({ color }) => <Calendar color={color} size={24} />,
         }}
       />
       <Tabs.Screen
         name="shelf"
         options={{
-          title: t('tabs.shelf'),
+          title: t("tabs.shelf"),
           tabBarIcon: ({ color }) => <SprayCan color={color} size={24} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: t('tabs.settings'),
+          title: t("tabs.settings"),
           tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
         }}
       />

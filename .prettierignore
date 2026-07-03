@@ -1,0 +1,7 @@
+node_modules
+.expo
+.tamagui
+playwright-report
+test-results
+bun.lock
+tamagui-web.css

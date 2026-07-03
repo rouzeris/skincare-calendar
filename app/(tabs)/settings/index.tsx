@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Platform, Alert, Share } from 'react-native';
-import { YStack, XStack, Text, Separator, ScrollView } from 'tamagui';
-import { useTheme } from '@/context/theme';
-import { useIntl, type AppLocale } from '@/context/intl';
-import { useCosmetics } from '@/context/cosmetics';
-import { useRoutine } from '@/context/routine';
+import React, { useState } from "react";
+import { Platform, Alert, Share } from "react-native";
+import { YStack, XStack, Text, Separator, ScrollView } from "tamagui";
+import { useTheme } from "@/context/theme";
+import { useIntl, type AppLocale } from "@/context/intl";
+import { useCosmetics } from "@/context/cosmetics";
+import { useRoutine } from "@/context/routine";
 import {
   Moon,
   Sun,
@@ -18,24 +18,27 @@ import {
   Trash2,
   FlaskConical,
   Check,
-} from 'lucide-react-native';
-import * as WebBrowser from 'expo-web-browser';
-import * as Linking from 'expo-linking';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+} from "lucide-react-native";
+import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const PRIVACY_POLICY_URL = 'https://cera.love/privacy';
-const TERMS_URL = 'https://cera.love/terms';
-const SUPPORT_EMAIL = 'help@cera.love';
-const APP_STORE_URL = 'https://apps.apple.com/app/id0000000000'; // Replace with actual ID
+const PRIVACY_POLICY_URL = "https://cera.love/privacy";
+const TERMS_URL = "https://cera.love/terms";
+const SUPPORT_EMAIL = "help@cera.love";
+const APP_STORE_URL = "https://apps.apple.com/app/id0000000000"; // Replace with actual ID
 const LANGUAGE_LABEL_KEYS = {
-  en: 'language.en',
-  pl: 'language.pl',
-  ua: 'language.ua',
-} as const satisfies Record<AppLocale, Parameters<ReturnType<typeof useIntl>['t']>[0]>;
+  en: "language.en",
+  pl: "language.pl",
+  ua: "language.ua",
+} as const satisfies Record<
+  AppLocale,
+  Parameters<ReturnType<typeof useIntl>["t"]>[0]
+>;
 const LANGUAGE_FLAGS = {
-  en: '🇬🇧',
-  pl: '🇵🇱',
-  ua: '🇺🇦',
+  en: "🇬🇧",
+  pl: "🇵🇱",
+  ua: "🇺🇦",
 } as const satisfies Record<AppLocale, string>;
 
 // TODO: Replace with actual feature flag from backend/auth system
@@ -47,7 +50,8 @@ const useIsDeveloper = () => {
 };
 
 export default function SettingsScreen() {
-  const { themeMode, setTheme, colors, showDetailedConflicts, setAppSettings } = useTheme();
+  const { themeMode, setTheme, colors, showDetailedConflicts, setAppSettings } =
+    useTheme();
   const { locale, locales, setLocale, t } = useIntl();
   const { products } = useCosmetics();
   const { routineConfig, routineHistory } = useRoutine();
@@ -55,26 +59,32 @@ export default function SettingsScreen() {
   const isDeveloper = useIsDeveloper();
 
   const handleOpenURL = async (url: string) => {
-    if (Platform.OS === 'web') {
-      window.open(url, '_blank');
+    if (Platform.OS === "web") {
+      window.open(url, "_blank");
     } else {
       await WebBrowser.openBrowserAsync(url);
     }
   };
 
   const handleContactSupport = () => {
-    const subject = encodeURIComponent(t('settings.supportSubject'));
-    const body = encodeURIComponent(`\n\n---\nApp Version: 1.0.0\nPlatform: ${Platform.OS}`);
-    void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`);
+    const subject = encodeURIComponent(t("settings.supportSubject"));
+    const body = encodeURIComponent(
+      `\n\n---\nApp Version: 1.0.0\nPlatform: ${Platform.OS}`,
+    );
+    void Linking.openURL(
+      `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`,
+    );
   };
 
   const handleRateApp = () => {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       void Linking.openURL(APP_STORE_URL);
-    } else if (Platform.OS === 'android') {
-      void Linking.openURL('market://details?id=app.rork.kalendarz_kosmetykow_twarz');
+    } else if (Platform.OS === "android") {
+      void Linking.openURL(
+        "market://details?id=app.rork.kalendarz_kosmetykow_twarz",
+      );
     } else {
-      Alert.alert(t('settings.rateTitle'), t('settings.rateBody'));
+      Alert.alert(t("settings.rateTitle"), t("settings.rateBody"));
     }
   };
 
@@ -83,7 +93,7 @@ export default function SettingsScreen() {
     try {
       const exportData = {
         exportedAt: new Date().toISOString(),
-        version: '1.0.0',
+        version: "1.0.0",
         products,
         routineConfig,
         routineHistory,
@@ -91,50 +101,46 @@ export default function SettingsScreen() {
 
       const jsonString = JSON.stringify(exportData, null, 2);
 
-      if (Platform.OS === 'web') {
-        const blob = new Blob([jsonString], { type: 'application/json' });
+      if (Platform.OS === "web") {
+        const blob = new Blob([jsonString], { type: "application/json" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = `skincare-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `skincare-backup-${new Date().toISOString().split("T")[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
       } else {
         await Share.share({
           message: jsonString,
-          title: t('settings.exportData'),
+          title: t("settings.exportData"),
         });
       }
     } catch {
-      Alert.alert(t('settings.exportFailed'), t('settings.exportFailedBody'));
+      Alert.alert(t("settings.exportFailed"), t("settings.exportFailedBody"));
     } finally {
       setIsExporting(false);
     }
   };
 
   const handleDeleteAllData = () => {
-    Alert.alert(
-      t('settings.deleteAllData'),
-      t('settings.deleteAllDataBody'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            await AsyncStorage.multiRemove([
-              'cosmetics_shelf',
-              'routine_config',
-              'routine_history',
-            ]);
-            // Reload the app
-            if (Platform.OS === 'web') {
-              window.location.reload();
-            }
-          },
+    Alert.alert(t("settings.deleteAllData"), t("settings.deleteAllDataBody"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.delete"),
+        style: "destructive",
+        onPress: async () => {
+          await AsyncStorage.multiRemove([
+            "cosmetics_shelf",
+            "routine_config",
+            "routine_history",
+          ]);
+          // Reload the app
+          if (Platform.OS === "web") {
+            window.location.reload();
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const SettingsRow = ({
@@ -194,7 +200,7 @@ export default function SettingsScreen() {
           flex={1}
           fontSize={16}
           color={selected ? colors.tint : colors.text}
-          fontWeight={selected ? '600' : '500'}
+          fontWeight={selected ? "600" : "500"}
         >
           {t(LANGUAGE_LABEL_KEYS[language])}
         </Text>
@@ -216,7 +222,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            {t('settings.ingredientAnalysis')}
+            {t("settings.ingredientAnalysis")}
           </Text>
           <YStack
             borderRadius={16}
@@ -228,17 +234,21 @@ export default function SettingsScreen() {
             <XStack
               alignItems="center"
               padding={16}
-              onPress={() => setAppSettings({ showDetailedConflicts: !showDetailedConflicts })}
+              onPress={() =>
+                setAppSettings({
+                  showDetailedConflicts: !showDetailedConflicts,
+                })
+              }
             >
               <YStack marginRight={12}>
                 <FlaskConical size={20} color={colors.text} />
               </YStack>
               <YStack flex={1}>
                 <Text fontSize={16} color={colors.text} fontWeight="500">
-                  {t('settings.detailedExplanations')}
+                  {t("settings.detailedExplanations")}
                 </Text>
                 <Text fontSize={13} color={colors.subtext} marginTop={2}>
-                  {t('settings.detailedExplanationsBody')}
+                  {t("settings.detailedExplanationsBody")}
                 </Text>
               </YStack>
               <YStack
@@ -247,14 +257,16 @@ export default function SettingsScreen() {
                 borderRadius={15}
                 justifyContent="center"
                 paddingHorizontal={3}
-                backgroundColor={showDetailedConflicts ? colors.tint : colors.border}
+                backgroundColor={
+                  showDetailedConflicts ? colors.tint : colors.border
+                }
               >
                 <YStack
                   width={24}
                   height={24}
                   borderRadius={12}
                   backgroundColor="#FFFFFF"
-                  alignSelf={showDetailedConflicts ? 'flex-end' : 'flex-start'}
+                  alignSelf={showDetailedConflicts ? "flex-end" : "flex-start"}
                   shadowColor="#000"
                   shadowOffset={{ width: 0, height: 1 }}
                   shadowOpacity={0.15}
@@ -275,7 +287,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            {t('language.section')}
+            {t("language.section")}
           </Text>
           <YStack
             borderRadius={16}
@@ -287,7 +299,9 @@ export default function SettingsScreen() {
             {locales.map((language, index) => (
               <React.Fragment key={language}>
                 <LanguageRow language={language} />
-                {index < locales.length - 1 && <Separator marginLeft={48} backgroundColor={colors.border} />}
+                {index < locales.length - 1 && (
+                  <Separator marginLeft={48} backgroundColor={colors.border} />
+                )}
               </React.Fragment>
             ))}
           </YStack>
@@ -303,7 +317,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            {t('settings.appearance')}
+            {t("settings.appearance")}
           </Text>
           <YStack
             borderRadius={16}
@@ -315,54 +329,69 @@ export default function SettingsScreen() {
             <XStack
               alignItems="center"
               padding={16}
-              backgroundColor={themeMode === 'light' ? colors.border : colors.card}
-              onPress={() => setTheme('light')}
+              backgroundColor={
+                themeMode === "light" ? colors.border : colors.card
+              }
+              onPress={() => setTheme("light")}
             >
               <YStack marginRight={12}>
-                <Sun size={20} color={themeMode === 'light' ? colors.tint : colors.text} />
+                <Sun
+                  size={20}
+                  color={themeMode === "light" ? colors.tint : colors.text}
+                />
               </YStack>
               <Text
                 fontSize={16}
-                color={themeMode === 'light' ? colors.tint : colors.text}
-                fontWeight={themeMode === 'light' ? '600' : '500'}
+                color={themeMode === "light" ? colors.tint : colors.text}
+                fontWeight={themeMode === "light" ? "600" : "500"}
               >
-                {t('settings.light')}
+                {t("settings.light")}
               </Text>
             </XStack>
             <Separator marginLeft={48} backgroundColor={colors.border} />
             <XStack
               alignItems="center"
               padding={16}
-              backgroundColor={themeMode === 'dark' ? colors.border : colors.card}
-              onPress={() => setTheme('dark')}
+              backgroundColor={
+                themeMode === "dark" ? colors.border : colors.card
+              }
+              onPress={() => setTheme("dark")}
             >
               <YStack marginRight={12}>
-                <Moon size={20} color={themeMode === 'dark' ? colors.tint : colors.text} />
+                <Moon
+                  size={20}
+                  color={themeMode === "dark" ? colors.tint : colors.text}
+                />
               </YStack>
               <Text
                 fontSize={16}
-                color={themeMode === 'dark' ? colors.tint : colors.text}
-                fontWeight={themeMode === 'dark' ? '600' : '500'}
+                color={themeMode === "dark" ? colors.tint : colors.text}
+                fontWeight={themeMode === "dark" ? "600" : "500"}
               >
-                {t('settings.dark')}
+                {t("settings.dark")}
               </Text>
             </XStack>
             <Separator marginLeft={48} backgroundColor={colors.border} />
             <XStack
               alignItems="center"
               padding={16}
-              backgroundColor={themeMode === 'auto' ? colors.border : colors.card}
-              onPress={() => setTheme('auto')}
+              backgroundColor={
+                themeMode === "auto" ? colors.border : colors.card
+              }
+              onPress={() => setTheme("auto")}
             >
               <YStack marginRight={12}>
-                <Monitor size={20} color={themeMode === 'auto' ? colors.tint : colors.text} />
+                <Monitor
+                  size={20}
+                  color={themeMode === "auto" ? colors.tint : colors.text}
+                />
               </YStack>
               <Text
                 fontSize={16}
-                color={themeMode === 'auto' ? colors.tint : colors.text}
-                fontWeight={themeMode === 'auto' ? '600' : '500'}
+                color={themeMode === "auto" ? colors.tint : colors.text}
+                fontWeight={themeMode === "auto" ? "600" : "500"}
               >
-                {t('settings.auto')}
+                {t("settings.auto")}
               </Text>
             </XStack>
           </YStack>
@@ -379,7 +408,7 @@ export default function SettingsScreen() {
               letterSpacing={0.5}
               color={colors.subtext}
             >
-              {t('settings.developer')}
+              {t("settings.developer")}
             </Text>
             <YStack
               borderRadius={16}
@@ -390,14 +419,16 @@ export default function SettingsScreen() {
             >
               <SettingsRow
                 icon={<Download size={20} color={colors.text} />}
-                label={t('settings.exportData')}
-                subtitle={t('settings.productsCount', { count: products.length })}
+                label={t("settings.exportData")}
+                subtitle={t("settings.productsCount", {
+                  count: products.length,
+                })}
                 onPress={handleExportData}
               />
               <Separator marginLeft={48} backgroundColor={colors.border} />
               <SettingsRow
                 icon={<Trash2 size={20} color={colors.error} />}
-                label={t('settings.deleteAllData')}
+                label={t("settings.deleteAllData")}
                 onPress={handleDeleteAllData}
                 showChevron={false}
                 danger
@@ -416,7 +447,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            {t('settings.support')}
+            {t("settings.support")}
           </Text>
           <YStack
             borderRadius={16}
@@ -427,14 +458,14 @@ export default function SettingsScreen() {
           >
             <SettingsRow
               icon={<Mail size={20} color={colors.text} />}
-              label={t('settings.contactSupport')}
+              label={t("settings.contactSupport")}
               subtitle={SUPPORT_EMAIL}
               onPress={handleContactSupport}
             />
             <Separator marginLeft={48} backgroundColor={colors.border} />
             <SettingsRow
               icon={<Star size={20} color={colors.text} />}
-              label={t('settings.rateApp')}
+              label={t("settings.rateApp")}
               onPress={handleRateApp}
             />
           </YStack>
@@ -450,7 +481,7 @@ export default function SettingsScreen() {
             letterSpacing={0.5}
             color={colors.subtext}
           >
-            {t('settings.legal')}
+            {t("settings.legal")}
           </Text>
           <YStack
             borderRadius={16}
@@ -461,13 +492,13 @@ export default function SettingsScreen() {
           >
             <SettingsRow
               icon={<Shield size={20} color={colors.text} />}
-              label={t('settings.privacyPolicy')}
+              label={t("settings.privacyPolicy")}
               onPress={() => handleOpenURL(PRIVACY_POLICY_URL)}
             />
             <Separator marginLeft={48} backgroundColor={colors.border} />
             <SettingsRow
               icon={<FileText size={20} color={colors.text} />}
-              label={t('settings.terms')}
+              label={t("settings.terms")}
               onPress={() => handleOpenURL(TERMS_URL)}
             />
           </YStack>
@@ -476,7 +507,7 @@ export default function SettingsScreen() {
         {/* Version */}
         <YStack alignItems="center" marginTop={20}>
           <Text fontSize={12} color={colors.subtext}>
-            {t('common.version', { version: '1.0.0' })}
+            {t("common.version", { version: "1.0.0" })}
           </Text>
         </YStack>
       </YStack>
