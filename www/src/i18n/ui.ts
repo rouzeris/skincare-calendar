@@ -12,6 +12,12 @@ export const langTags: Record<Locale, string> = {
 export const localePath = (locale: Locale, path = "/") =>
   locale === defaultLocale ? path : `/${locale}${path}`;
 
+export const localeFlags: Record<Locale, { flag: string; name: string }> = {
+  pl: { flag: "🇵🇱", name: "Polski" },
+  ua: { flag: "🇺🇦", name: "Українська" },
+  en: { flag: "🇬🇧", name: "English" },
+};
+
 export const ui = {
   pl: {
     "meta.title": "Cera — kalendarz pielęgnacji twarzy",

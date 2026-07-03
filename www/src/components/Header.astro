@@ -1,6 +1,11 @@
 ---
-import { locales, localePath, type Locale } from "../i18n/ui";
-import { t } from "../i18n/ui";
+import {
+  locales,
+  localePath,
+  localeFlags as flags,
+  t,
+  type Locale,
+} from "../i18n/ui";
 
 interface Props {
   locale: Locale;
@@ -20,8 +25,10 @@ const tr = t(locale);
             href={localePath(l)}
             aria-current={l === locale ? "page" : undefined}
             lang={l === "ua" ? "uk" : l}
+            title={flags[l].name}
           >
-            {l.toUpperCase()}
+            <span aria-hidden="true">{flags[l].flag}</span>
+            <span class="sr-only">{flags[l].name}</span>
           </a>
         ))
       }
@@ -63,24 +70,29 @@ const tr = t(locale);
   }
 
   .lang-nav a {
-    font-size: 0.8125rem;
-    font-weight: 480;
-    letter-spacing: 0.08em;
+    font-size: 1.25rem;
+    line-height: 1;
     text-decoration: none;
-    color: var(--night-subtle);
     padding: var(--space-2);
+    opacity: 0.55;
+    filter: saturate(0.75);
+    transition:
+      opacity 150ms var(--ease-out-quint),
+      filter 150ms var(--ease-out-quint);
   }
 
   .lang-nav a[aria-current="page"] {
-    color: var(--night-ink);
+    opacity: 1;
+    filter: none;
     text-decoration: underline;
-    text-underline-offset: 0.4em;
-    text-decoration-color: var(--night-accent);
+    text-underline-offset: 0.45em;
+    text-decoration-color: var(--day-accent);
     text-decoration-thickness: 2px;
   }
 
   .lang-nav a:hover {
-    color: var(--night-ink);
+    opacity: 1;
+    filter: none;
   }
 
   @media (max-width: 720px) {

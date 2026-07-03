@@ -223,8 +223,11 @@ button {
   gap: var(--space-2);
   padding: var(--space-2);
   background: var(--day-surface);
-  border: 1px solid var(--day-line);
   border-radius: var(--radius-pill);
+  box-shadow:
+    0 1px 2px oklch(0.28 0.022 20 / 0.06),
+    0 6px 18px -6px oklch(0.35 0.06 20 / 0.18),
+    0 20px 45px -18px oklch(0.4 0.09 25 / 0.22);
 }
 
 .wl-bar input {
@@ -313,6 +316,50 @@ button {
   .wl-bar button {
     padding-block: var(--space-4);
   }
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: url("/grain.png") repeat;
+  background-size: 96px;
+  mix-blend-mode: multiply;
+  opacity: 0.06;
+}
+
+.reveal {
+  animation: reveal-rise 600ms var(--ease-out-quint) both;
+  animation-timeline: view();
+  animation-range: entry 5% entry 45%;
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0.3;
+    transform: translateY(1.25rem);
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  .reveal {
+    animation: none;
+  }
+}
+
+.scene-fade {
+  height: clamp(6rem, 14vh, 10rem);
+  pointer-events: none;
+}
+
+.scene-fade-dusk {
+  background: linear-gradient(180deg, var(--day-surface), var(--dusk-bg));
+}
+
+.scene-fade-night {
+  background: linear-gradient(180deg, var(--dusk-bg), var(--night-bg));
 }
 
 @media (prefers-reduced-motion: reduce) {

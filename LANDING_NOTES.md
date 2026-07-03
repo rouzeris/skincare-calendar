@@ -67,6 +67,19 @@ TikTok-style 9:16 clips on the landing — possibly AI UGC (avatar "get ready wi
 - AI UGC risk: uncanny beauty content can burn trust with this audience — test against real footage (Rosia filming a real evening routine beats a synthetic avatar).
 - Format doubles as ad creative for TikTok/Reels when marketing starts.
 
+## v2 implemented (2026-07-04)
+
+Direction chosen: **scroll-driven storytelling + textured warmth** (instead of the Variant route, which stays available above).
+
+- Hero = morning scene: leaf-shadow video over warm rose light (mix-blend multiply, warmed with sepia filter, masked fade), light-theme phone only. Diptych removed.
+- Scroll arc: day → sunset gradient band → dusk (lamp glow) → night gradient → night CTA (moon glow). Gentle `animation-timeline: view()` reveals on screenshots/viz, visible-by-default states.
+- Texture: tiled noise `grain.png` fixed overlay (multiply, 6%), layered tactile shadows on form bar + screenshots.
+- Flags in language switcher (header + footer), sr-only names for a11y. Caveat: Windows renders flag emoji as letter pairs ("PL") — swap to inline SVG flags if that matters.
+
+### Leaf video licensing — IMPORTANT
+
+`www/public/shadows-loop.mp4` is **Lefos's asset, local test only** — gitignored (repo is public), never deploy it. Source: `https://static.lefos.com/06d030a36ecf815aaa3878a97d9c82ec960be4b7/assets/shadows-loop-ohxjmG36.mp4` (h264, 1280×720, 7 s loop, 125 kB). Replace with our own before launch: Midjourney/video-gen prompt ≈ "soft blurred shadows of swaying leaves on a white plaster wall, gentle summer breeze, dappled sunlight, seamless loop, grayscale, minimal" — grade to match, keep under ~300 kB.
+
 ## After Variant
 
 - Map the chosen concept back onto `www/` — sections, tokens, and i18n plumbing already exist; this is a reskin, not a rebuild.

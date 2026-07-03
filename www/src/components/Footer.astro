@@ -1,5 +1,5 @@
 ---
-import { locales, localePath, t, type Locale } from "../i18n/ui";
+import { locales, localePath, localeFlags, t, type Locale } from "../i18n/ui";
 
 interface Props {
   locale: Locale;
@@ -7,6 +7,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const tr = t(locale);
+const flags = localeFlags;
 ---
 
 <footer class="theme-night site-footer">
@@ -23,8 +24,10 @@ const tr = t(locale);
             href={localePath(l)}
             aria-current={l === locale ? "page" : undefined}
             lang={l === "ua" ? "uk" : l}
+            title={flags[l].name}
           >
-            {l.toUpperCase()}
+            <span aria-hidden="true">{flags[l].flag}</span>
+            <span class="sr-only">{flags[l].name}</span>
           </a>
         ))
       }

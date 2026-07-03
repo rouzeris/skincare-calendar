@@ -24,7 +24,7 @@ const rows = [
     <h2 id="rhythm-title">{tr("freq.title")}</h2>
     <p class="rhythm-body">{tr("freq.body")}</p>
 
-    <figure class="viz" role="img" aria-label={tr("freq.viz.caption")}>
+    <figure class="viz reveal" role="img" aria-label={tr("freq.viz.caption")}>
       <div class="viz-rows">
         {
           rows.map((row) => (
@@ -48,6 +48,16 @@ const rows = [
 </section>
 
 <style>
+  .rhythm {
+    background:
+      radial-gradient(
+        55rem 40rem at 88% 0%,
+        oklch(0.48 0.09 30 / 0.35),
+        transparent 65%
+      ),
+      var(--dusk-bg);
+  }
+
   .rhythm h2 {
     font-size: var(--text-h2);
     max-width: 18ch;

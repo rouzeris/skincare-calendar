@@ -32,76 +32,49 @@ const labels = {
 };
 ---
 
-<section class="hero">
-  <div class="hero-bg" aria-hidden="true">
-    <div class="hero-bg-night"></div>
-  </div>
+<section class="hero theme-day">
+  <div class="hero-light" aria-hidden="true"></div>
+  <video
+    class="hero-leaves"
+    src="/shadows-loop.mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    aria-hidden="true"></video>
 
   <div class="hero-inner container">
-    <p class="halves" aria-hidden="true">
-      <span class="half-day">
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          ><circle cx="12" cy="12" r="4"></circle><path
-            d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"
-          ></path></svg
-        >
-        {tr("hero.morning")}
-      </span>
-      <span class="half-night">
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          ><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg
-        >
-        {tr("hero.evening")}
-      </span>
+    <p class="morning">
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+        ><circle cx="12" cy="12" r="4"></circle><path
+          d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"
+        ></path></svg
+      >
+      {tr("hero.morning")}
     </p>
 
-    <div class="seam-text">
-      <div class="st st-day">
-        <h1>
-          {
-            h1Words.map((w, i) => (
-              <>
-                <span class="w" style={`--i:${i}`}>
-                  {w}
-                </span>
-                {i < h1Words.length - 1 ? " " : ""}
-              </>
-            ))
-          }
-        </h1>
-        <p class="sub">{tr("hero.sub")}</p>
-      </div>
-      <div class="st st-night" aria-hidden="true">
-        <h1>
-          {
-            h1Words.map((w, i) => (
-              <>
-                <span class="w" style={`--i:${i}`}>
-                  {w}
-                </span>
-                {i < h1Words.length - 1 ? " " : ""}
-              </>
-            ))
-          }
-        </h1>
-        <p class="sub">{tr("hero.sub")}</p>
-      </div>
-    </div>
+    <h1>
+      {
+        h1Words.map((w, i) => (
+          <>
+            <span class="w" style={`--i:${i}`}>
+              {w}
+            </span>
+            {i < h1Words.length - 1 ? " " : ""}
+          </>
+        ))
+      }
+    </h1>
+    <p class="sub">{tr("hero.sub")}</p>
 
     <div class="hero-form">
       <WaitlistForm
@@ -121,15 +94,6 @@ const labels = {
         densities={[1, 2]}
         loading="eager"
       />
-      <Image
-        src={shot(locale, "dark")}
-        alt=""
-        width={390}
-        densities={[1, 2]}
-        loading="eager"
-        class="phone-dark"
-        aria-hidden="true"
-      />
     </div>
   </div>
 </section>
@@ -138,21 +102,47 @@ const labels = {
   .hero {
     position: relative;
     overflow: clip;
-    color: var(--day-ink);
   }
 
-  .hero-bg {
+  .hero-light {
     position: absolute;
     inset: 0;
-    background: var(--day-bg);
+    background:
+      radial-gradient(
+        90rem 60rem at 18% -10%,
+        oklch(0.95 0.035 55 / 0.9),
+        transparent 60%
+      ),
+      radial-gradient(
+        70rem 50rem at 85% 15%,
+        oklch(0.93 0.045 17 / 0.55),
+        transparent 65%
+      );
   }
 
-  .hero-bg-night {
+  .hero-leaves {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, var(--night-bg), oklch(0.16 0.04 350));
-    clip-path: inset(0 0 0 50%);
-    animation: seam-in 1100ms var(--ease-out-quint) both;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+    opacity: 0;
+    filter: sepia(0.5) saturate(0.7) brightness(1.28);
+    mask-image: linear-gradient(180deg, black 45%, transparent 88%);
+    animation: leaves-in 2400ms var(--ease-out-quint) 400ms forwards;
+  }
+
+  @keyframes leaves-in {
+    to {
+      opacity: 0.24;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-leaves {
+      display: none;
+    }
   }
 
   .hero-inner {
@@ -160,78 +150,40 @@ const labels = {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: clamp(6rem, 14vh, 9rem);
+    text-align: center;
+    padding-top: clamp(7rem, 15vh, 10rem);
   }
 
-  .halves {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 46rem;
-    font-size: var(--text-small);
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    animation: rise 700ms var(--ease-out-quint) 850ms both;
-  }
-
-  .halves span {
+  .morning {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-  }
-
-  .half-day {
+    font-size: var(--text-small);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
     color: var(--day-subtle);
+    animation: rise 700ms var(--ease-out-quint) 750ms both;
   }
 
-  .half-night {
-    color: var(--night-subtle);
-  }
-
-  .seam-text {
-    position: relative;
-    width: 100%;
-    text-align: center;
-    margin-top: clamp(2rem, 5vh, 3.5rem);
-  }
-
-  .st h1 {
+  h1 {
     font-size: var(--text-display);
     font-weight: 540;
     max-width: 14ch;
-    margin-inline: auto;
+    margin-top: var(--space-6);
   }
 
-  .st h1 .w {
+  h1 .w {
     display: inline-block;
     animation: rise 800ms var(--ease-out-quint) both;
-    animation-delay: calc(150ms + var(--i) * 70ms);
+    animation-delay: calc(120ms + var(--i) * 70ms);
   }
 
-  .st .sub {
+  .sub {
     font-size: var(--text-lead);
     max-width: 44ch;
-    margin: var(--space-6) auto 0;
-    animation: rise 800ms var(--ease-out-quint) 520ms both;
-  }
-
-  .st-day {
-    color: var(--day-ink);
-  }
-
-  .st-day .sub {
+    margin-top: var(--space-6);
     color: var(--day-subtle);
-  }
-
-  .st-night {
-    position: absolute;
-    inset: 0;
-    color: var(--night-ink);
-    clip-path: inset(0 0 0 50%);
-  }
-
-  .st-night .sub {
-    color: var(--night-subtle);
+    animation: rise 800ms var(--ease-out-quint) 480ms both;
   }
 
   .hero-form {
@@ -239,33 +191,22 @@ const labels = {
     width: 100%;
     display: flex;
     justify-content: center;
-    animation: rise 800ms var(--ease-out-quint) 700ms both;
+    animation: rise 800ms var(--ease-out-quint) 640ms both;
   }
 
   .phone {
-    position: relative;
-    width: min(21rem, 76vw);
+    width: min(20rem, 74vw);
     margin-top: clamp(3rem, 7vh, 5rem);
     border-radius: 2.2rem 2.2rem 0 0;
-    box-shadow: 0 -18px 60px oklch(0.2 0.05 4 / 0.18);
-    animation: phone-rise 1000ms var(--ease-out-expo) 300ms both;
+    box-shadow:
+      0 -2px 6px oklch(0.28 0.022 20 / 0.05),
+      0 -14px 40px -8px oklch(0.4 0.09 30 / 0.22),
+      0 -40px 90px -20px oklch(0.5 0.12 40 / 0.18);
+    animation: phone-rise 1000ms var(--ease-out-expo) 280ms both;
   }
 
   .phone img {
     border-radius: 2.2rem 2.2rem 0 0;
-  }
-
-  .phone-dark {
-    position: absolute;
-    inset: 0;
-    clip-path: inset(0 0 0 50%);
-    animation: seam-in 1100ms var(--ease-out-quint) both;
-  }
-
-  @keyframes seam-in {
-    from {
-      clip-path: inset(0 0 0 100%);
-    }
   }
 
   @keyframes rise {
@@ -279,13 +220,6 @@ const labels = {
     from {
       opacity: 0;
       transform: translateY(4rem);
-    }
-  }
-
-  @media (max-width: 720px) {
-    .halves {
-      max-width: 100%;
-      padding-inline: var(--space-2);
     }
   }
 </style>

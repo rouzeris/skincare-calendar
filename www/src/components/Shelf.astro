@@ -22,7 +22,7 @@ const tr = t(locale);
       <h2 id="shelf-title">{tr("shelf.title")}</h2>
       <p>{tr("shelf.body")}</p>
     </div>
-    <div class="shelf-shot">
+    <div class="shelf-shot reveal">
       <Image
         src={shots[`../assets/app/shelf-${locale}-light.png`]!.default}
         alt={tr("shelf.imgAlt")}
@@ -37,7 +37,7 @@ const tr = t(locale);
 <style>
   .shelf {
     background: var(--day-surface);
-    border-block: 1px solid var(--day-line);
+    border-top: 1px solid var(--day-line);
   }
 
   .shelf-grid {
@@ -64,7 +64,10 @@ const tr = t(locale);
     width: min(19rem, 100%);
     border-radius: 2rem;
     overflow: clip;
-    border: 1px solid var(--day-line);
+    box-shadow:
+      0 1px 3px oklch(0.28 0.022 20 / 0.06),
+      0 12px 32px -10px oklch(0.35 0.06 20 / 0.2),
+      0 34px 70px -24px oklch(0.4 0.09 25 / 0.24);
   }
 
   @media (max-width: 820px) {
