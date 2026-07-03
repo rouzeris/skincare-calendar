@@ -16,60 +16,21 @@ const { title, path } = Astro.props;
   description={`${title} for the Cera app.`}
   path={path}
 >
-  <div class="theme-day legal-page">
-    <header class="container legal-header">
-      <a href="/" class="back">← cera<span>.</span></a>
+  <div class="bg-day-bg text-day-ink">
+    <header
+      class="mx-auto w-full max-w-3xl px-[clamp(1.25rem,4vw,2.5rem)] py-8"
+    >
+      <a
+        href="/"
+        class="text-xl font-bold tracking-tight text-day-ink no-underline"
+        >← cera<span class="text-day-accent">.</span></a
+      >
     </header>
-    <main class="container legal-prose">
+    <main
+      class="mx-auto w-full max-w-3xl px-[clamp(1.25rem,4vw,2.5rem)] pb-28 [&_a]:text-day-accent [&_h1]:mt-8 [&_h1]:mb-6 [&_h1]:text-h2 [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_li]:my-2 [&_p]:my-3 [&_ul]:list-disc [&_ul]:pl-6"
+    >
       <slot />
     </main>
   </div>
   <Footer locale="en" />
 </Base>
-
-<style>
-  .legal-header {
-    padding-block: var(--space-8);
-  }
-
-  .back {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    font-weight: 560;
-    text-decoration: none;
-  }
-
-  .back span {
-    color: var(--day-accent);
-  }
-
-  .legal-prose {
-    max-width: 46rem;
-    padding-bottom: var(--space-28);
-  }
-
-  .legal-prose :global(h1) {
-    font-size: var(--text-h2);
-    margin-block: var(--space-8) var(--space-6);
-  }
-
-  .legal-prose :global(h2) {
-    font-size: 1.5rem;
-    margin-block: var(--space-12) var(--space-4);
-  }
-
-  .legal-prose :global(h3) {
-    font-size: 1.125rem;
-    margin-block: var(--space-8) var(--space-3);
-  }
-
-  .legal-prose :global(p),
-  .legal-prose :global(li) {
-    margin-block: var(--space-3);
-    color: var(--day-ink);
-  }
-
-  .legal-prose :global(a) {
-    color: var(--day-accent);
-  }
-</style>

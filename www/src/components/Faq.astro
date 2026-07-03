@@ -1,0 +1,60 @@
+---
+import { localePath, t, type Locale } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const tr = t(locale);
+
+const items = [1, 2, 3, 4, 5].map((n) => ({
+  q: tr(`faq.${n}.q` as Parameters<typeof tr>[0]),
+  a: tr(`faq.${n}.a` as Parameters<typeof tr>[0]),
+  privacyLink: n === 4,
+}));
+---
+
+<section
+  class="bg-night-bg py-section font-[380] tracking-[0.01em] text-night-ink"
+  aria-labelledby="faq-title"
+>
+  <div class="mx-auto w-full max-w-3xl px-[clamp(1.25rem,4vw,2.5rem)]">
+    <h2 id="faq-title" class="text-h2 font-medium">{tr("faq.title")}</h2>
+    <div class="mt-12">
+      {
+        items.map(({ q, a, privacyLink }) => (
+          <details class="group border-b border-night-line py-2">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-medium [&::-webkit-details-marker]:hidden">
+              {q}
+              <svg
+                class="shrink-0 text-night-subtle transition-transform duration-200 ease-out-quint group-open:rotate-45"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </summary>
+            <p class="max-w-[60ch] pb-5 text-night-subtle">
+              {a}{" "}
+              {privacyLink && (
+                <a
+                  href="/privacy"
+                  class="text-night-ink underline underline-offset-4"
+                >
+                  →
+                </a>
+              )}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>

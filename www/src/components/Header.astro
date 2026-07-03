@@ -1,106 +1,25 @@
 ---
-import {
-  locales,
-  localePath,
-  localeFlags as flags,
-  t,
-  type Locale,
-} from "../i18n/ui";
+import { localePath, type Locale } from "../i18n/ui";
+import LangSelect from "./LangSelect.astro";
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
-const tr = t(locale);
 ---
 
-<header class="site-header">
-  <div class="container header-row">
-    <a href={localePath(locale)} class="wordmark">cera<span>.</span></a>
-    <nav aria-label={tr("a11y.langSwitch")} class="lang-nav">
-      {
-        locales.map((l) => (
-          <a
-            href={localePath(l)}
-            aria-current={l === locale ? "page" : undefined}
-            lang={l === "ua" ? "uk" : l}
-            title={flags[l].name}
-          >
-            <span aria-hidden="true">{flags[l].flag}</span>
-            <span class="sr-only">{flags[l].name}</span>
-          </a>
-        ))
-      }
-    </nav>
+<header
+  class="absolute inset-x-0 top-0 z-10 pt-[clamp(1rem,3vw,2rem)] text-day-ink"
+>
+  <div
+    class="mx-auto flex w-full max-w-6xl items-center justify-between px-[clamp(1.25rem,4vw,2.5rem)]"
+  >
+    <a
+      href={localePath(locale)}
+      class="text-xl font-bold tracking-tight text-day-ink no-underline max-md:text-lg"
+      >cera<span class="text-day-accent">.</span></a
+    >
+    <LangSelect locale={locale} />
   </div>
 </header>
-
-<style>
-  .site-header {
-    position: absolute;
-    inset-inline: 0;
-    top: 0;
-    z-index: var(--z-header);
-    padding-top: clamp(1rem, 3vw, 2rem);
-  }
-
-  .header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-
-  .wordmark {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 620;
-    letter-spacing: -0.01em;
-    text-decoration: none;
-    color: var(--day-ink);
-  }
-
-  .wordmark span {
-    color: var(--day-accent);
-  }
-
-  .lang-nav {
-    display: flex;
-    gap: var(--space-4);
-  }
-
-  .lang-nav a {
-    font-size: 1.25rem;
-    line-height: 1;
-    text-decoration: none;
-    padding: var(--space-2);
-    opacity: 0.55;
-    filter: saturate(0.75);
-    transition:
-      opacity 150ms var(--ease-out-quint),
-      filter 150ms var(--ease-out-quint);
-  }
-
-  .lang-nav a[aria-current="page"] {
-    opacity: 1;
-    filter: none;
-    text-decoration: underline;
-    text-underline-offset: 0.45em;
-    text-decoration-color: var(--day-accent);
-    text-decoration-thickness: 2px;
-  }
-
-  .lang-nav a:hover {
-    opacity: 1;
-    filter: none;
-  }
-
-  @media (max-width: 720px) {
-    .wordmark {
-      font-size: 1.25rem;
-    }
-    .lang-nav {
-      gap: var(--space-2);
-    }
-  }
-</style>

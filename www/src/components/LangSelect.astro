@@ -1,0 +1,39 @@
+---
+import { locales, localePath, localeFlags, t, type Locale } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const tr = t(locale);
+---
+
+<select
+  class="cursor-pointer rounded-full border border-current/30 bg-transparent px-4 py-2 text-sm text-inherit hover:border-current/55"
+  aria-label={tr("a11y.langSwitch")}
+  data-lang-select
+>
+  {
+    locales.map((l) => (
+      <option
+        value={localePath(l)}
+        selected={l === locale}
+        lang={l === "ua" ? "uk" : l}
+        aria-label={localeFlags[l].name}
+      >
+        {localeFlags[l].flag}
+      </option>
+    ))
+  }
+</select>
+
+<script>
+  for (const el of document.querySelectorAll<HTMLSelectElement>(
+    "[data-lang-select]",
+  )) {
+    el.addEventListener("change", () => {
+      window.location.href = el.value;
+    });
+  }
+</script>

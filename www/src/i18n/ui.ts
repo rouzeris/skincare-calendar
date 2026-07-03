@@ -52,7 +52,7 @@ export const ui = {
     "shelf.body":
       "Cera liczy PAO za Ciebie i przypomni, zanim krem się przeterminuje. Koniec z wąchaniem słoiczków.",
     "shelf.imgAlt": "Ekran półki z kosmetykami i datami ważności",
-    "freq.title": "Kwas co trzy dni? Ogarnięte.",
+    "freq.title": "Kwas co trzy dni? Zaplanowane.",
     "freq.body":
       "Retinol w poniedziałki i czwartki, peeling co dziesięć dni, reszta codziennie. Cera pamięta cały harmonogram — nawet kiedy Ty nie musisz.",
     "freq.imgAlt":
@@ -61,6 +61,21 @@ export const ui = {
     "freq.viz.acid": "Kwas",
     "freq.viz.cream": "Krem",
     "freq.viz.caption": "Dwa tygodnie rutyny w Cerze",
+    "faq.title": "Pytania i odpowiedzi",
+    "faq.1.q": "Kiedy będzie można pobrać Cerę?",
+    "faq.1.a":
+      "Pracujemy nad wersją na iOS i Androida. Lista oczekujących dostanie dostęp pierwsza.",
+    "faq.2.q": "Ile będzie kosztować?",
+    "faq.2.a":
+      "Podstawowa wersja będzie darmowa. Szczegóły ogłosimy przed startem.",
+    "faq.3.q": "Na jakie telefony?",
+    "faq.3.a": "iOS i Android. Cera działa też w przeglądarce.",
+    "faq.4.q": "Co z moją prywatnością?",
+    "faq.4.a":
+      "Twoje rutyny są Twoje. Dane trzymamy tylko po to, żeby zsynchronizować je między urządzeniami — szczegóły w polityce prywatności.",
+    "faq.5.q": "Czy Cera zastąpi dermatologa?",
+    "faq.5.a":
+      "Nie. Cera pomaga w codziennej pielęgnacji — z poważnymi problemami skóry zawsze idź do lekarza.",
     "final.title": "Zadbaj o swój wieczorny rytuał",
     "final.sub": "Zapisz się — damy Ci znać, gdy Cera będzie gotowa.",
     "footer.privacy": "Polityka prywatności",
@@ -101,7 +116,7 @@ export const ui = {
     "shelf.body":
       "Cera рахує PAO за тебе й нагадає, перш ніж крем зіпсується. Жодного нюхання баночок.",
     "shelf.imgAlt": "Екран полиці з косметикою та термінами придатності",
-    "freq.title": "Кислота раз на три дні? Без проблем.",
+    "freq.title": "Кислота раз на три дні? Заплановано.",
     "freq.body":
       "Ретинол по понеділках і четвергах, пілінг раз на десять днів, решта — щодня. Cera пам'ятає весь розклад — навіть коли ти не мусиш.",
     "freq.imgAlt": "Форма частоти: щодня, обрані дні, інтервал",
@@ -109,6 +124,21 @@ export const ui = {
     "freq.viz.acid": "Кислота",
     "freq.viz.cream": "Крем",
     "freq.viz.caption": "Два тижні рутини в Cera",
+    "faq.title": "Питання й відповіді",
+    "faq.1.q": "Коли можна буде завантажити Cera?",
+    "faq.1.a":
+      "Працюємо над версією для iOS та Android. Список очікування отримає доступ першим.",
+    "faq.2.q": "Скільки коштуватиме?",
+    "faq.2.a":
+      "Базова версія буде безкоштовною. Деталі оголосимо перед запуском.",
+    "faq.3.q": "Для яких телефонів?",
+    "faq.3.a": "iOS та Android. Cera працює також у браузері.",
+    "faq.4.q": "Що з моєю приватністю?",
+    "faq.4.a":
+      "Твої рутини — твої. Дані зберігаємо лише для синхронізації між пристроями — деталі в політиці конфіденційності.",
+    "faq.5.q": "Чи замінить Cera дерматолога?",
+    "faq.5.a":
+      "Ні. Cera допомагає в щоденному догляді — з серйозними проблемами шкіри завжди звертайся до лікаря.",
     "final.title": "Подбай про свій вечірній ритуал",
     "final.sub": "Запишись — повідомимо, щойно Cera буде готова.",
     "footer.privacy": "Політика конфіденційності",
@@ -150,7 +180,7 @@ export const ui = {
     "shelf.body":
       "Cera counts PAO for you and nudges you before a cream goes off. No more jar-sniffing.",
     "shelf.imgAlt": "Product shelf screen with expiry dates",
-    "freq.title": "Acids every third day? Handled.",
+    "freq.title": "Acids every third day? Planned.",
     "freq.body":
       "Retinol on Mondays and Thursdays, a peel every ten days, the rest daily. Cera keeps the whole schedule — even when you don't have to.",
     "freq.imgAlt": "Frequency form: daily, specific days, interval",
@@ -158,6 +188,21 @@ export const ui = {
     "freq.viz.acid": "Acid",
     "freq.viz.cream": "Cream",
     "freq.viz.caption": "Two weeks of a routine in Cera",
+    "faq.title": "Questions & answers",
+    "faq.1.q": "When can I download Cera?",
+    "faq.1.a":
+      "We're building the iOS and Android versions now. The waitlist gets access first.",
+    "faq.2.q": "How much will it cost?",
+    "faq.2.a":
+      "The core version will be free. We'll announce details before launch.",
+    "faq.3.q": "Which phones?",
+    "faq.3.a": "iOS and Android. Cera also works in the browser.",
+    "faq.4.q": "What about my privacy?",
+    "faq.4.a":
+      "Your routines are yours. We store data only to sync it across your devices — details in the privacy policy.",
+    "faq.5.q": "Will Cera replace a dermatologist?",
+    "faq.5.a":
+      "No. Cera helps with daily care — for serious skin problems, always see a doctor.",
     "final.title": "Protect your evening ritual",
     "final.sub": "Sign up — we'll tell you the moment Cera is ready.",
     "footer.privacy": "Privacy policy",

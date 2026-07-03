@@ -1,4 +1,7 @@
-<div class="dial" aria-hidden="true">
+<div
+  class="pointer-events-none fixed right-[clamp(1rem,3vw,2rem)] bottom-[clamp(1rem,3vw,2rem)] z-20 opacity-90 max-md:hidden"
+  aria-hidden="true"
+>
   <svg width="44" height="44" viewBox="0 0 44 44">
     <circle
       cx="22"
@@ -7,7 +10,9 @@
       fill="oklch(0.2 0.042 4 / 0.35)"
       stroke="oklch(0.76 0.05 10 / 0.4)"
       stroke-width="1"></circle>
-    <g class="dial-disc">
+    <g
+      class="[transform:rotate(calc(var(--scroll-p,0)*180deg))] [transform-origin:22px_22px]"
+    >
       <circle cx="22" cy="10" r="5" fill="oklch(0.85 0.16 80)"></circle>
       <path
         d="M25 32.5a6 6 0 1 1-5.5-9.3 4.8 4.8 0 0 0 5.5 9.3Z"
@@ -15,28 +20,6 @@
     </g>
   </svg>
 </div>
-
-<style>
-  .dial {
-    position: fixed;
-    right: clamp(1rem, 3vw, 2rem);
-    bottom: clamp(1rem, 3vw, 2rem);
-    z-index: var(--z-dial);
-    pointer-events: none;
-    opacity: 0.9;
-  }
-
-  .dial-disc {
-    transform-origin: 22px 22px;
-    transform: rotate(calc(var(--scroll-p, 0) * 180deg));
-  }
-
-  @media (max-width: 720px) {
-    .dial {
-      display: none;
-    }
-  }
-</style>
 
 <script>
   const setP = () => {

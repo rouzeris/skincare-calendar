@@ -22,36 +22,51 @@ const labels = {
 };
 ---
 
-<section class="section theme-night final" aria-labelledby="final-title">
-  <div class="container final-inner">
-    <svg
-      class="moon"
-      aria-hidden="true"
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.6"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+<section
+  class="bg-[radial-gradient(40rem_28rem_at_50%_30%,oklch(0.32_0.07_4/0.55),transparent_70%)] bg-night-bg py-[calc(var(--spacing-section)*1.25)] font-[380] tracking-[0.01em] text-night-ink"
+  aria-labelledby="final-title"
+>
+  <div
+    class="mx-auto flex w-full max-w-6xl flex-col items-center px-[clamp(1.25rem,4vw,2.5rem)] text-center"
+  >
+    <p
+      class="inline-flex items-center gap-2 text-sm tracking-[0.09em] uppercase text-night-subtle"
     >
-      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
-    </svg>
-    <h2 id="final-title">{tr("final.title")}</h2>
-    <p>{tr("final.sub")}</p>
-    <div class="final-form">
+      <svg
+        aria-hidden="true"
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="text-night-accent"
+      >
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+      </svg>
+      {tr("hero.evening")}
+    </p>
+    <h2 id="final-title" class="mt-8 max-w-[18ch] text-h2 font-medium">
+      {tr("final.title")}
+    </h2>
+    <p class="mt-6 max-w-[40ch] text-lead text-night-subtle">
+      {tr("final.sub")}
+    </p>
+    <div class="mt-12 flex w-full justify-center">
       <WaitlistForm
         client:visible
         labels={labels}
         locale={locale}
         endpoint={waitlistEndpoint}
         id="final-wl"
+        tone="night"
       />
     </div>
     {
-      /* App store badges — uncomment at launch (assets: public/badges/*)
-      <div class="badges">
+      /* App store badges — uncomment at launch:
+      <div>
         <h3>{tr("badges.title")}</h3>
         <a href="https://apps.apple.com/app/…">App Store</a>
         <a href="https://play.google.com/store/apps/details?id=…">Google Play</a>
@@ -60,47 +75,3 @@ const labels = {
     }
   </div>
 </section>
-
-<style>
-  .final {
-    padding-block: calc(var(--section-pad) * 1.25);
-    background:
-      radial-gradient(
-        40rem 28rem at 50% 30%,
-        oklch(0.32 0.07 4 / 0.55),
-        transparent 70%
-      ),
-      var(--night-bg);
-  }
-
-  .final-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .moon {
-    color: var(--accent);
-    margin-bottom: var(--space-8);
-  }
-
-  .final h2 {
-    font-size: var(--text-h2);
-    max-width: 18ch;
-  }
-
-  .final p {
-    margin-top: var(--space-6);
-    font-size: var(--text-lead);
-    color: var(--subtle);
-    max-width: 40ch;
-  }
-
-  .final-form {
-    margin-top: var(--space-12);
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-</style>

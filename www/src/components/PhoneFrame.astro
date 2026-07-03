@@ -1,0 +1,28 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<figure class={`relative ${className}`}>
+  <div
+    class="relative rounded-[3rem] bg-[linear-gradient(160deg,oklch(0.32_0.02_280),oklch(0.16_0.015_280)_60%)] p-[10px] shadow-[inset_0_1px_1px_oklch(1_0_0/0.25),inset_0_-1px_1px_oklch(0_0_0/0.4)]"
+  >
+    <span
+      class="absolute top-24 -left-[2px] h-8 w-[3px] rounded-l-sm bg-[oklch(0.25_0.015_280)]"
+      aria-hidden="true"></span>
+    <span
+      class="absolute top-36 -left-[2px] h-12 w-[3px] rounded-l-sm bg-[oklch(0.25_0.015_280)]"
+      aria-hidden="true"></span>
+    <span
+      class="absolute top-28 -right-[2px] h-16 w-[3px] rounded-r-sm bg-[oklch(0.25_0.015_280)]"
+      aria-hidden="true"></span>
+    <div
+      class="overflow-clip rounded-[2.4rem] bg-day-surface ring-1 ring-black/40"
+    >
+      <slot />
+    </div>
+  </div>
+</figure>

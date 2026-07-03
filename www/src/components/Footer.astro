@@ -1,5 +1,6 @@
 ---
-import { locales, localePath, localeFlags, t, type Locale } from "../i18n/ui";
+import { t, type Locale } from "../i18n/ui";
+import LangSelect from "./LangSelect.astro";
 
 interface Props {
   locale: Locale;
@@ -7,92 +8,32 @@ interface Props {
 
 const { locale } = Astro.props;
 const tr = t(locale);
-const flags = localeFlags;
 ---
 
-<footer class="theme-night site-footer">
-  <div class="container footer-row">
-    <span class="wordmark">cera<span class="dot">.</span></span>
-    <nav class="footer-links" aria-label="Legal">
-      <a href="/privacy">{tr("footer.privacy")}</a>
-      <a href="/terms">{tr("footer.terms")}</a>
+<footer
+  class="border-t border-night-line bg-night-bg py-12 text-sm text-night-ink"
+>
+  <div
+    class="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-8 px-[clamp(1.25rem,4vw,2.5rem)] max-[640px]:flex-col max-[640px]:items-start max-[640px]:gap-6"
+  >
+    <span class="text-lg font-bold tracking-tight"
+      >cera<span class="text-night-accent">.</span></span
+    >
+    <nav class="flex gap-6" aria-label="Legal">
+      <a
+        href="/privacy"
+        class="text-night-subtle no-underline hover:text-night-ink hover:underline hover:underline-offset-[0.35em]"
+        >{tr("footer.privacy")}</a
+      >
+      <a
+        href="/terms"
+        class="text-night-subtle no-underline hover:text-night-ink hover:underline hover:underline-offset-[0.35em]"
+        >{tr("footer.terms")}</a
+      >
     </nav>
-    <nav class="footer-langs" aria-label={tr("a11y.langSwitch")}>
-      {
-        locales.map((l) => (
-          <a
-            href={localePath(l)}
-            aria-current={l === locale ? "page" : undefined}
-            lang={l === "ua" ? "uk" : l}
-            title={flags[l].name}
-          >
-            <span aria-hidden="true">{flags[l].flag}</span>
-            <span class="sr-only">{flags[l].name}</span>
-          </a>
-        ))
-      }
-    </nav>
-    <small>{tr("footer.copyright")}</small>
+    <LangSelect locale={locale} />
+    <small class="ml-auto text-night-subtle max-[640px]:ml-0"
+      >{tr("footer.copyright")}</small
+    >
   </div>
 </footer>
-
-<style>
-  .site-footer {
-    border-top: 1px solid var(--line);
-    padding-block: var(--space-12);
-    font-size: var(--text-small);
-  }
-
-  .footer-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--space-8);
-  }
-
-  .wordmark {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    font-weight: 560;
-  }
-
-  .wordmark .dot {
-    color: var(--accent);
-  }
-
-  .footer-links,
-  .footer-langs {
-    display: flex;
-    gap: var(--space-6);
-  }
-
-  .site-footer a {
-    color: var(--subtle);
-    text-decoration: none;
-  }
-
-  .site-footer a:hover {
-    color: var(--ink);
-    text-decoration: underline;
-    text-underline-offset: 0.35em;
-  }
-
-  .footer-langs a[aria-current="page"] {
-    color: var(--ink);
-  }
-
-  small {
-    margin-left: auto;
-    color: var(--subtle);
-  }
-
-  @media (max-width: 640px) {
-    .footer-row {
-      flex-direction: column;
-      gap: var(--space-6);
-    }
-    small {
-      margin-left: 0;
-    }
-  }
-</style>

@@ -5,6 +5,7 @@ import Hero from "./Hero.astro";
 import HowItWorks from "./HowItWorks.astro";
 import Shelf from "./Shelf.astro";
 import Rhythm from "./Rhythm.astro";
+import Faq from "./Faq.astro";
 import FinalCta from "./FinalCta.astro";
 import Footer from "./Footer.astro";
 import Dial from "./Dial.astro";
@@ -26,15 +27,28 @@ const waitlistEndpoint =
   title={tr("meta.title")}
   description={tr("meta.description")}
 >
-  <a href="#main" class="skip-link">{tr("a11y.skip")}</a>
+  <a
+    href="#main"
+    class="absolute -left-[9999px] z-[100] rounded-br-xl bg-day-ink px-6 py-3 text-day-bg focus:top-0 focus:left-0"
+    >{tr("a11y.skip")}</a
+  >
   <Header locale={locale} />
   <main id="main">
     <Hero locale={locale} waitlistEndpoint={waitlistEndpoint} />
     <HowItWorks locale={locale} />
     <Shelf locale={locale} />
-    <div class="scene-fade scene-fade-dusk" aria-hidden="true"></div>
+    <div
+      class="h-[clamp(6rem,14vh,10rem)] bg-linear-to-b from-day-surface to-dusk-bg"
+      aria-hidden="true"
+    >
+    </div>
     <Rhythm locale={locale} />
-    <div class="scene-fade scene-fade-night" aria-hidden="true"></div>
+    <div
+      class="h-[clamp(6rem,14vh,10rem)] bg-linear-to-b from-dusk-bg to-night-bg"
+      aria-hidden="true"
+    >
+    </div>
+    <Faq locale={locale} />
     <FinalCta locale={locale} waitlistEndpoint={waitlistEndpoint} />
   </main>
   <Footer locale={locale} />

@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
+import PhoneFrame from "./PhoneFrame.astro";
 import { t, type Locale } from "../i18n/ui";
 
 const shots = import.meta.glob<{ default: ImageMetadata }>(
@@ -16,13 +17,24 @@ const { locale } = Astro.props;
 const tr = t(locale);
 ---
 
-<section class="section theme-day shelf" aria-labelledby="shelf-title">
-  <div class="container shelf-grid">
-    <div class="shelf-copy">
-      <h2 id="shelf-title">{tr("shelf.title")}</h2>
-      <p>{tr("shelf.body")}</p>
+<section
+  class="border-t border-day-line bg-day-surface py-section text-day-ink"
+  aria-labelledby="shelf-title"
+>
+  <div
+    class="mx-auto grid w-full max-w-6xl grid-cols-[7fr_5fr] items-center gap-[clamp(2.5rem,6vw,6rem)] px-[clamp(1.25rem,4vw,2.5rem)] max-[820px]:grid-cols-1"
+  >
+    <div>
+      <h2 id="shelf-title" class="max-w-[16ch] text-h2">
+        {tr("shelf.title")}
+      </h2>
+      <p class="mt-6 max-w-[40ch] text-lead text-day-subtle">
+        {tr("shelf.body")}
+      </p>
     </div>
-    <div class="shelf-shot reveal">
+    <PhoneFrame
+      class="reveal w-[min(18rem,80vw)] justify-self-center drop-shadow-[0_24px_36px_oklch(0.4_0.09_25/0.24)]"
+    >
       <Image
         src={shots[`../assets/app/shelf-${locale}-light.png`]!.default}
         alt={tr("shelf.imgAlt")}
@@ -30,52 +42,6 @@ const tr = t(locale);
         densities={[1, 2]}
         loading="lazy"
       />
-    </div>
+    </PhoneFrame>
   </div>
 </section>
-
-<style>
-  .shelf {
-    background: var(--day-surface);
-    border-top: 1px solid var(--day-line);
-  }
-
-  .shelf-grid {
-    display: grid;
-    grid-template-columns: 7fr 5fr;
-    align-items: center;
-    gap: clamp(2.5rem, 6vw, 6rem);
-  }
-
-  .shelf-copy h2 {
-    font-size: var(--text-h2);
-    max-width: 16ch;
-  }
-
-  .shelf-copy p {
-    margin-top: var(--space-6);
-    font-size: var(--text-lead);
-    color: var(--subtle);
-    max-width: 40ch;
-  }
-
-  .shelf-shot {
-    justify-self: center;
-    width: min(19rem, 100%);
-    border-radius: 2rem;
-    overflow: clip;
-    box-shadow:
-      0 1px 3px oklch(0.28 0.022 20 / 0.06),
-      0 12px 32px -10px oklch(0.35 0.06 20 / 0.2),
-      0 34px 70px -24px oklch(0.4 0.09 25 / 0.24);
-  }
-
-  @media (max-width: 820px) {
-    .shelf-grid {
-      grid-template-columns: 1fr;
-    }
-    .shelf-shot {
-      width: min(17rem, 80vw);
-    }
-  }
-</style>
