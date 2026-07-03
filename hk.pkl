@@ -10,6 +10,11 @@ local linters = new Mapping<String, Step> {
     ["typecheck"] {
         glob = "**/*.{ts,tsx}"
         check = "bun typecheck"
+        exclude = "www/**"
+    }
+    ["astro-check"] {
+        glob = "www/**/*.{ts,tsx,astro}"
+        check = "bun run --cwd www typecheck"
     }
 }
 

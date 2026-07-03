@@ -1,0 +1,86 @@
+---
+import { t, type Locale } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const tr = t(locale);
+
+const steps = [1, 2, 3].map((n) => ({
+  n,
+  title: tr(`how.${n}.title` as Parameters<typeof tr>[0]),
+  body: tr(`how.${n}.body` as Parameters<typeof tr>[0]),
+}));
+---
+
+<section class="section theme-day how" aria-labelledby="how-title">
+  <div class="container">
+    <h2 id="how-title">{tr("how.title")}</h2>
+    <ol class="steps">
+      {
+        steps.map(({ n, title, body }) => (
+          <li class="step">
+            <span class="step-n" aria-hidden="true">
+              {n}
+            </span>
+            <h3>{title}</h3>
+            <p>{body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .how h2 {
+    font-size: var(--text-h2);
+    max-width: 20ch;
+  }
+
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-18);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+  }
+
+  .step:nth-child(2) {
+    transform: translateY(var(--space-12));
+  }
+
+  .step-n {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 3.5rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--accent);
+    display: block;
+  }
+
+  .step h3 {
+    font-size: var(--text-h3);
+    margin-top: var(--space-4);
+  }
+
+  .step p {
+    margin-top: var(--space-3);
+    color: var(--subtle);
+  }
+
+  @media (max-width: 820px) {
+    .steps {
+      grid-template-columns: 1fr;
+      max-width: 34rem;
+      gap: var(--space-12);
+    }
+    .step:nth-child(2) {
+      transform: none;
+    }
+  }
+</style>

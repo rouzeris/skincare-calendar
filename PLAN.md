@@ -29,9 +29,10 @@ hooks, mise.toml, GitHub Actions CI (closes #9).
 - [ ] Rebrand identifiers **before first store upload** (irreversible after):
       `app.json` `scheme`, `ios.bundleIdentifier`, `android.package`,
       market URL in `app/(tabs)/settings/index.tsx`, README
-- [ ] Host privacy policy + terms at `<domain>/privacy`, `<domain>/terms`
-      (already linked in settings)
-- [ ] Deploy web to Vercel
+- [x] Landing page built (`www/` — Astro + React, PL/UA/EN, waitlist form,
+      `/privacy` + `/terms` rendered from `legal/*.md`)
+- [ ] Deploy landing to Vercel; set `PUBLIC_WAITLIST_URL` (Convex HTTP action)
+      to activate the waitlist form
 
 ### 2. Backend foundation (Convex)
 

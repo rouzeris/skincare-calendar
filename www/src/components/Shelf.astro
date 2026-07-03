@@ -1,0 +1,78 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { t, type Locale } from "../i18n/ui";
+
+const shots = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/app/shelf-*-light.png",
+  { eager: true },
+);
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const tr = t(locale);
+---
+
+<section class="section theme-day shelf" aria-labelledby="shelf-title">
+  <div class="container shelf-grid">
+    <div class="shelf-copy">
+      <h2 id="shelf-title">{tr("shelf.title")}</h2>
+      <p>{tr("shelf.body")}</p>
+    </div>
+    <div class="shelf-shot">
+      <Image
+        src={shots[`../assets/app/shelf-${locale}-light.png`]!.default}
+        alt={tr("shelf.imgAlt")}
+        width={390}
+        densities={[1, 2]}
+        loading="lazy"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .shelf {
+    background: var(--day-surface);
+    border-block: 1px solid var(--day-line);
+  }
+
+  .shelf-grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 6rem);
+  }
+
+  .shelf-copy h2 {
+    font-size: var(--text-h2);
+    max-width: 16ch;
+  }
+
+  .shelf-copy p {
+    margin-top: var(--space-6);
+    font-size: var(--text-lead);
+    color: var(--subtle);
+    max-width: 40ch;
+  }
+
+  .shelf-shot {
+    justify-self: center;
+    width: min(19rem, 100%);
+    border-radius: 2rem;
+    overflow: clip;
+    border: 1px solid var(--day-line);
+  }
+
+  @media (max-width: 820px) {
+    .shelf-grid {
+      grid-template-columns: 1fr;
+    }
+    .shelf-shot {
+      width: min(17rem, 80vw);
+    }
+  }
+</style>

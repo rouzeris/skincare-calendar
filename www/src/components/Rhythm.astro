@@ -1,0 +1,132 @@
+---
+import { t, type Locale } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const tr = t(locale);
+
+const DAYS = 14;
+const rows = [
+  { label: tr("freq.viz.retinol"), on: new Set([0, 3, 7, 10]) },
+  { label: tr("freq.viz.acid"), on: new Set([1, 4, 7, 10, 13]) },
+  {
+    label: tr("freq.viz.cream"),
+    on: new Set(Array.from({ length: DAYS }, (_, i) => i)),
+  },
+];
+---
+
+<section class="section theme-dusk rhythm" aria-labelledby="rhythm-title">
+  <div class="container">
+    <h2 id="rhythm-title">{tr("freq.title")}</h2>
+    <p class="rhythm-body">{tr("freq.body")}</p>
+
+    <figure class="viz" role="img" aria-label={tr("freq.viz.caption")}>
+      <div class="viz-rows">
+        {
+          rows.map((row) => (
+            <div class="viz-row">
+              <span class="viz-label">{row.label}</span>
+              <span class="viz-dots">
+                {Array.from({ length: DAYS }, (_, day) => (
+                  <span
+                    class={row.on.has(day) ? "dot dot-on" : "dot"}
+                    style={`--d:${day}`}
+                  />
+                ))}
+              </span>
+            </div>
+          ))
+        }
+      </div>
+      <figcaption>{tr("freq.viz.caption")}</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .rhythm h2 {
+    font-size: var(--text-h2);
+    max-width: 18ch;
+  }
+
+  .rhythm-body {
+    margin-top: var(--space-6);
+    font-size: var(--text-lead);
+    color: var(--subtle);
+    max-width: 46ch;
+  }
+
+  .viz {
+    margin: var(--space-18) 0 0;
+    max-width: 40rem;
+  }
+
+  .viz-rows {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .viz-row {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .viz-label {
+    font-size: var(--text-small);
+    font-weight: 480;
+    color: var(--ink);
+  }
+
+  .viz-dots {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .dot {
+    width: clamp(0.7rem, 1.9vw, 1.05rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: oklch(1 0 0 / 0.13);
+  }
+
+  .dot-on {
+    background: var(--accent);
+    animation: dot-in 500ms var(--ease-out-quint) both;
+    animation-delay: calc(var(--d) * 35ms);
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+  }
+
+  figcaption {
+    margin-top: var(--space-6);
+    font-size: var(--text-small);
+    color: var(--subtle);
+  }
+
+  @keyframes dot-in {
+    from {
+      transform: scale(0.55);
+      opacity: 0.35;
+    }
+  }
+
+  @supports not (animation-timeline: view()) {
+    .dot-on {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .viz-row {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+  }
+</style>
