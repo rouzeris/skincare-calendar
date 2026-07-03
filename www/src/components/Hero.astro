@@ -38,7 +38,10 @@ const labels = {
     aria-hidden="true"
   >
   </div>
-  <div class="leaves-scroll absolute inset-0" aria-hidden="true">
+  <div
+    class="leaves-scroll pointer-events-none absolute inset-0 z-[5]"
+    aria-hidden="true"
+  >
     <video
       class="anim-leaves-in absolute inset-0 h-full w-full object-cover opacity-0 mix-blend-multiply [animation-delay:400ms] [filter:sepia(0.5)_saturate(0.7)_brightness(1.28)] [mask-image:linear-gradient(180deg,black_45%,transparent_88%)] motion-reduce:hidden"
       src="/shadows-loop.mp4"
