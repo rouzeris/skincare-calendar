@@ -55,11 +55,34 @@ export default function WaitlistForm({
   }
 
   if (status === "success") {
+    const accent = tone === "night" ? "text-night-accent" : "text-day-accent";
     return (
       <p
-        className="w-[min(28rem,100%)] p-4 text-center text-lead font-medium"
+        className="flex w-[min(28rem,100%)] animate-[success-rise_600ms_var(--ease-out-quint)_both] flex-col items-center gap-3 p-4 text-center text-lead font-medium"
         role="status"
       >
+        <svg
+          className={`size-10 ${accent}`}
+          viewBox="0 0 40 40"
+          fill="none"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <circle
+            cx="20"
+            cy="20"
+            r="18"
+            strokeWidth="2"
+            className="animate-[check-draw_700ms_var(--ease-out-quint)_100ms_forwards] [stroke-dasharray:113] [stroke-dashoffset:113]"
+          />
+          <path
+            d="M13 20.5l5 5 9-10"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="animate-[check-draw_450ms_var(--ease-out-quint)_600ms_forwards] [stroke-dasharray:22] [stroke-dashoffset:22]"
+          />
+        </svg>
         {labels.success}
       </p>
     );
@@ -110,7 +133,7 @@ export default function WaitlistForm({
         <button
           type="submit"
           disabled={status === "sending"}
-          className="cursor-pointer rounded-full bg-day-accent px-6 py-3 font-semibold whitespace-nowrap text-[oklch(0.99_0.005_17)] transition-[transform,background-color] duration-150 ease-out-quint hover:scale-[1.03] hover:bg-day-accent-hover active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 max-[480px]:py-4"
+          className="cursor-pointer rounded-full bg-day-accent px-6 py-3 font-semibold whitespace-nowrap text-[oklch(0.99_0.005_17)] transition-[transform,background-color,box-shadow] duration-200 ease-out-quint hover:-translate-y-px hover:bg-day-accent-hover hover:shadow-[0_8px_20px_-8px_oklch(0.55_0.21_17/0.55)] active:translate-y-0 active:scale-[0.98] active:shadow-none disabled:cursor-wait disabled:opacity-70 max-[480px]:py-4"
         >
           {status === "sending" ? labels.sending : labels.cta}
         </button>

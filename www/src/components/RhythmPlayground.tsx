@@ -17,10 +17,21 @@ interface Props {
 const DAYS = 14;
 
 const ROWS = [
-  { key: "retinol", on: new Set([0, 3, 7, 10]), time: "evening" as const },
-  { key: "acid", on: new Set([1, 4, 7, 10, 13]), time: "evening" as const },
+  {
+    key: "retinol",
+    brand: "Paula's Choice",
+    on: new Set([0, 3, 7, 10]),
+    time: "evening" as const,
+  },
+  {
+    key: "acid",
+    brand: "The Ordinary",
+    on: new Set([1, 4, 7, 10, 13]),
+    time: "evening" as const,
+  },
   {
     key: "cream",
+    brand: "La Roche-Posay",
     on: new Set(Array.from({ length: DAYS }, (_, i) => i)),
     time: "both" as const,
   },
@@ -69,14 +80,14 @@ export default function RhythmPlayground({ labels }: Props) {
     }
   };
 
+  const itemName = (r: (typeof ROWS)[number]) =>
+    `${rowLabel(r.key)} ${r.brand}`;
   const morningItems = (day: number) =>
-    ROWS.filter((r) => r.on.has(day) && r.time === "both").map((r) =>
-      rowLabel(r.key),
-    );
+    ROWS.filter((r) => r.on.has(day) && r.time === "both").map(itemName);
   const eveningItems = (day: number) =>
     ROWS.filter(
       (r) => r.on.has(day) && (r.time === "both" || r.time === "evening"),
-    ).map((r) => rowLabel(r.key));
+    ).map(itemName);
 
   return (
     <div className="relative mt-18 max-w-2xl">
@@ -116,10 +127,15 @@ export default function RhythmPlayground({ labels }: Props) {
         {ROWS.map((row) => (
           <div
             key={row.key}
-            className="grid grid-cols-[6.5rem_1fr] items-center gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-2"
+            className="grid grid-cols-[8.5rem_1fr] items-center gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-2"
           >
-            <span className="text-sm font-medium text-dusk-ink">
-              {rowLabel(row.key)}
+            <span className="text-sm leading-tight">
+              <span className="font-medium text-dusk-ink">
+                {rowLabel(row.key)}
+              </span>
+              <span className="block text-xs text-dusk-subtle">
+                {row.brand}
+              </span>
             </span>
             <span className="flex justify-between gap-1">
               {Array.from({ length: DAYS }, (_, day) => {

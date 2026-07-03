@@ -101,6 +101,10 @@ Direction picked: scroll-day choreography + playable ritual widget (no WebGL sha
 
 `www/public/shadows-loop.mp4` is **Lefos's asset, local test only** — gitignored (repo is public), never deploy it. Source: `https://static.lefos.com/06d030a36ecf815aaa3878a97d9c82ec960be4b7/assets/shadows-loop-ohxjmG36.mp4` (h264, 1280×720, 7 s loop, 125 kB). Replace with our own before launch: Midjourney/video-gen prompt ≈ "soft blurred shadows of swaying leaves on a white plaster wall, gentle summer breeze, dappled sunlight, seamless loop, grayscale, minimal" — grade to match, keep under ~300 kB.
 
+## Notes on brands
+
+Rhythm widget + app screenshots name real products (Paula's Choice, The Ordinary, La Roche-Posay) as an illustrative routine — nominative use, no endorsement implied. Swap if anyone objects.
+
 ## After Variant
 
 - Map the chosen concept back onto `www/` — sections, tokens, and i18n plumbing already exist; this is a reskin, not a rebuild.
