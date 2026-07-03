@@ -9,24 +9,38 @@ const { locale } = Astro.props;
 const tr = t(locale);
 ---
 
-<select
-  class="cursor-pointer rounded-full border border-current/30 bg-transparent px-4 py-2 text-sm text-inherit hover:border-current/55"
-  aria-label={tr("a11y.langSwitch")}
-  data-lang-select
->
-  {
-    locales.map((l) => (
-      <option
-        value={localePath(l)}
-        selected={l === locale}
-        lang={l === "ua" ? "uk" : l}
-        aria-label={localeFlags[l].name}
-      >
-        {localeFlags[l].flag}
-      </option>
-    ))
-  }
-</select>
+<span class="relative inline-flex items-center">
+  <select
+    class="cursor-pointer appearance-none rounded-lg bg-transparent py-1.5 pr-6 pl-2 text-base leading-none transition-colors duration-150 hover:bg-current/10"
+    aria-label={tr("a11y.langSwitch")}
+    data-lang-select
+  >
+    {
+      locales.map((l) => (
+        <option
+          value={localePath(l)}
+          selected={l === locale}
+          lang={l === "ua" ? "uk" : l}
+          aria-label={localeFlags[l].name}
+        >
+          {localeFlags[l].flag}
+        </option>
+      ))
+    }
+  </select>
+  <svg
+    class="pointer-events-none absolute right-1.5 size-3 opacity-45"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="m6 9 6 6 6-6"></path>
+  </svg>
+</span>
 
 <script>
   for (const el of document.querySelectorAll<HTMLSelectElement>(

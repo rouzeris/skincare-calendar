@@ -22,9 +22,12 @@ const { class: className = "" } = Astro.props;
     <div
       class="relative overflow-clip rounded-[2.4rem] bg-[#FAFAF9] ring-1 ring-black/40"
     >
-      <div class="relative h-10" aria-hidden="true">
+      <div
+        class="flex aspect-[393/59] items-center justify-center"
+        aria-hidden="true"
+      >
         <span
-          class="absolute top-2.5 left-1/2 h-[18px] w-[27%] -translate-x-1/2 rounded-full bg-[oklch(0.13_0.01_280)] shadow-[inset_0_0_2px_oklch(1_0_0/0.15)]"
+          class="aspect-[125/37] w-[32%] rounded-full bg-[oklch(0.13_0.01_280)] shadow-[inset_0_0_2px_oklch(1_0_0/0.15)]"
         ></span>
       </div>
       <slot />

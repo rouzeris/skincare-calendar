@@ -79,7 +79,7 @@
     background: var(--color-day-bg);
     font-kerning: normal;
     font-optical-sizing: auto;
-    font-feature-settings: "cv01", "cv02", "cv10", "ss02", "ss03";
+    font-feature-settings: "cv01", "cv02", "cv10", "ss02", "ss03", "cv11";
     -webkit-font-smoothing: antialiased;
   }
 
@@ -119,6 +119,7 @@
     html {
       scroll-behavior: auto;
     }
+
     *,
     *::before,
     *::after {

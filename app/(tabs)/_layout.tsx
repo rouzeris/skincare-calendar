@@ -44,6 +44,9 @@ export default function TabLayout() {
             web: "system-ui",
           }),
           fontSize: 12,
+          lineHeight: 16,
+          minHeight: 16,
+          paddingBottom: 2,
           fontWeight: "500",
         },
       }}
