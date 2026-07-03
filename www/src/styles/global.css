@@ -1,7 +1,23 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "InterVariable";
+  src: url("/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "InterVariable";
+  src: url("/fonts/InterVariable-Italic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: "Inter Variable", "Inter-Fallback", system-ui, sans-serif;
+  --font-sans: "InterVariable", "Inter-Fallback", system-ui, sans-serif;
 
   --color-day-bg: oklch(0.976 0.006 17);
   --color-day-surface: oklch(0.995 0.003 17);
@@ -27,11 +43,11 @@
   --text-display: clamp(2.625rem, 5vw + 1rem, 5rem);
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.03em;
-  --text-display--font-weight: 640;
+  --text-display--font-weight: 680;
   --text-h2: clamp(1.875rem, 3vw + 0.75rem, 3.25rem);
   --text-h2--line-height: 1.1;
   --text-h2--letter-spacing: -0.025em;
-  --text-h2--font-weight: 620;
+  --text-h2--font-weight: 640;
   --text-lead: clamp(1.125rem, 0.6vw + 1rem, 1.3125rem);
   --text-lead--line-height: 1.55;
 
@@ -58,10 +74,12 @@
     font-family: var(--font-sans);
     font-size: 1.0625rem;
     line-height: 1.65;
+    font-weight: 420;
     color: var(--color-day-ink);
     background: var(--color-day-bg);
     font-kerning: normal;
     font-optical-sizing: auto;
+    font-feature-settings: "cv01", "cv02", "cv10", "ss02", "ss03";
     -webkit-font-smoothing: antialiased;
   }
 
