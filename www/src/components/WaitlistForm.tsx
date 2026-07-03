@@ -109,7 +109,7 @@ export default function WaitlistForm({
       }}
       noValidate
     >
-      <div className="flex gap-2 rounded-full bg-day-surface p-2 shadow-[0_1px_2px_oklch(0.28_0.022_20/0.06),0_6px_18px_-6px_oklch(0.35_0.06_20/0.18),0_20px_45px_-18px_oklch(0.4_0.09_25/0.22)] focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-day-accent max-[480px]:flex-col max-[480px]:rounded-[1.4rem]">
+      <div className="flex gap-2 rounded-full bg-day-surface p-2 shadow-[inset_2px_2px_6px_oklch(0.82_0.028_20/0.5),inset_-2px_-2px_6px_oklch(1_0_0/0.85),0_1px_2px_oklch(0.28_0.022_20/0.05)] focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-day-accent max-[480px]:flex-col max-[480px]:rounded-[1.4rem]">
         <label className="sr-only" htmlFor={inputId}>
           {labels.label}
         </label>
@@ -133,23 +133,9 @@ export default function WaitlistForm({
         <button
           type="submit"
           disabled={status === "sending"}
-          className="group/btn cursor-pointer rounded-full bg-day-accent px-6 py-3 font-semibold whitespace-nowrap text-[oklch(0.99_0.005_17)] transition-[transform,background-color] duration-200 ease-out-quint active:scale-[0.97] disabled:cursor-wait disabled:opacity-70 max-[480px]:py-4"
+          className="cursor-pointer rounded-full bg-day-accent bg-[linear-gradient(180deg,oklch(1_0_0/0.14),oklch(1_0_0/0)_60%)] px-6 py-3 font-semibold whitespace-nowrap text-[oklch(0.99_0.005_17)] shadow-[inset_0_1px_0_oklch(1_0_0/0.25),inset_0_-1px_0_oklch(0.42_0.18_17/0.5),0_1px_0_oklch(0.42_0.17_17/0.9),0_3px_7px_-3px_oklch(0.3_0.12_17/0.3)] transition-[transform,box-shadow,filter] duration-150 ease-out-quint hover:brightness-[1.05] active:translate-y-[1px] active:shadow-[inset_0_1px_3px_oklch(0.35_0.15_17/0.45),0_0px_0_oklch(0.42_0.17_17/0.9)] disabled:cursor-wait disabled:opacity-70 max-[480px]:py-4"
         >
-          {status === "sending" ? (
-            labels.sending
-          ) : (
-            <span className="relative block overflow-hidden">
-              <span className="block transition-transform duration-300 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover/btn:-translate-y-[110%]">
-                {labels.cta}
-              </span>
-              <span
-                className="absolute inset-0 block translate-y-[110%] transition-transform duration-300 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover/btn:translate-y-0"
-                aria-hidden="true"
-              >
-                {labels.cta}
-              </span>
-            </span>
-          )}
+          {status === "sending" ? labels.sending : labels.cta}
         </button>
       </div>
       <p
