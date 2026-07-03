@@ -1,4 +1,5 @@
 ---
+import RhythmPlayground from "./RhythmPlayground";
 import { t, type Locale } from "../i18n/ui";
 
 interface Props {
@@ -8,22 +9,27 @@ interface Props {
 const { locale } = Astro.props;
 const tr = t(locale);
 
-const DAYS = 14;
-const rows = [
-  { label: tr("freq.viz.retinol"), on: new Set([0, 3, 7, 10]) },
-  { label: tr("freq.viz.acid"), on: new Set([1, 4, 7, 10, 13]) },
-  {
-    label: tr("freq.viz.cream"),
-    on: new Set(Array.from({ length: DAYS }, (_, i) => i)),
-  },
-];
+const labels = {
+  retinol: tr("freq.viz.retinol"),
+  acid: tr("freq.viz.acid"),
+  cream: tr("freq.viz.cream"),
+  day: tr("viz.day"),
+  morning: tr("viz.morning"),
+  evening: tr("viz.evening"),
+  tapHint: tr("viz.tapHint"),
+};
 ---
 
 <section
-  class="bg-[radial-gradient(55rem_40rem_at_88%_0%,oklch(0.48_0.09_30/0.35),transparent_65%)] bg-dusk-bg py-section font-[380] tracking-[0.01em] text-dusk-ink"
+  class="relative overflow-clip bg-dusk-bg py-section font-[380] tracking-[0.01em] text-dusk-ink"
   aria-labelledby="rhythm-title"
 >
-  <div class="mx-auto w-full max-w-6xl px-[clamp(1.25rem,4vw,2.5rem)]">
+  <div
+    class="lamp-drift absolute inset-0 bg-[radial-gradient(55rem_40rem_at_88%_0%,oklch(0.48_0.09_30/0.35),transparent_65%)]"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="relative mx-auto w-full max-w-6xl px-[clamp(1.25rem,4vw,2.5rem)]">
     <h2 id="rhythm-title" class="max-w-[18ch] text-h2 font-medium">
       {tr("freq.title")}
     </h2>
@@ -31,33 +37,25 @@ const rows = [
       {tr("freq.body")}
     </p>
 
-    <figure
-      class="reveal mt-18 max-w-2xl"
-      role="img"
-      aria-label={tr("freq.viz.caption")}
-    >
-      <div class="grid gap-6">
-        {
-          rows.map((row) => (
-            <div class="grid grid-cols-[6.5rem_1fr] items-center gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-2">
-              <span class="text-sm font-medium text-dusk-ink">{row.label}</span>
-              <span class="flex justify-between gap-1">
-                {Array.from({ length: DAYS }, (_, day) => (
-                  <span
-                    class={`aspect-square w-[clamp(0.7rem,1.9vw,1.05rem)] rounded-full ${
-                      row.on.has(day) ? "dot-in bg-night-accent" : "bg-white/13"
-                    }`}
-                    style={`animation-delay: calc(${day} * 35ms)`}
-                  />
-                ))}
-              </span>
-            </div>
-          ))
-        }
-      </div>
-      <figcaption class="mt-6 text-sm text-dusk-subtle">
-        {tr("freq.viz.caption")}
-      </figcaption>
-    </figure>
+    <RhythmPlayground client:visible labels={labels} />
   </div>
 </section>
+
+<style>
+  @supports (animation-timeline: view()) {
+    .lamp-drift {
+      animation: lamp-drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes lamp-drift {
+      from {
+        transform: translateY(-6%);
+      }
+      to {
+        transform: translateY(10%);
+      }
+    }
+  }
+</style>

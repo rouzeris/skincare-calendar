@@ -87,6 +87,16 @@ Direction chosen: **scroll-driven storytelling + textured warmth** (instead of t
 - Language switcher: single flag-only `<select>` (native, `aria-label`ed) in header + footer.
 - Copy: „Ogarnięte." → „Zaplanowane." (too slangy for the calm/caring voice — watch for this register in future copy).
 
+## Overdrive (2026-07-04)
+
+Direction picked: scroll-day choreography + playable ritual widget (no WebGL shader — parked).
+
+- Leaf shadows drift up + dim as the hero scrolls away (scroll-driven, `@supports` guarded).
+- Lamp glow in the dusk section drifts with scroll.
+- Night CTA: the phone **falls asleep** — light theme crossfades to dark (screen bg + screenshot) as it enters the viewport; scrubbing back wakes it.
+- Rhythm viz is now `RhythmPlayground.tsx`: pointer trail blooms dots with staggered glow, tapping a day opens a routine-preview card (`startViewTransition` + `@starting-style`, Esc closes). SSR'd so dots render before JS.
+- All effects transform/opacity/bg-color only, reduced-motion safe, static fallbacks.
+
 ### Leaf video licensing — IMPORTANT
 
 `www/public/shadows-loop.mp4` is **Lefos's asset, local test only** — gitignored (repo is public), never deploy it. Source: `https://static.lefos.com/06d030a36ecf815aaa3878a97d9c82ec960be4b7/assets/shadows-loop-ohxjmG36.mp4` (h264, 1280×720, 7 s loop, 125 kB). Replace with our own before launch: Midjourney/video-gen prompt ≈ "soft blurred shadows of swaying leaves on a white plaster wall, gentle summer breeze, dappled sunlight, seamless loop, grayscale, minimal" — grade to match, keep under ~300 kB.

@@ -61,6 +61,10 @@ export const ui = {
     "freq.viz.acid": "Kwas",
     "freq.viz.cream": "Krem",
     "freq.viz.caption": "Dwa tygodnie rutyny w Cerze",
+    "viz.day": "Dzień",
+    "viz.morning": "Rano",
+    "viz.evening": "Wieczór",
+    "viz.tapHint": "Dotknij dnia, żeby podejrzeć rutynę.",
     "faq.title": "Pytania i odpowiedzi",
     "faq.1.q": "Kiedy będzie można pobrać Cerę?",
     "faq.1.a":
@@ -124,6 +128,10 @@ export const ui = {
     "freq.viz.acid": "Кислота",
     "freq.viz.cream": "Крем",
     "freq.viz.caption": "Два тижні рутини в Cera",
+    "viz.day": "День",
+    "viz.morning": "Ранок",
+    "viz.evening": "Вечір",
+    "viz.tapHint": "Торкнись дня, щоб побачити рутину.",
     "faq.title": "Питання й відповіді",
     "faq.1.q": "Коли можна буде завантажити Cera?",
     "faq.1.a":
@@ -188,6 +196,10 @@ export const ui = {
     "freq.viz.acid": "Acid",
     "freq.viz.cream": "Cream",
     "freq.viz.caption": "Two weeks of a routine in Cera",
+    "viz.day": "Day",
+    "viz.morning": "Morning",
+    "viz.evening": "Evening",
+    "viz.tapHint": "Tap a day to preview the routine.",
     "faq.title": "Questions & answers",
     "faq.1.q": "When can I download Cera?",
     "faq.1.a":

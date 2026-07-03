@@ -1,9 +1,10 @@
 ---
 interface Props {
   class?: string;
+  screenClass?: string;
 }
 
-const { class: className = "" } = Astro.props;
+const { class: className = "", screenClass = "bg-[#FAFAF9]" } = Astro.props;
 ---
 
 <figure class={`relative ${className}`}>
@@ -20,7 +21,7 @@ const { class: className = "" } = Astro.props;
       class="absolute top-28 -right-[2px] h-16 w-[3px] rounded-r-sm bg-[oklch(0.25_0.015_280)]"
       aria-hidden="true"></span>
     <div
-      class="relative overflow-clip rounded-[2.4rem] bg-[#FAFAF9] ring-1 ring-black/40"
+      class={`relative overflow-clip rounded-[2.4rem] ring-1 ring-black/40 ${screenClass}`}
     >
       <div
         class="flex aspect-[393/59] items-center justify-center"
