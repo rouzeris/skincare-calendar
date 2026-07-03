@@ -11,8 +11,25 @@ const tr = t(locale);
 const items = [1, 2, 3, 4, 5].map((n) => ({
   q: tr(`faq.${n}.q` as Parameters<typeof tr>[0]),
   a: tr(`faq.${n}.a` as Parameters<typeof tr>[0]),
-  privacyLink: n === 4,
 }));
+
+const linkText = tr("faq.4.linkText");
+const splitAnswer = (a: string) => {
+  const i = a.indexOf(linkText);
+  return i === -1
+    ? null
+    : ([a.slice(0, i), a.slice(i + linkText.length)] as const);
+};
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: items.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+});
 ---
 
 <section
@@ -23,38 +40,70 @@ const items = [1, 2, 3, 4, 5].map((n) => ({
     <h2 id="faq-title" class="text-h2 font-medium">{tr("faq.title")}</h2>
     <div class="mt-12">
       {
-        items.map(({ q, a, privacyLink }) => (
-          <details class="group border-b border-night-line py-2">
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-medium [&::-webkit-details-marker]:hidden">
-              {q}
-              <svg
-                class="shrink-0 text-night-subtle transition-transform duration-200 ease-out-quint group-open:rotate-45"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                aria-hidden="true"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-            </summary>
-            <p class="max-w-[60ch] pb-5 text-night-subtle">
-              {a}{" "}
-              {privacyLink && (
-                <a
-                  href="/privacy"
-                  class="text-night-ink underline underline-offset-4"
+        items.map(({ q, a }, i) => {
+          const parts = splitAnswer(a);
+          return (
+            <details
+              class={`faq-item group ${i > 0 ? "border-t border-night-line" : ""}`}
+            >
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium transition-colors duration-150 hover:text-white [&::-webkit-details-marker]:hidden">
+                {q}
+                <svg
+                  class="shrink-0 text-night-subtle transition-transform duration-200 ease-out-quint group-open:rotate-45 group-hover:text-night-accent"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  aria-hidden="true"
                 >
-                  →
-                </a>
-              )}
-            </p>
-          </details>
-        ))
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </summary>
+              <p class="max-w-[60ch] pb-6 text-night-subtle">
+                {parts ? (
+                  <>
+                    {parts[0]}
+                    <a
+                      href="/privacy"
+                      class="text-night-ink underline decoration-night-accent underline-offset-4 hover:text-white"
+                    >
+                      {linkText}
+                    </a>
+                    {parts[1]}
+                  </>
+                ) : (
+                  a
+                )}
+              </p>
+            </details>
+          );
+        })
       }
     </div>
   </div>
 </section>
+
+<script type="application/ld+json" set:html={jsonLd} is:inline />
+
+<style>
+  @supports (interpolate-size: allow-keywords) {
+    .faq-item {
+      interpolate-size: allow-keywords;
+    }
+
+    .faq-item::details-content {
+      block-size: 0;
+      overflow-y: clip;
+      transition:
+        block-size 300ms var(--ease-out-quint),
+        content-visibility 300ms allow-discrete;
+    }
+
+    .faq-item[open]::details-content {
+      block-size: auto;
+    }
+  }
+</style>

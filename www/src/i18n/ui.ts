@@ -77,6 +77,7 @@ export const ui = {
     "faq.4.q": "Co z moją prywatnością?",
     "faq.4.a":
       "Twoje rutyny są Twoje. Dane trzymamy tylko po to, żeby zsynchronizować je między urządzeniami. Szczegóły znajdziesz w polityce prywatności.",
+    "faq.4.linkText": "polityce prywatności",
     "faq.5.q": "Czy Cera zastąpi dermatologa?",
     "faq.5.a":
       "Nie. Cera pomaga w codziennej pielęgnacji. Z poważnymi problemami skóry idź do lekarza.",
@@ -144,6 +145,7 @@ export const ui = {
     "faq.4.q": "Що з моєю приватністю?",
     "faq.4.a":
       "Твої рутини — твої. Дані зберігаємо лише для синхронізації між пристроями. Деталі знайдеш у політиці конфіденційності.",
+    "faq.4.linkText": "політиці конфіденційності",
     "faq.5.q": "Чи замінить Cera дерматолога?",
     "faq.5.a":
       "Ні. Cera допомагає в щоденному догляді. З серйозними проблемами шкіри звертайся до лікаря.",
@@ -212,6 +214,7 @@ export const ui = {
     "faq.4.q": "What about my privacy?",
     "faq.4.a":
       "Your routines are yours. We store data only to sync it across your devices. You'll find the details in the privacy policy.",
+    "faq.4.linkText": "privacy policy",
     "faq.5.q": "Will Cera replace a dermatologist?",
     "faq.5.a":
       "No. Cera helps with daily care. For serious skin problems, see a doctor.",
