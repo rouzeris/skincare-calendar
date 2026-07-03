@@ -19,19 +19,19 @@ const DAYS = 14;
 const ROWS = [
   {
     key: "retinol",
-    brand: "Paula's Choice",
+    product: "Paula's Choice Clinical 0.3% Retinol",
     on: new Set([0, 3, 7, 10]),
     time: "evening" as const,
   },
   {
     key: "acid",
-    brand: "The Ordinary",
+    product: "The Ordinary Mandelic Acid 10% + HA",
     on: new Set([1, 4, 7, 10, 13]),
     time: "evening" as const,
   },
   {
     key: "cream",
-    brand: "La Roche-Posay",
+    product: "La Roche-Posay Toleriane Sensitive",
     on: new Set(Array.from({ length: DAYS }, (_, i) => i)),
     time: "both" as const,
   },
@@ -80,22 +80,22 @@ export default function RhythmPlayground({ labels }: Props) {
     }
   };
 
-  const itemName = (r: (typeof ROWS)[number]) =>
-    `${rowLabel(r.key)} ${r.brand}`;
   const morningItems = (day: number) =>
-    ROWS.filter((r) => r.on.has(day) && r.time === "both").map(itemName);
+    ROWS.filter((r) => r.on.has(day) && r.time === "both").map(
+      (r) => r.product,
+    );
   const eveningItems = (day: number) =>
     ROWS.filter(
       (r) => r.on.has(day) && (r.time === "both" || r.time === "evening"),
-    ).map(itemName);
+    ).map((r) => r.product);
 
   return (
     <div className="relative mt-18 max-w-2xl">
       {openDay !== null && (
         <div
-          className="absolute -top-4 z-10 w-56 -translate-y-full rounded-xl bg-dusk-surface p-4 text-sm shadow-[0_16px_40px_-12px_oklch(0_0_0/0.5)] [view-transition-name:ritual-card] starting:scale-95 starting:opacity-0"
+          className="absolute -top-4 z-10 w-64 -translate-y-full rounded-xl bg-dusk-surface p-4 text-sm shadow-[0_16px_40px_-12px_oklch(0_0_0/0.5)] [view-transition-name:ritual-card] starting:scale-95 starting:opacity-0"
           style={{
-            left: `clamp(0px, calc(7.5rem + ${(openDay + 0.5) / DAYS} * (100% - 7.5rem) - 7rem), calc(100% - 14rem))`,
+            left: `clamp(0px, calc(11rem + ${(openDay + 0.5) / DAYS} * (100% - 11rem) - 8rem), calc(100% - 16rem))`,
             transition:
               "opacity 250ms cubic-bezier(0.22,1,0.36,1), transform 250ms cubic-bezier(0.22,1,0.36,1)",
           }}
@@ -127,14 +127,14 @@ export default function RhythmPlayground({ labels }: Props) {
         {ROWS.map((row) => (
           <div
             key={row.key}
-            className="grid grid-cols-[8.5rem_1fr] items-center gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-2"
+            className="grid grid-cols-[10rem_1fr] items-center gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-2"
           >
             <span className="text-sm leading-tight">
               <span className="font-medium text-dusk-ink">
                 {rowLabel(row.key)}
               </span>
               <span className="block text-xs text-dusk-subtle">
-                {row.brand}
+                {row.product}
               </span>
             </span>
             <span className="flex justify-between gap-1">

@@ -133,9 +133,23 @@ export default function WaitlistForm({
         <button
           type="submit"
           disabled={status === "sending"}
-          className="cursor-pointer rounded-full bg-day-accent px-6 py-3 font-semibold whitespace-nowrap text-[oklch(0.99_0.005_17)] transition-[transform,background-color,box-shadow] duration-200 ease-out-quint hover:-translate-y-px hover:bg-day-accent-hover hover:shadow-[0_8px_20px_-8px_oklch(0.55_0.21_17/0.55)] active:translate-y-0 active:scale-[0.98] active:shadow-none disabled:cursor-wait disabled:opacity-70 max-[480px]:py-4"
+          className="group/btn cursor-pointer rounded-full bg-day-accent px-6 py-3 font-semibold whitespace-nowrap text-[oklch(0.99_0.005_17)] transition-[transform,background-color] duration-200 ease-out-quint active:scale-[0.97] disabled:cursor-wait disabled:opacity-70 max-[480px]:py-4"
         >
-          {status === "sending" ? labels.sending : labels.cta}
+          {status === "sending" ? (
+            labels.sending
+          ) : (
+            <span className="relative block overflow-hidden">
+              <span className="block transition-transform duration-300 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover/btn:-translate-y-[110%]">
+                {labels.cta}
+              </span>
+              <span
+                className="absolute inset-0 block translate-y-[110%] transition-transform duration-300 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover/btn:translate-y-0"
+                aria-hidden="true"
+              >
+                {labels.cta}
+              </span>
+            </span>
+          )}
         </button>
       </div>
       <p

@@ -33,7 +33,7 @@ const jsonLd = JSON.stringify({
 ---
 
 <section
-  class="bg-night-bg py-section font-[380] tracking-[0.01em] text-night-ink"
+  class="bg-[#1C1917] py-section font-[380] tracking-[0.01em] text-night-ink"
   aria-labelledby="faq-title"
 >
   <div class="mx-auto w-full max-w-3xl px-[clamp(1.25rem,4vw,2.5rem)]">
@@ -44,7 +44,7 @@ const jsonLd = JSON.stringify({
           const parts = splitAnswer(a);
           return (
             <details
-              class={`faq-item group ${i > 0 ? "border-t border-night-line" : ""}`}
+              class={`faq-item group ${i > 0 ? "border-t border-white/10" : ""}`}
             >
               <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium transition-colors duration-150 hover:text-white [&::-webkit-details-marker]:hidden">
                 {q}
@@ -68,7 +68,7 @@ const jsonLd = JSON.stringify({
                     {parts[0]}
                     <a
                       href="/privacy"
-                      class="text-night-ink underline decoration-night-accent underline-offset-4 hover:text-white"
+                      class="link-swipe font-medium text-night-ink [--swipe-c:var(--color-night-accent)] [--swipe-ink:#1C1917]"
                     >
                       {linkText}
                     </a>
