@@ -2,16 +2,15 @@ amends "package://github.com/jdx/hk/releases/download/v1.48.0/hk@1.48.0#/Config.
 import "package://github.com/jdx/hk/releases/download/v1.48.0/hk@1.48.0#/Builtins.pkl"
 
 local linters = new Mapping<String, Step> {
-    // Add linters here. Examples:
-    // ["prettier"] = Builtins.prettier
-    // ["eslint"] = Builtins.eslint
-    // ["ruff"] = Builtins.ruff
-
-    // Or define custom steps:
-    // ["custom"] {
-    //     glob = "**/*.py"
-    //     check = "mypy {{ files }}"
-    // }
+    ["prettier"] = Builtins.prettier
+    ["eslint"] {
+        glob = "**/*.{ts,tsx}"
+        check = "bunx eslint {{files}}"
+    }
+    ["typecheck"] {
+        glob = "**/*.{ts,tsx}"
+        check = "bun typecheck"
+    }
 }
 
 hooks {
