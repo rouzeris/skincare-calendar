@@ -1,17 +1,13 @@
-- This project uses Bun (not NPM, PNPM, or Yarn). Use `bunx` instead of `npx`
-- End-to-end tests should be whole user flows, not simple checks.
+- Bun, not npm/pnpm/yarn. `bunx` not `npx`.
+- E2E tests = whole user flows, not simple checks.
 
-## Development Commands
+## Commands
 
-Run from repo root (app lives at root, not in an `expo/` subdir): `bun start-web`, `bun start`, `bun typecheck`, `bun lint`.
+`bun start-web`, `bun start`, `bun typecheck`, `bun lint`, `bun run test` (Playwright e2e).
 
-Run `hk install` once to set up pre-commit hooks (prettier, eslint, typecheck via `hk.pkl`).
+`hk install` once → pre-commit hooks (prettier, eslint, typecheck; see `hk.pkl`).
 
 ## Convex
 
-This project uses [Convex](https://convex.dev) as its backend.
-
-When working on Convex code, **always read
-`convex/_generated/ai/guidelines.md` first** for guidelines on
-how to use Convex APIs and patterns. The file contains rules that
-override what you may have learned about Convex from training data.
+Backend = [Convex](https://convex.dev). Before Convex work, read
+`convex/_generated/ai/guidelines.md` — rules there override training data.
