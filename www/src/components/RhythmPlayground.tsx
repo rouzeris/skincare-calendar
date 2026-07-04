@@ -42,6 +42,7 @@ export default function RhythmPlayground({ labels }: Props) {
   const [openDay, setOpenDay] = useState<number | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(0);
+  const openedByHover = useRef(false);
 
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
@@ -72,12 +73,19 @@ export default function RhythmPlayground({ labels }: Props) {
   };
 
   const toggleDay = (day: number) => {
+    openedByHover.current = false;
     const next = openDay === day ? null : day;
     if (document.startViewTransition) {
       document.startViewTransition(() => setOpenDay(next));
     } else {
       setOpenDay(next);
     }
+  };
+
+  const hoverDay = (e: React.PointerEvent, day: number) => {
+    if (e.pointerType !== "mouse") return;
+    openedByHover.current = true;
+    setOpenDay(day);
   };
 
   const morningItems = (day: number) =>
@@ -121,7 +129,13 @@ export default function RhythmPlayground({ labels }: Props) {
       <div
         ref={gridRef}
         onPointerMove={trackPointer}
-        onPointerLeave={() => setHotCol(null)}
+        onPointerLeave={() => {
+          setHotCol(null);
+          if (openedByHover.current) {
+            openedByHover.current = false;
+            setOpenDay(null);
+          }
+        }}
         className="grid gap-6"
       >
         {ROWS.map((row) => (
@@ -156,7 +170,8 @@ export default function RhythmPlayground({ labels }: Props) {
                       row.key === "cream" ? openDay === day : undefined
                     }
                     onClick={() => toggleDay(day)}
-                    className={`aspect-square w-[clamp(0.7rem,1.9vw,1.05rem)] cursor-pointer rounded-full transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    onPointerEnter={(e) => hoverDay(e, day)}
+                    className={`relative aspect-square w-[clamp(0.7rem,1.9vw,1.05rem)] cursor-pointer rounded-full transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] after:absolute after:-inset-2.5 after:content-[''] ${
                       on ? "bg-night-accent" : "bg-white/13"
                     }`}
                     style={{
