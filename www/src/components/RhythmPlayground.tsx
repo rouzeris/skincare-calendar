@@ -100,11 +100,14 @@ export default function RhythmPlayground({ labels }: Props) {
       DAYS - 1,
       Math.max(0, Math.floor((x / (rect.width - labelOffset)) * DAYS)),
     );
-    rawX.set(
-      clampX(e.clientX - wrap.getBoundingClientRect().left - CARD_W / 2),
-    );
+    const wrapRect = wrap.getBoundingClientRect();
+    rawX.set(clampX(e.clientX - wrapRect.left + 18));
+    rawY.set(e.clientY - wrapRect.top - 10);
     cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => setHotCol(col));
+    rafRef.current = requestAnimationFrame(() => {
+      setHotCol(col);
+      if (openedByHover.current) setOpenDay(col);
+    });
   };
 
   const toggleDay = (day: number, e?: React.MouseEvent) => {
@@ -119,8 +122,8 @@ export default function RhythmPlayground({ labels }: Props) {
     if (wrap && e) {
       const w = wrap.getBoundingClientRect();
       const b = e.currentTarget.getBoundingClientRect();
-      x = clampX(b.left + b.width / 2 - w.left - CARD_W / 2);
-      y = b.top - w.top - 14;
+      x = clampX(b.right - w.left + 14);
+      y = b.top - w.top - 10;
     }
     if (openDay === null) {
       rawX.jump(x);
@@ -138,8 +141,8 @@ export default function RhythmPlayground({ labels }: Props) {
       const wrap = wrapRef.current;
       if (wrap) {
         const r = wrap.getBoundingClientRect();
-        rawX.jump(clampX(e.clientX - r.left - CARD_W / 2));
-        rawY.jump(e.clientY - r.top - 14);
+        rawX.jump(clampX(e.clientX - r.left + 18));
+        rawY.jump(e.clientY - r.top - 10);
       }
     }
     openedByHover.current = true;
@@ -245,6 +248,22 @@ export default function RhythmPlayground({ labels }: Props) {
         }}
         className="grid gap-6"
       >
+        <div
+          className="grid grid-cols-[10rem_1fr] items-center gap-4 max-[560px]:grid-cols-1 max-[560px]:gap-2"
+          aria-hidden="true"
+        >
+          <span className="max-[560px]:hidden" />
+          <span className="flex justify-between gap-1">
+            {Array.from({ length: DAYS }, (_, day) => (
+              <span
+                key={day}
+                className="w-[clamp(0.7rem,1.9vw,1.05rem)] text-center text-[10px] leading-none text-dusk-subtle tabular-nums"
+              >
+                {day + 1}
+              </span>
+            ))}
+          </span>
+        </div>
         {ROWS.map((row) => (
           <div
             key={row.key}
