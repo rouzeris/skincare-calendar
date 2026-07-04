@@ -48,7 +48,6 @@ export default function RhythmPlayground({ labels }: Props) {
   const [openDay, setOpenDay] = useState<number | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [wrapW, setWrapW] = useState(0);
   const rafRef = useRef(0);
   const openedByHover = useRef(false);
   const reducedMotion =
@@ -74,15 +73,6 @@ export default function RhythmPlayground({ labels }: Props) {
       labelOffset + ((day + 0.5) / DAYS) * (w - labelOffset) - CARD_W / 2,
     );
   };
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => setWrapW(el.clientWidth));
-    ro.observe(el);
-    setWrapW(el.clientWidth);
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
