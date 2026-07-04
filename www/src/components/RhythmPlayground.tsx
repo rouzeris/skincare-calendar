@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 
 export interface RhythmLabels {
   retinol: string;
@@ -41,8 +42,19 @@ export default function RhythmPlayground({ labels }: Props) {
   const [hotCol, setHotCol] = useState<number | null>(null);
   const [openDay, setOpenDay] = useState<number | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [wrapW, setWrapW] = useState(0);
   const rafRef = useRef(0);
   const openedByHover = useRef(false);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setWrapW(el.clientWidth));
+    ro.observe(el);
+    setWrapW(el.clientWidth);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
@@ -74,12 +86,7 @@ export default function RhythmPlayground({ labels }: Props) {
 
   const toggleDay = (day: number) => {
     openedByHover.current = false;
-    const next = openDay === day ? null : day;
-    if (document.startViewTransition) {
-      document.startViewTransition(() => setOpenDay(next));
-    } else {
-      setOpenDay(next);
-    }
+    setOpenDay(openDay === day ? null : day);
   };
 
   const hoverDay = (e: React.PointerEvent, day: number) => {
@@ -97,34 +104,51 @@ export default function RhythmPlayground({ labels }: Props) {
       (r) => r.on.has(day) && (r.time === "both" || r.time === "evening"),
     ).map((r) => r.product);
 
+  const CARD_W = 256;
+  const labelOffset = wrapW > 520 ? 176 : 0;
+  const cardX =
+    openDay === null
+      ? 0
+      : Math.min(
+          Math.max(
+            0,
+            labelOffset +
+              ((openDay + 0.5) / DAYS) * (wrapW - labelOffset) -
+              CARD_W / 2,
+          ),
+          Math.max(0, wrapW - CARD_W),
+        );
+
   return (
-    <div className="relative mt-18 max-w-2xl">
-      {openDay !== null && (
-        <div
-          className="absolute -top-4 z-10 w-64 -translate-y-full rounded-xl bg-dusk-surface p-4 text-sm shadow-[0_16px_40px_-12px_oklch(0_0_0/0.5)] [view-transition-name:ritual-card] starting:scale-95 starting:opacity-0"
-          style={{
-            left: `clamp(0px, calc(11rem + ${(openDay + 0.5) / DAYS} * (100% - 11rem) - 8rem), calc(100% - 16rem))`,
-            transition:
-              "opacity 250ms cubic-bezier(0.22,1,0.36,1), transform 250ms cubic-bezier(0.22,1,0.36,1)",
-          }}
-          role="region"
-          aria-label={`${labels.day} ${openDay + 1}`}
-        >
-          <p className="font-semibold text-dusk-ink">
-            {labels.day} {openDay + 1}
-          </p>
-          <dl className="mt-2 grid gap-1 text-dusk-subtle">
-            <div className="flex gap-2">
-              <dt className="font-medium text-dusk-ink">{labels.morning}:</dt>
-              <dd>{morningItems(openDay).join(", ") || "—"}</dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="font-medium text-dusk-ink">{labels.evening}:</dt>
-              <dd>{eveningItems(openDay).join(", ") || "—"}</dd>
-            </div>
-          </dl>
-        </div>
-      )}
+    <div ref={wrapRef} className="relative mt-18 max-w-2xl">
+      <AnimatePresence>
+        {openDay !== null && (
+          <motion.div
+            key="ritual-card"
+            initial={{ opacity: 0, scale: 0.95, x: cardX }}
+            animate={{ opacity: 1, scale: 1, x: cardX }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 420, damping: 34 }}
+            className="absolute -top-4 left-0 z-10 w-64 -translate-y-full rounded-xl bg-dusk-surface p-4 text-sm shadow-[0_16px_40px_-12px_oklch(0_0_0/0.5)]"
+            role="region"
+            aria-label={`${labels.day} ${openDay + 1}`}
+          >
+            <p className="font-semibold text-dusk-ink">
+              {labels.day} {openDay + 1}
+            </p>
+            <dl className="mt-2 grid gap-1 text-dusk-subtle">
+              <div className="flex gap-2">
+                <dt className="font-medium text-dusk-ink">{labels.morning}:</dt>
+                <dd>{morningItems(openDay).join(", ") || "—"}</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="font-medium text-dusk-ink">{labels.evening}:</dt>
+                <dd>{eveningItems(openDay).join(", ") || "—"}</dd>
+              </div>
+            </dl>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div
         ref={gridRef}

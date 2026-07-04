@@ -133,7 +133,7 @@ export default function WaitlistForm({
         <button
           type="submit"
           disabled={status === "sending"}
-          className="cursor-pointer rounded-full bg-day-accent bg-[linear-gradient(180deg,oklch(1_0_0/0.14),oklch(1_0_0/0)_60%)] px-6 py-3 font-semibold whitespace-nowrap text-[oklch(0.99_0.005_17)] shadow-[inset_0_1px_0_oklch(1_0_0/0.25),inset_0_-1px_0_oklch(0.42_0.18_17/0.5),0_1px_0_oklch(0.42_0.17_17/0.9),0_3px_7px_-3px_oklch(0.3_0.12_17/0.3)] transition-[transform,box-shadow,filter] duration-150 ease-out-quint hover:translate-y-[1px] hover:shadow-[inset_0_1px_0_oklch(1_0_0/0.25),inset_0_-1px_0_oklch(0.42_0.18_17/0.5),0_0_0_oklch(0.42_0.17_17/0.9),0_2px_5px_-2px_oklch(0.3_0.12_17/0.25)] active:translate-y-[1px] active:shadow-[inset_0_1px_3px_oklch(0.35_0.15_17/0.45),0_0_0_oklch(0.42_0.17_17/0.9)] disabled:cursor-wait disabled:opacity-70 max-[480px]:py-4"
+          className="cursor-pointer rounded-full bg-day-accent bg-[linear-gradient(180deg,oklch(1_0_0/0.14),oklch(1_0_0/0)_60%)] px-6 py-3 font-semibold whitespace-nowrap text-[oklch(0.99_0.005_17)] shadow-[inset_0_1px_0_oklch(1_0_0/0.25),inset_0_-1px_0_oklch(0.42_0.18_17/0.5),0_1px_0_oklch(0.42_0.17_17/0.9),0_3px_7px_-3px_oklch(0.3_0.12_17/0.3)] transition-[transform,box-shadow,filter] duration-150 ease-out-quint hover:translate-y-[1px] hover:shadow-[inset_0_1px_0_oklch(1_0_0/0.25),inset_0_-1px_0_oklch(0.42_0.18_17/0.5),0_0_0_oklch(0.42_0.17_17/0.9),0_2px_5px_-2px_oklch(0.3_0.12_17/0.25)] active:translate-y-[2px] active:shadow-[inset_0_1px_3px_oklch(0.35_0.15_17/0.45),0_0_0_oklch(0.42_0.17_17/0.9)] disabled:cursor-wait disabled:opacity-70 max-[480px]:py-4"
         >
           {status === "sending" ? labels.sending : labels.cta}
         </button>
