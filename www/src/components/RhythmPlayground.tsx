@@ -85,6 +85,10 @@ export default function RhythmPlayground({ labels }: Props) {
   };
 
   const toggleDay = (day: number) => {
+    if (openDay === day && openedByHover.current) {
+      openedByHover.current = false;
+      return;
+    }
     openedByHover.current = false;
     setOpenDay(openDay === day ? null : day);
   };
