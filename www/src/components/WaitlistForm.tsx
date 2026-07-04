@@ -109,7 +109,7 @@ export default function WaitlistForm({
       }}
       noValidate
     >
-      <div className="flex gap-2 rounded-full bg-day-surface p-2 shadow-[inset_1px_1px_4px_oklch(0.82_0.028_20/0.3),inset_-1px_-1px_4px_oklch(1_0_0/0.6),0_0_0_1px_oklch(0.28_0.022_20/0.1)] focus-within:outline focus-within:outline-offset-2 focus-within:outline-day-accent/50 max-[480px]:flex-col max-[480px]:rounded-[1.4rem]">
+      <div className="flex gap-2 rounded-full bg-day-surface p-2 shadow-[inset_1px_1px_4px_oklch(0.82_0.028_20/0.3),inset_-1px_-1px_4px_oklch(1_0_0/0.6),0_0_0_1px_oklch(0.28_0.022_20/0.1)] focus-within:outline focus-within:outline-offset-2 focus-within:outline-day-ink/30 max-[480px]:flex-col max-[480px]:rounded-[1.4rem]">
         <label className="sr-only" htmlFor={inputId}>
           {labels.label}
         </label>

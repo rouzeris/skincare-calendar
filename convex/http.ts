@@ -2,19 +2,9 @@ import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 
-const ALLOWED_ORIGINS = new Set([
-  "https://cera.love",
-  "https://www.cera.love",
-  "http://localhost:4321",
-  "http://localhost:4977",
-]);
-
 const corsHeaders = (req: Request) => {
-  const origin = req.headers.get("Origin") ?? "";
   return {
-    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.has(origin)
-      ? origin
-      : "https://cera.love",
+    "Access-Control-Allow-Origin": req.headers.get("Origin") ?? "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Max-Age": "86400",
