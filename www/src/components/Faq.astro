@@ -8,17 +8,18 @@ interface Props {
 const { locale } = Astro.props;
 const tr = t(locale);
 
-const items = [1, 2, 3, 4, 5].map((n) => ({
-  q: tr(`faq.${n}.q` as Parameters<typeof tr>[0]),
-  a: tr(`faq.${n}.a` as Parameters<typeof tr>[0]),
+const items = ([1, 2, 3, 4, 5] as const).map((n) => ({
+  n,
+  q: tr(`faq.${n}.q`),
+  a: tr(`faq.${n}.a`),
 }));
 
 const linkText = tr("faq.4.linkText");
 const splitAnswer = (a: string) => {
   const i = a.indexOf(linkText);
-  return i === -1
-    ? null
-    : ([a.slice(0, i), a.slice(i + linkText.length)] as const);
+  if (i === -1)
+    throw new Error(`faq.4.a must contain faq.4.linkText ("${linkText}")`);
+  return [a.slice(0, i), a.slice(i + linkText.length)] as const;
 };
 
 const jsonLd = JSON.stringify({
@@ -36,12 +37,12 @@ const jsonLd = JSON.stringify({
   class="bg-night-bg py-section font-[380] tracking-[0.01em] text-night-ink"
   aria-labelledby="faq-title"
 >
-  <div class="mx-auto w-full max-w-3xl px-[clamp(1.25rem,4vw,2.5rem)]">
+  <div class="mx-auto w-full max-w-3xl px-gutter">
     <h2 id="faq-title" class="text-h2 font-medium">{tr("faq.title")}</h2>
     <div class="mt-12">
       {
-        items.map(({ q, a }, i) => {
-          const parts = splitAnswer(a);
+        items.map(({ n, q, a }, i) => {
+          const parts = n === 4 ? splitAnswer(a) : null;
           return (
             <details
               class={`faq-item group ${i > 0 ? "border-t border-night-line" : ""}`}

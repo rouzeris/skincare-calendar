@@ -1,6 +1,6 @@
 ---
 import WaitlistForm from "./WaitlistForm";
-import { t, type Locale } from "../i18n/ui";
+import { t, waitlistLabels, type Locale } from "../i18n/ui";
 
 interface Props {
   locale: Locale;
@@ -9,17 +9,6 @@ interface Props {
 
 const { locale, waitlistEndpoint } = Astro.props;
 const tr = t(locale);
-
-const labels = {
-  label: tr("waitlist.label"),
-  placeholder: tr("waitlist.placeholder"),
-  cta: tr("waitlist.cta"),
-  sending: tr("waitlist.sending"),
-  hint: tr("waitlist.hint"),
-  success: tr("waitlist.success"),
-  error: tr("waitlist.error"),
-  invalid: tr("waitlist.invalid"),
-};
 ---
 
 <section
@@ -27,7 +16,7 @@ const labels = {
   aria-labelledby="final-title"
 >
   <div
-    class="mx-auto flex w-full max-w-6xl flex-col items-center px-[clamp(1.25rem,4vw,2.5rem)] text-center"
+    class="mx-auto flex w-full max-w-6xl flex-col items-center px-gutter text-center"
   >
     <h2 id="final-title" class="max-w-[18ch] text-h2 font-medium">
       {tr("final.title")}
@@ -38,7 +27,7 @@ const labels = {
     <div class="mt-12 flex w-full justify-center">
       <WaitlistForm
         client:visible
-        labels={labels}
+        labels={waitlistLabels(locale)}
         locale={locale}
         endpoint={waitlistEndpoint}
         id="final-wl"

@@ -17,9 +17,7 @@ const { title, path } = Astro.props;
   path={path}
 >
   <div class="bg-day-bg text-day-ink">
-    <header
-      class="mx-auto w-full max-w-3xl px-[clamp(1.25rem,4vw,2.5rem)] py-8"
-    >
+    <header class="mx-auto w-full max-w-3xl px-gutter py-8">
       <a
         href="/"
         class="text-xl font-bold tracking-tight text-day-ink no-underline"
@@ -27,7 +25,7 @@ const { title, path } = Astro.props;
       >
     </header>
     <main
-      class="mx-auto w-full max-w-3xl px-[clamp(1.25rem,4vw,2.5rem)] pb-28 [&_a]:text-day-accent [&_h1]:mt-8 [&_h1]:mb-6 [&_h1]:text-h2 [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_li]:my-2 [&_p]:my-3 [&_ul]:list-disc [&_ul]:pl-6"
+      class="mx-auto w-full max-w-3xl px-gutter pb-28 [&_a]:text-day-accent [&_h1]:mt-8 [&_h1]:mb-6 [&_h1]:text-h2 [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_li]:my-2 [&_p]:my-3 [&_ul]:list-disc [&_ul]:pl-6"
     >
       <slot />
     </main>

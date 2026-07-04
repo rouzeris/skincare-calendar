@@ -1,3 +1,5 @@
+import type { WaitlistLabels } from "../components/WaitlistForm";
+
 export const locales = ["pl", "ua", "en"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "pl";
@@ -232,5 +234,18 @@ export const ui = {
 
 export type UIKey = keyof (typeof ui)["pl"];
 
-export const t = (locale: Locale) => (key: UIKey) =>
-  (ui[locale][key] ?? ui[defaultLocale][key]) as string;
+export const t = (locale: Locale) => (key: UIKey) => ui[locale][key];
+
+export const waitlistLabels = (locale: Locale): WaitlistLabels => {
+  const tr = t(locale);
+  return {
+    label: tr("waitlist.label"),
+    placeholder: tr("waitlist.placeholder"),
+    cta: tr("waitlist.cta"),
+    sending: tr("waitlist.sending"),
+    hint: tr("waitlist.hint"),
+    success: tr("waitlist.success"),
+    error: tr("waitlist.error"),
+    invalid: tr("waitlist.invalid"),
+  };
+};

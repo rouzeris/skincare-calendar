@@ -25,19 +25,19 @@ const DAYS = 14;
 
 const ROWS = [
   {
-    key: "retinol",
+    key: "retinol" as const,
     product: "Paula's Choice Clinical 0.3% Retinol",
     on: new Set([0, 3, 7, 10]),
     time: "evening" as const,
   },
   {
-    key: "acid",
+    key: "acid" as const,
     product: "The Ordinary Mandelic Acid 10% + HA",
     on: new Set([1, 4, 7, 10, 13]),
     time: "evening" as const,
   },
   {
-    key: "cream",
+    key: "cream" as const,
     product: "La Roche-Posay Toleriane Sensitive",
     on: new Set(Array.from({ length: DAYS }, (_, i) => i)),
     time: "both" as const,
@@ -62,12 +62,6 @@ export default function RhythmPlayground({ labels }: Props) {
   const springX = useSpring(rawX, springConfig);
   const springY = useSpring(rawY, springConfig);
 
-  const dayCenterX = (day: number) => {
-    const w = wrapRef.current?.clientWidth ?? 0;
-    const labelOffset = w > 520 ? 176 : 0;
-    return labelOffset + ((day + 0.5) / DAYS) * (w - labelOffset) + 14;
-  };
-
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpenDay(null);
@@ -76,12 +70,7 @@ export default function RhythmPlayground({ labels }: Props) {
     return () => window.removeEventListener("keydown", close);
   }, []);
 
-  const rowLabel = (key: string) =>
-    key === "retinol"
-      ? labels.retinol
-      : key === "acid"
-        ? labels.acid
-        : labels.cream;
+  const weekdays = labels.weekdays.split(" ");
 
   const trackPointer = (e: React.PointerEvent) => {
     const grid = gridRef.current;
@@ -104,21 +93,18 @@ export default function RhythmPlayground({ labels }: Props) {
     });
   };
 
-  const toggleDay = (day: number, e?: React.MouseEvent) => {
+  const toggleDay = (day: number, e: React.MouseEvent) => {
     if (openDay === day && openedByHover.current) {
       openedByHover.current = false;
       return;
     }
     openedByHover.current = false;
     const wrap = wrapRef.current;
-    let x = dayCenterX(day);
-    let y = 0;
-    if (wrap && e) {
-      const w = wrap.getBoundingClientRect();
-      const b = e.currentTarget.getBoundingClientRect();
-      x = b.right - w.left + 14;
-      y = b.top - w.top - 10;
-    }
+    if (!wrap) return;
+    const w = wrap.getBoundingClientRect();
+    const b = e.currentTarget.getBoundingClientRect();
+    const x = b.right - w.left + 14;
+    const y = b.top - w.top - 10;
     if (openDay === null) {
       rawX.jump(x);
       rawY.jump(y);
@@ -253,7 +239,7 @@ export default function RhythmPlayground({ labels }: Props) {
                 key={day}
                 className="w-[clamp(0.7rem,1.9vw,1.05rem)] text-center text-[10px] leading-none text-dusk-subtle"
               >
-                {labels.weekdays.split(" ")[day % 7]}
+                {weekdays[day % 7]}
               </span>
             ))}
           </span>
@@ -265,7 +251,7 @@ export default function RhythmPlayground({ labels }: Props) {
           >
             <span className="text-sm leading-tight">
               <span className="font-medium text-dusk-ink">
-                {rowLabel(row.key)}
+                {labels[row.key]}
               </span>
               <span className="block text-xs text-dusk-subtle">
                 {row.product}
