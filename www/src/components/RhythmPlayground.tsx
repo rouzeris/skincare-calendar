@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+} from "motion/react";
 
 export interface RhythmLabels {
   retinol: string;
@@ -46,6 +51,29 @@ export default function RhythmPlayground({ labels }: Props) {
   const [wrapW, setWrapW] = useState(0);
   const rafRef = useRef(0);
   const openedByHover = useRef(false);
+  const reducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const rawX = useMotionValue(0);
+  const springX = useSpring(
+    rawX,
+    reducedMotion
+      ? { stiffness: 4000, damping: 300 }
+      : { stiffness: 380, damping: 36 },
+  );
+
+  const CARD_W = 256;
+  const clampX = (x: number) => {
+    const w = wrapRef.current?.clientWidth ?? 0;
+    return Math.min(Math.max(0, x), Math.max(0, w - CARD_W));
+  };
+  const dayCenterX = (day: number) => {
+    const w = wrapRef.current?.clientWidth ?? 0;
+    const labelOffset = w > 520 ? 176 : 0;
+    return clampX(
+      labelOffset + ((day + 0.5) / DAYS) * (w - labelOffset) - CARD_W / 2,
+    );
+  };
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -73,12 +101,17 @@ export default function RhythmPlayground({ labels }: Props) {
 
   const trackPointer = (e: React.PointerEvent) => {
     const grid = gridRef.current;
-    if (!grid) return;
+    const wrap = wrapRef.current;
+    if (!grid || !wrap) return;
     const rect = grid.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const labelOffset = rect.width > 520 ? 176 : 0;
+    const x = e.clientX - rect.left - labelOffset;
     const col = Math.min(
       DAYS - 1,
-      Math.max(0, Math.floor((x / rect.width) * DAYS)),
+      Math.max(0, Math.floor((x / (rect.width - labelOffset)) * DAYS)),
+    );
+    rawX.set(
+      clampX(e.clientX - wrap.getBoundingClientRect().left - CARD_W / 2),
     );
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => setHotCol(col));
@@ -90,11 +123,20 @@ export default function RhythmPlayground({ labels }: Props) {
       return;
     }
     openedByHover.current = false;
+    if (openDay === null) rawX.jump(dayCenterX(day));
+    else rawX.set(dayCenterX(day));
     setOpenDay(openDay === day ? null : day);
   };
 
   const hoverDay = (e: React.PointerEvent, day: number) => {
     if (e.pointerType !== "mouse") return;
+    if (openDay === null) {
+      const wrap = wrapRef.current;
+      if (wrap)
+        rawX.jump(
+          clampX(e.clientX - wrap.getBoundingClientRect().left - CARD_W / 2),
+        );
+    }
     openedByHover.current = true;
     setOpenDay(day);
   };
@@ -108,45 +150,31 @@ export default function RhythmPlayground({ labels }: Props) {
       (r) => r.on.has(day) && (r.time === "both" || r.time === "evening"),
     ).map((r) => r.product);
 
-  const CARD_W = 256;
-  const labelOffset = wrapW > 520 ? 176 : 0;
-  const cardX =
-    openDay === null
-      ? 0
-      : Math.min(
-          Math.max(
-            0,
-            labelOffset +
-              ((openDay + 0.5) / DAYS) * (wrapW - labelOffset) -
-              CARD_W / 2,
-          ),
-          Math.max(0, wrapW - CARD_W),
-        );
-
   return (
     <div ref={wrapRef} className="relative mt-18 max-w-2xl">
       <AnimatePresence>
         {openDay !== null && (
           <motion.div
             key="ritual-card"
-            initial={{ opacity: 0, scale: 0.95, x: cardX }}
-            animate={{ opacity: 1, scale: 1, x: cardX }}
+            initial={{ opacity: 0, scale: 0.96, y: 6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 420, damping: 34 }}
-            className="absolute -top-4 left-0 z-10 w-64 -translate-y-full rounded-xl bg-dusk-surface p-4 text-sm shadow-[0_16px_40px_-12px_oklch(0_0_0/0.5)]"
+            style={{ x: springX }}
+            className="absolute -top-4 left-0 z-10 w-64 -translate-y-full rounded-xl bg-day-surface p-4 text-sm text-day-ink shadow-[0_16px_40px_-12px_oklch(0_0_0/0.5)]"
             role="region"
             aria-label={`${labels.day} ${openDay + 1}`}
           >
-            <p className="font-semibold text-dusk-ink">
+            <p className="font-semibold text-day-ink">
               {labels.day} {openDay + 1}
             </p>
-            <dl className="mt-2 grid gap-1 text-dusk-subtle">
+            <dl className="mt-2 grid gap-1 text-day-subtle">
               <div className="flex gap-2">
-                <dt className="font-medium text-dusk-ink">{labels.morning}:</dt>
+                <dt className="font-medium text-day-ink">{labels.morning}:</dt>
                 <dd>{morningItems(openDay).join(", ") || "—"}</dd>
               </div>
               <div className="flex gap-2">
-                <dt className="font-medium text-dusk-ink">{labels.evening}:</dt>
+                <dt className="font-medium text-day-ink">{labels.evening}:</dt>
                 <dd>{eveningItems(openDay).join(", ") || "—"}</dd>
               </div>
             </dl>
