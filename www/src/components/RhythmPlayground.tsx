@@ -14,6 +14,7 @@ export interface RhythmLabels {
   morning: string;
   evening: string;
   tapHint: string;
+  weekdays: string;
 }
 
 interface Props {
@@ -61,17 +62,10 @@ export default function RhythmPlayground({ labels }: Props) {
   const springX = useSpring(rawX, springConfig);
   const springY = useSpring(rawY, springConfig);
 
-  const CARD_W = 256;
-  const clampX = (x: number) => {
-    const w = wrapRef.current?.clientWidth ?? 0;
-    return Math.min(Math.max(0, x), Math.max(0, w - CARD_W));
-  };
   const dayCenterX = (day: number) => {
     const w = wrapRef.current?.clientWidth ?? 0;
     const labelOffset = w > 520 ? 176 : 0;
-    return clampX(
-      labelOffset + ((day + 0.5) / DAYS) * (w - labelOffset) - CARD_W / 2,
-    );
+    return labelOffset + ((day + 0.5) / DAYS) * (w - labelOffset) + 14;
   };
 
   useEffect(() => {
@@ -101,7 +95,7 @@ export default function RhythmPlayground({ labels }: Props) {
       Math.max(0, Math.floor((x / (rect.width - labelOffset)) * DAYS)),
     );
     const wrapRect = wrap.getBoundingClientRect();
-    rawX.set(clampX(e.clientX - wrapRect.left + 18));
+    rawX.set(e.clientX - wrapRect.left + 18);
     rawY.set(e.clientY - wrapRect.top - 10);
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
@@ -122,7 +116,7 @@ export default function RhythmPlayground({ labels }: Props) {
     if (wrap && e) {
       const w = wrap.getBoundingClientRect();
       const b = e.currentTarget.getBoundingClientRect();
-      x = clampX(b.right - w.left + 14);
+      x = b.right - w.left + 14;
       y = b.top - w.top - 10;
     }
     if (openDay === null) {
@@ -141,7 +135,7 @@ export default function RhythmPlayground({ labels }: Props) {
       const wrap = wrapRef.current;
       if (wrap) {
         const r = wrap.getBoundingClientRect();
-        rawX.jump(clampX(e.clientX - r.left + 18));
+        rawX.jump(e.clientX - r.left + 18);
         rawY.jump(e.clientY - r.top - 10);
       }
     }
@@ -257,9 +251,9 @@ export default function RhythmPlayground({ labels }: Props) {
             {Array.from({ length: DAYS }, (_, day) => (
               <span
                 key={day}
-                className="w-[clamp(0.7rem,1.9vw,1.05rem)] text-center text-[10px] leading-none text-dusk-subtle tabular-nums"
+                className="w-[clamp(0.7rem,1.9vw,1.05rem)] text-center text-[10px] leading-none text-dusk-subtle"
               >
-                {day + 1}
+                {labels.weekdays.split(" ")[day % 7]}
               </span>
             ))}
           </span>
