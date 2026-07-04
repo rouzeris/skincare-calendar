@@ -53,13 +53,13 @@ export default function RhythmPlayground({ labels }: Props) {
   const reducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const springConfig = reducedMotion
+    ? { stiffness: 4000, damping: 300 }
+    : { stiffness: 380, damping: 36 };
   const rawX = useMotionValue(0);
-  const springX = useSpring(
-    rawX,
-    reducedMotion
-      ? { stiffness: 4000, damping: 300 }
-      : { stiffness: 380, damping: 36 },
-  );
+  const rawY = useMotionValue(0);
+  const springX = useSpring(rawX, springConfig);
+  const springY = useSpring(rawY, springConfig);
 
   const CARD_W = 256;
   const clampX = (x: number) => {
@@ -107,14 +107,28 @@ export default function RhythmPlayground({ labels }: Props) {
     rafRef.current = requestAnimationFrame(() => setHotCol(col));
   };
 
-  const toggleDay = (day: number) => {
+  const toggleDay = (day: number, e?: React.MouseEvent) => {
     if (openDay === day && openedByHover.current) {
       openedByHover.current = false;
       return;
     }
     openedByHover.current = false;
-    if (openDay === null) rawX.jump(dayCenterX(day));
-    else rawX.set(dayCenterX(day));
+    const wrap = wrapRef.current;
+    let x = dayCenterX(day);
+    let y = 0;
+    if (wrap && e) {
+      const w = wrap.getBoundingClientRect();
+      const b = e.currentTarget.getBoundingClientRect();
+      x = clampX(b.left + b.width / 2 - w.left - CARD_W / 2);
+      y = b.top - w.top - 14;
+    }
+    if (openDay === null) {
+      rawX.jump(x);
+      rawY.jump(y);
+    } else {
+      rawX.set(x);
+      rawY.set(y);
+    }
     setOpenDay(openDay === day ? null : day);
   };
 
@@ -122,10 +136,11 @@ export default function RhythmPlayground({ labels }: Props) {
     if (e.pointerType !== "mouse") return;
     if (openDay === null) {
       const wrap = wrapRef.current;
-      if (wrap)
-        rawX.jump(
-          clampX(e.clientX - wrap.getBoundingClientRect().left - CARD_W / 2),
-        );
+      if (wrap) {
+        const r = wrap.getBoundingClientRect();
+        rawX.jump(clampX(e.clientX - r.left - CARD_W / 2));
+        rawY.jump(e.clientY - r.top - 14);
+      }
     }
     openedByHover.current = true;
     setOpenDay(day);
@@ -146,28 +161,74 @@ export default function RhythmPlayground({ labels }: Props) {
         {openDay !== null && (
           <motion.div
             key="ritual-card"
-            initial={{ opacity: 0, scale: 0.96, y: 6 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 420, damping: 34 }}
-            style={{ x: springX }}
-            className="absolute -top-4 left-0 z-10 w-64 -translate-y-full rounded-xl bg-day-surface p-4 text-sm text-day-ink shadow-[0_16px_40px_-12px_oklch(0_0_0/0.5)]"
+            style={{ x: springX, y: springY }}
+            className="pointer-events-none absolute top-0 left-0 z-10 w-64 -translate-y-full rounded-xl bg-day-surface p-4 text-sm text-day-ink ring-1 ring-black/5 shadow-[0_4px_12px_-4px_oklch(0_0_0/0.35)]"
             role="region"
             aria-label={`${labels.day} ${openDay + 1}`}
           >
-            <p className="font-semibold text-day-ink">
+            <p className="text-xs font-semibold tracking-[0.06em] text-day-subtle uppercase">
               {labels.day} {openDay + 1}
             </p>
-            <dl className="mt-2 grid gap-1 text-day-subtle">
-              <div className="flex gap-2">
-                <dt className="font-medium text-day-ink">{labels.morning}:</dt>
-                <dd>{morningItems(openDay).join(", ") || "—"}</dd>
+            <div className="mt-3 grid gap-2.5">
+              <div className="flex gap-2.5">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  className="mt-0.5 shrink-0 text-[oklch(0.68_0.13_70)]"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4" />
+                </svg>
+                <span className="sr-only">{labels.morning}:</span>
+                <ul className="grid gap-1">
+                  {(morningItems(openDay).length
+                    ? morningItems(openDay)
+                    : ["—"]
+                  ).map((item) => (
+                    <li key={item} className="text-[13px] leading-snug">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className="flex gap-2">
-                <dt className="font-medium text-day-ink">{labels.evening}:</dt>
-                <dd>{eveningItems(openDay).join(", ") || "—"}</dd>
+              <div className="flex gap-2.5">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mt-0.5 shrink-0 text-[oklch(0.5_0.09_330)]"
+                  aria-hidden="true"
+                >
+                  <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+                </svg>
+                <span className="sr-only">{labels.evening}:</span>
+                <ul className="grid gap-1">
+                  {(eveningItems(openDay).length
+                    ? eveningItems(openDay)
+                    : ["—"]
+                  ).map((item) => (
+                    <li key={item} className="text-[13px] leading-snug">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </dl>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -215,7 +276,7 @@ export default function RhythmPlayground({ labels }: Props) {
                     aria-expanded={
                       row.key === "cream" ? openDay === day : undefined
                     }
-                    onClick={() => toggleDay(day)}
+                    onClick={(e) => toggleDay(day, e)}
                     onPointerEnter={(e) => hoverDay(e, day)}
                     className={`relative aspect-square w-[clamp(0.7rem,1.9vw,1.05rem)] cursor-pointer rounded-full transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] after:absolute after:-inset-2.5 after:content-[''] ${
                       on ? "bg-night-accent" : "bg-white/13"
