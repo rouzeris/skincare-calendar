@@ -97,7 +97,7 @@
   }
 
   ::selection {
-    background: oklch(0.55 0.21 17 / 0.25);
+    background: oklch(0.52 0.16 258 / 0.22);
   }
 
   :focus-visible {

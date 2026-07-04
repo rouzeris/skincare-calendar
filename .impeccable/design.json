@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-04T01:00:00Z",
+  "title": "Design System: Cera",
+  "extensions": {
+    "colorMeta": {
+      "rose-accent": {
+        "role": "primary",
+        "displayName": "Cera Rose",
+        "canonical": "#E11D48",
+        "tonalRamp": [
+          "oklch(0.2 0.09 17)",
+          "oklch(0.3 0.13 17)",
+          "oklch(0.42 0.17 17)",
+          "oklch(0.55 0.21 17)",
+          "oklch(0.65 0.17 15)",
+          "oklch(0.72 0.14 14)",
+          "oklch(0.85 0.07 14)",
+          "oklch(0.95 0.02 14)"
+        ]
+      },
+      "link-day": {
+        "role": "secondary",
+        "displayName": "Periwinkle Link",
+        "canonical": "oklch(0.52 0.16 258)",
+        "tonalRamp": [
+          "oklch(0.25 0.09 258)",
+          "oklch(0.35 0.12 258)",
+          "oklch(0.45 0.15 258)",
+          "oklch(0.52 0.16 258)",
+          "oklch(0.62 0.14 258)",
+          "oklch(0.74 0.11 258)",
+          "oklch(0.85 0.06 258)",
+          "oklch(0.94 0.02 258)"
+        ]
+      },
+      "day-bg": {
+        "role": "neutral",
+        "displayName": "Morning Stone",
+        "canonical": "oklch(0.976 0.006 17)",
+        "tonalRamp": [
+          "oklch(0.2 0.042 4)",
+          "oklch(0.26 0.055 330)",
+          "oklch(0.36 0.075 345)",
+          "oklch(0.47 0.03 20)",
+          "oklch(0.67 0.045 10)",
+          "oklch(0.89 0.012 17)",
+          "oklch(0.976 0.006 17)",
+          "oklch(0.995 0.003 17)"
+        ]
+      },
+      "night-bg": {
+        "role": "neutral",
+        "displayName": "Plum Night",
+        "canonical": "oklch(0.2 0.042 4)",
+        "tonalRamp": [
+          "oklch(0.14 0.03 4)",
+          "oklch(0.2 0.042 4)",
+          "oklch(0.255 0.05 4)",
+          "oklch(0.33 0.05 4)",
+          "oklch(0.44 0.085 350)",
+          "oklch(0.6 0.06 10)",
+          "oklch(0.76 0.05 10)",
+          "oklch(0.945 0.014 10)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero H1 only." },
+      "body": {
+        "displayName": "Body",
+        "purpose": "420 on light, 380 + 0.01em tracking on dusk/night."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-rest",
+        "value": "0 2px 8px rgb(0 0 0 / 0.05)",
+        "purpose": "App routine/product cards."
+      },
+      {
+        "name": "key-lip",
+        "value": "inset 0 1px 0 oklch(1 0 0 / 0.25), inset 0 -1px 0 oklch(0.42 0.18 17 / 0.5), 0 1px 0 oklch(0.42 0.17 17 / 0.9), 0 3px 7px -3px oklch(0.3 0.12 17 / 0.3)",
+        "purpose": "Primary button at rest; collapses on hover/press."
+      },
+      {
+        "name": "tray-inset",
+        "value": "inset 1px 1px 4px oklch(0.82 0.028 20 / 0.3), inset -1px -1px 4px oklch(1 0 0 / 0.6), 0 0 0 1px oklch(0.28 0.022 20 / 0.1)",
+        "purpose": "Debossed input containers."
+      },
+      {
+        "name": "night-glow",
+        "value": "0 0 10px oklch(0.72 0.14 14 / 0.5)",
+        "purpose": "Active rhythm dots, night accents."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default easing for entrances and state changes."
+      },
+      {
+        "name": "swipe-link",
+        "value": "250ms 33ms cubic-bezier(0.19, 1, 0.22, 1)",
+        "purpose": "Marker-swipe link hover."
+      },
+      {
+        "name": "popover-spring",
+        "value": "spring(stiffness 420, damping 34)",
+        "purpose": "motion.dev spring for the day-preview card."
+      },
+      {
+        "name": "blur-in",
+        "value": "1150ms ease-out-quint, from blur(10px) + translateY(1rem)",
+        "purpose": "Hero entrance, importance-ordered ~220ms stagger."
+      }
+    ],
+    "breakpoints": [
+      { "name": "form-stack", "value": "480px" },
+      { "name": "hero-split", "value": "940px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Neumorphic rose key: scrim face, 1px lip, sinks on hover and press.",
+      "html": "<button class=\"ds-btn-primary\">Dołącz do listy</button>",
+      "css": ".ds-btn-primary { background: linear-gradient(180deg, oklch(1 0 0 / 0.14), oklch(1 0 0 / 0) 60%), oklch(0.55 0.21 17); color: oklch(0.99 0.005 17); font-weight: 600; padding: 12px 24px; border: none; border-radius: 999px; cursor: pointer; box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.25), inset 0 -1px 0 oklch(0.42 0.18 17 / 0.5), 0 1px 0 oklch(0.42 0.17 17 / 0.9), 0 3px 7px -3px oklch(0.3 0.12 17 / 0.3); transition: transform 150ms cubic-bezier(0.22,1,0.36,1), box-shadow 150ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-primary:hover { transform: translateY(1px); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.25), inset 0 -1px 0 oklch(0.42 0.18 17 / 0.5), 0 0 0 oklch(0.42 0.17 17 / 0.9), 0 2px 5px -2px oklch(0.3 0.12 17 / 0.25); } .ds-btn-primary:active { transform: translateY(2px); box-shadow: inset 0 1px 3px oklch(0.35 0.15 17 / 0.45); }"
+    },
+    {
+      "name": "Input Tray",
+      "kind": "input",
+      "description": "Debossed pill tray holding an input and the primary key.",
+      "html": "<div class=\"ds-tray\"><input class=\"ds-tray-input\" placeholder=\"Twój e-mail\" /></div>",
+      "css": ".ds-tray { display: flex; gap: 8px; padding: 8px; border-radius: 999px; background: oklch(0.995 0.003 17); box-shadow: inset 1px 1px 4px oklch(0.82 0.028 20 / 0.3), inset -1px -1px 4px oklch(1 0 0 / 0.6), 0 0 0 1px oklch(0.28 0.022 20 / 0.1); } .ds-tray:focus-within { outline: 1px solid oklch(0.28 0.022 20 / 0.3); outline-offset: 2px; } .ds-tray-input { flex: 1; min-width: 0; border: none; background: transparent; padding: 12px 16px; font: inherit; color: oklch(0.28 0.022 20); outline: none; } .ds-tray-input::placeholder { color: oklch(0.47 0.03 20); }"
+    },
+    {
+      "name": "Marker-Swipe Link",
+      "kind": "custom",
+      "description": "Text link with a rotated periwinkle band that sweeps to full on hover.",
+      "html": "<a href=\"#\" class=\"ds-link\">polityce prywatności</a>",
+      "css": ".ds-link { --c: oklch(0.52 0.16 258); position: relative; z-index: 0; color: inherit; text-decoration: none; transition: color 250ms 33ms cubic-bezier(0.19,1,0.22,1); } .ds-link::before { content: ''; position: absolute; top: 50%; right: -0.15rem; left: -0.1rem; height: 0.6em; z-index: -1; background: color-mix(in oklch, var(--c), transparent 85%); transform: rotateZ(-1deg); transition: background-color 250ms 33ms cubic-bezier(0.19,1,0.22,1), transform 250ms 33ms cubic-bezier(0.19,1,0.22,1); } .ds-link:hover { color: white; } .ds-link:hover::before { background: var(--c); transform: translateY(-50%) rotateZ(0.35deg) scaleY(2); }"
+    },
+    {
+      "name": "App Card",
+      "kind": "card",
+      "refersTo": "card-app",
+      "description": "Routine/product card as rendered in the mobile app.",
+      "html": "<div class=\"ds-card\"><span class=\"ds-card-brand\">The Ordinary</span><span class=\"ds-card-name\">Serum z niacynamidem</span></div>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 2px; background: #FFFFFF; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.05); } .ds-card-brand { color: #E11D48; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; } .ds-card-name { color: #292524; font-size: 16px; font-weight: 500; }"
+    },
+    {
+      "name": "Rhythm Dot",
+      "kind": "chip",
+      "description": "One day in the 14-day rhythm strip; on-days glow night-rose.",
+      "html": "<span class=\"ds-dot ds-dot-on\"></span>",
+      "css": ".ds-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: rgb(255 255 255 / 0.13); transition: transform 300ms cubic-bezier(0.22,1,0.36,1), box-shadow 300ms cubic-bezier(0.22,1,0.36,1); } .ds-dot-on { background: oklch(0.72 0.14 14); } .ds-dot-on:hover { transform: scale(1.45); box-shadow: 0 0 10px oklch(0.72 0.14 14 / 0.5); }"
+    },
+    {
+      "name": "FAQ Row",
+      "kind": "custom",
+      "description": "Night-section details row with rotating plus toggle.",
+      "html": "<details class=\"ds-faq\"><summary class=\"ds-faq-q\">Ile będzie kosztować?<svg class=\"ds-faq-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg></summary><p class=\"ds-faq-a\">Podstawowa wersja będzie darmowa.</p></details>",
+      "css": ".ds-faq { border-top: 1px solid oklch(0.33 0.05 4); background: oklch(0.2 0.042 4); color: oklch(0.945 0.014 10); } .ds-faq-q { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 0; font-weight: 500; cursor: pointer; list-style: none; transition: color 150ms; } .ds-faq-q:hover { color: white; } .ds-faq-q::-webkit-details-marker { display: none; } .ds-faq-icon { color: oklch(0.76 0.05 10); transition: transform 200ms cubic-bezier(0.22,1,0.36,1); } .ds-faq[open] .ds-faq-icon { transform: rotate(45deg); } .ds-faq-a { max-width: 60ch; padding-bottom: 24px; color: oklch(0.76 0.05 10); margin: 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Twoja cera ma swój rytm — The Day's Rhythm",
+    "overview": "Every Cera surface knows what time it is. The app renders the same routine under two lights — Stone-white mornings and Stone-900 evenings, marked in-product with Sun/Moon icons. The landing compresses that day into one scroll: leaf-shadowed morning, mesh twilight, plum night. Light is the narrative material; calm is the register; warmth comes from light, texture, and soft-tactile controls.",
+    "keyCharacteristics": [
+      "One day, two themes: every color has a Rano and a Wieczór answer",
+      "Rose is identity and action; it never decorates",
+      "Soft-tactile controls — things you press, gently",
+      "Real app screenshots as the only product imagery",
+      "Trilingual (PL/UA/EN) by default"
+    ],
+    "rules": [
+      {
+        "name": "The One Rose Rule",
+        "body": "Rose marks identity and primary action — never decoration, never large surfaces.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gradient Space Rule",
+        "body": "Multi-stop background blends interpolate in oklch; sRGB gray midpoints are prohibited.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Weights-Apart Rule",
+        "body": "Adjacent hierarchy levels differ by ≥140 weight units or a full size step.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Object Rule",
+        "body": "Only the phone frame earns a large drop shadow; it is the single physically lifted thing on any screen.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do give every new surface a time of day; pick tokens from that ramp, never mix ramps in one component.",
+      "Do interpolate multi-color gradients in oklch and hide banding under the 6% grain.",
+      "Do use real app screenshots (per-locale, seeded data) for product imagery.",
+      "Do keep body text ≥16px at ≥4.5:1; drop dark-section body weight to 380.",
+      "Do respect prefers-reduced-motion with visible-by-default states."
+    ],
+    "donts": [
+      "Don't use beauty-influencer aesthetics: glossy gradients, sparkle, glow-up hype.",
+      "Don't slip into clinical/pharma coldness — sterile white, blue crosses, lab language.",
+      "Don't reach for SaaS landing grammar: hero-metric blocks, identical card grids, eyebrow kickers.",
+      "Don't make medical claims in UI copy; serious problems route to a doctor.",
+      "Don't put rose on large surfaces or use it as a text-link color.",
+      "Don't use slang in copy; the voice is a knowledgeable friend, unhurried."
+    ]
+  }
+}
