@@ -57,12 +57,12 @@ const labels = {
   >
     <div class="flex flex-col items-center min-[940px]:items-start">
       <h1
-        class="anim-blur-in max-w-[14ch] text-display [animation-delay:100ms]"
+        class="anim-blur-in max-w-[14ch] text-display [animation-delay:120ms]"
       >
         {tr("hero.h1")}
       </h1>
       <p
-        class="anim-blur-in mt-6 max-w-[44ch] text-lead text-day-subtle [animation-delay:280ms]"
+        class="anim-blur-in mt-6 max-w-[44ch] text-lead text-day-subtle [animation-delay:340ms]"
       >
         {tr("hero.sub")}
       </p>
@@ -82,7 +82,7 @@ const labels = {
     </div>
 
     <PhoneFrame
-      class="anim-blur-in mt-[clamp(3rem,7vh,5rem)] w-[min(20rem,74vw)] drop-shadow-[0_30px_40px_oklch(0.4_0.09_30/0.28)] [animation-delay:640ms] min-[940px]:mt-0 min-[940px]:justify-self-end"
+      class="anim-blur-in mt-[clamp(3rem,7vh,5rem)] w-[min(20rem,74vw)] drop-shadow-[0_30px_40px_oklch(0.4_0.09_30/0.28)] [animation-delay:780ms] min-[940px]:mt-0 min-[940px]:justify-self-end"
     >
       <Image
         src={shot(locale, "light")}
@@ -97,11 +97,11 @@ const labels = {
 
 <style>
   .hero-form :global(form > div:first-of-type) {
-    animation: blur-in 900ms var(--ease-out-quint) 460ms both;
+    animation: blur-in 1150ms var(--ease-out-quint) 560ms both;
   }
 
   .hero-form :global(form > p) {
-    animation: blur-in 900ms var(--ease-out-quint) 820ms both;
+    animation: blur-in 1150ms var(--ease-out-quint) 1000ms both;
   }
 
   @supports (animation-timeline: view()) {

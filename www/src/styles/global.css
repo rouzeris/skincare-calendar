@@ -172,7 +172,7 @@
 }
 
 @utility anim-blur-in {
-  animation: blur-in 900ms var(--ease-out-quint) both;
+  animation: blur-in 1150ms var(--ease-out-quint) both;
 }
 
 @utility anim-leaves-in {
