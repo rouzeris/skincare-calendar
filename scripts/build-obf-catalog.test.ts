@@ -44,6 +44,41 @@ test("preserves an existing catalog when the source is invalid", async () => {
   }
 });
 
+test("preserves an existing catalog when the source is missing", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "cera-catalog-"));
+  const outputPath = join(directory, "catalog.jsonl");
+
+  try {
+    await writeFile(outputPath, "existing catalog\n");
+    await assert.rejects(
+      buildCatalog(join(directory, "missing.csv.gz"), outputPath),
+      /ENOENT/,
+    );
+    assert.equal(await readFile(outputPath, "utf8"), "existing catalog\n");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("preserves an existing catalog when no products qualify", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "cera-catalog-"));
+  const inputPath = join(directory, "empty.csv.gz");
+  const outputPath = join(directory, "catalog.jsonl");
+  const header = Object.keys(columns).join("\t");
+
+  try {
+    await writeFile(inputPath, gzipSync(`${header}\n1\t\t\t\t\t\t\t\n`));
+    await writeFile(outputPath, "existing catalog\n");
+    await assert.rejects(
+      buildCatalog(inputPath, outputPath),
+      /Catalog contains no products/,
+    );
+    assert.equal(await readFile(outputPath, "utf8"), "existing catalog\n");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("builds an attributed catalog product", () => {
   assert.deepEqual(
     toCatalogProduct(columns, [

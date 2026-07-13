@@ -84,6 +84,7 @@ test.describe("Product Shelf Management", () => {
     const productName = page.getByPlaceholder(/Niacinamide/);
     const brand = page.getByPlaceholder(/The Ordinary/);
     await productName.fill("CeraVe");
+    await expect(page.getByText("Searching catalog…")).toBeVisible();
 
     // 2. Verify suggestions appear from the shared catalog
     await expect(page.getByText(/Hydrating Facial Cleanser/i)).toBeVisible();
@@ -93,6 +94,7 @@ test.describe("Product Shelf Management", () => {
     const dropdown = page.getByTestId("catalog-suggestions");
     const dropdownElement = await dropdown.elementHandle();
     await productName.fill("no-such-catalog-product");
+    await expect(page.getByText(/Hydrating Facial Cleanser/i)).toBeVisible();
     await expect(page.getByText("No catalog matches")).toBeVisible();
     expect(
       await dropdownElement!.evaluate((element) => element.isConnected),

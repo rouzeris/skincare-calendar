@@ -1,72 +1,57 @@
-import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { normalizeCatalogSearch } from "@/shared/catalog-search";
+import { useEffect, useRef, useState } from "react";
+import type { CatalogSuggestion } from "@/catalog/types";
+import { useCatalogSearch } from "@/context/catalog";
 
-export type CatalogSuggestion = {
-  id: string;
-  barcode: string;
-  brand: string;
-  productName: string;
-  quantity?: string;
-  category?: string;
+export type CatalogSuggestionsState = {
+  status: "not-queried" | "loading" | "complete" | "error";
+  suggestions: CatalogSuggestion[];
 };
 
-const fixture: CatalogSuggestion[] = [
-  {
-    id: "fixture-cerave-cleanser",
-    barcode: "fixture-1",
-    brand: "CeraVe",
-    productName: "Hydrating Facial Cleanser",
-    quantity: "236 ml",
-    category: "Face cleansers",
-  },
-  {
-    id: "fixture-loreal-cream",
-    barcode: "fixture-2",
-    brand: "L'Oréal",
-    productName: "Revitalift Cream",
-    quantity: "50 ml",
-    category: "Face creams",
-  },
-];
+type CatalogRequestState = CatalogSuggestionsState & { query: string };
 
-const useFixture = process.env.EXPO_PUBLIC_CATALOG_FIXTURE === "true";
+const notQueried: CatalogRequestState = {
+  query: "",
+  status: "not-queried",
+  suggestions: [],
+};
 
-function searchFixture(query: string) {
-  const search = normalizeCatalogSearch(query);
-  if (search.length < 2) return [];
-  return fixture.filter((item) =>
-    normalizeCatalogSearch(`${item.brand} ${item.productName}`).includes(
-      search,
-    ),
-  );
-}
-
-export function useCatalogSuggestions(name: string) {
-  const [catalogQuery, setCatalogQuery] = useState("");
-  const [displayed, setDisplayed] = useState<CatalogSuggestion[]>([]);
+export function useCatalogSuggestions(name: string): CatalogSuggestionsState {
+  const search = useCatalogSearch();
+  const request = useRef(0);
+  const [state, setState] = useState<CatalogRequestState>(notQueried);
 
   useEffect(() => {
-    const timeout = setTimeout(() => setCatalogQuery(name.trim()), 200);
+    const query = name.trim();
+    const requestId = ++request.current;
+    if (query.length < 2) {
+      setState(notQueried);
+      return;
+    }
+
+    setState((current) => ({
+      query,
+      status: "loading",
+      suggestions: current.suggestions,
+    }));
+    const timeout = setTimeout(() => {
+      void search(query).then(
+        (suggestions) => {
+          if (request.current === requestId)
+            setState({ query, status: "complete", suggestions });
+        },
+        () => {
+          if (request.current === requestId)
+            setState((current) => ({ ...current, status: "error" }));
+        },
+      );
+    }, 200);
+
     return () => clearTimeout(timeout);
-  }, [name]);
+  }, [name, search]);
 
-  const remote = useQuery(
-    api.catalog.search,
-    !useFixture && catalogQuery.length > 1 ? { query: catalogQuery } : "skip",
-  );
-  const current = useMemo(
-    () =>
-      useFixture
-        ? searchFixture(catalogQuery)
-        : remote?.map(({ _id, ...item }) => ({ id: _id, ...item })),
-    [catalogQuery, remote],
-  );
-
-  useEffect(() => {
-    if (current !== undefined) setDisplayed(current);
-  }, [current]);
-
-  return displayed;
+  const query = name.trim();
+  if (query.length < 2) return notQueried;
+  if (state.query !== query)
+    return { status: "loading", suggestions: state.suggestions } as const;
+  return state;
 }

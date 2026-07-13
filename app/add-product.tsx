@@ -67,7 +67,7 @@ export default function AddProductScreen() {
   const [intervalDays, setIntervalDays] = useState("2");
   const [selectedWeekDays, setSelectedWeekDays] = useState<number[]>([]);
 
-  const displayedSuggestions = useCatalogSuggestions(name);
+  const catalogSuggestions = useCatalogSuggestions(name);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(calendarViewMonth);
@@ -90,7 +90,9 @@ export default function AddProductScreen() {
     setShowSuggestions(text.trim().length > 1);
   };
 
-  const selectSuggestion = (item: (typeof displayedSuggestions)[number]) => {
+  const selectSuggestion = (
+    item: (typeof catalogSuggestions.suggestions)[number],
+  ) => {
     setBrand(item.brand);
     setName(item.productName);
     setShowSuggestions(false);
@@ -381,8 +383,8 @@ export default function AddProductScreen() {
                 shadowRadius={12}
                 elevation={8}
               >
-                {displayedSuggestions.length > 0 ? (
-                  displayedSuggestions.slice(0, 5).map((item) => (
+                {catalogSuggestions.suggestions.length > 0 ? (
+                  catalogSuggestions.suggestions.slice(0, 5).map((item) => (
                     <YStack
                       key={item.id}
                       paddingVertical={12}
@@ -397,9 +399,17 @@ export default function AddProductScreen() {
                       </Text>
                     </YStack>
                   ))
-                ) : (
+                ) : catalogSuggestions.status === "complete" ? (
                   <Text padding={12} fontSize={14} color={colors.subtext}>
                     {t("add.noCatalogMatches")}
+                  </Text>
+                ) : catalogSuggestions.status === "error" ? (
+                  <Text padding={12} fontSize={14} color={colors.subtext}>
+                    {t("error.message")}
+                  </Text>
+                ) : (
+                  <Text padding={12} fontSize={14} color={colors.subtext}>
+                    {t("add.searchingCatalog")}
                   </Text>
                 )}
               </YStack>

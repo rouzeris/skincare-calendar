@@ -1,4 +1,5 @@
 import { CosmeticsProvider } from "@/context/cosmetics";
+import { CatalogProvider } from "@/context/catalog";
 import { IntlProvider, useIntl } from "@/context/intl";
 import { RoutineProvider } from "@/context/routine";
 import { ThemeProvider, useTheme } from "@/context/theme";
@@ -11,7 +12,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useColorScheme } from "react-native";
 import { TamaguiProvider } from "tamagui";
 import { StatusBar } from "expo-status-bar";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { tamaguiConfig } from "../tamagui.config";
 
 import "../tamagui-web.css";
@@ -19,14 +19,6 @@ import "../tamagui-web.css";
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
-const convexUrl =
-  process.env.EXPO_PUBLIC_CONVEX_URL ??
-  (process.env.EXPO_PUBLIC_CATALOG_FIXTURE === "true"
-    ? "https://catalog-fixture.convex.cloud"
-    : undefined);
-if (!convexUrl) throw new Error("EXPO_PUBLIC_CONVEX_URL is required");
-const convexClient = new ConvexReactClient(convexUrl);
-
 function RootNavigator() {
   const { colors, colorScheme } = useTheme();
   const { t } = useIntl();
@@ -100,7 +92,7 @@ function AppProviders() {
       onReset={handleErrorReset}
       labels={errorLabels}
     >
-      <ConvexProvider client={convexClient}>
+      <CatalogProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
             <CosmeticsProvider>
@@ -110,7 +102,7 @@ function AppProviders() {
             </CosmeticsProvider>
           </ThemeProvider>
         </QueryClientProvider>
-      </ConvexProvider>
+      </CatalogProvider>
     </ErrorBoundary>
   );
 }

@@ -1,7 +1,8 @@
 import { once } from "node:events";
-import { createReadStream, createWriteStream } from "node:fs";
-import { rename, rm } from "node:fs/promises";
+import { createWriteStream } from "node:fs";
+import { open, rename, rm } from "node:fs/promises";
 import { createInterface } from "node:readline";
+import { finished, pipeline } from "node:stream/promises";
 import { pathToFileURL } from "node:url";
 import { createGunzip } from "node:zlib";
 import { normalizeCatalogSearch } from "../shared/catalog-search";
@@ -64,15 +65,22 @@ export function toCatalogProduct(
 
 export async function buildCatalog(inputPath: string, outputPath: string) {
   const temporaryPath = `${outputPath}.${process.pid}.${Date.now()}.tmp`;
-  const input = createReadStream(inputPath).pipe(createGunzip());
-  const lines = createInterface({ input, crlfDelay: Infinity });
+  const inputFile = await open(inputPath, "r");
+  const source = inputFile.createReadStream({ autoClose: false });
+  const gunzip = createGunzip();
+  const decompression = pipeline(source, gunzip);
+  void decompression.catch(() => undefined);
+  const lines = createInterface({ input: gunzip, crlfDelay: Infinity });
   const output = createWriteStream(temporaryPath, {
     encoding: "utf8",
     flags: "wx",
   });
+  const outputCompletion = finished(output);
+  void outputCompletion.catch(() => undefined);
   let columns: Record<string, number> | undefined;
   let imported = 0;
   let skipped = 0;
+  let committed = false;
 
   try {
     await once(output, "open");
@@ -100,16 +108,22 @@ export async function buildCatalog(inputPath: string, outputPath: string) {
         await once(output, "drain");
       imported++;
     }
+    await decompression;
 
     output.end();
-    await once(output, "finish");
+    await outputCompletion;
+    if (imported === 0) throw new Error("Catalog contains no products");
     await rename(temporaryPath, outputPath);
+    committed = true;
     return { imported, skipped };
-  } catch (error) {
+  } finally {
+    source.destroy();
+    gunzip.destroy();
     output.destroy();
     lines.close();
-    await rm(temporaryPath, { force: true });
-    throw error;
+    await Promise.allSettled([decompression, outputCompletion]);
+    await inputFile.close();
+    if (!committed) await rm(temporaryPath, { force: true });
   }
 }
 
