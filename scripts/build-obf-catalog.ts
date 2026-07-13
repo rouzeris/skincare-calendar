@@ -1,8 +1,10 @@
 import { once } from "node:events";
 import { createReadStream, createWriteStream } from "node:fs";
+import { rename, rm } from "node:fs/promises";
 import { createInterface } from "node:readline";
 import { pathToFileURL } from "node:url";
 import { createGunzip } from "node:zlib";
+import { normalizeCatalogSearch } from "../shared/catalog-search";
 
 const REQUIRED_COLUMNS = [
   "code",
@@ -15,35 +17,30 @@ const REQUIRED_COLUMNS = [
   "completeness",
 ];
 
-export function normalizeSearch(value) {
-  return value
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim()
-    .toLowerCase();
-}
-
-function numberOrZero(value) {
+function numberOrZero(value: string) {
   const number = Number(value);
   return Number.isFinite(number) ? number : 0;
 }
 
-function clean(value) {
+function clean(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
-function first(value) {
+function first(value: string) {
   return clean(value.split(",")[0] ?? "");
 }
 
-export function toCatalogProduct(columns, row) {
+export function toCatalogProduct(
+  columns: Record<string, number>,
+  row: string[],
+) {
   const barcode = clean(row[columns.code] ?? "");
   const productName = clean(row[columns.product_name] ?? "");
   const brands = clean(row[columns.brands] ?? "");
   const brand = first(brands);
   if (!barcode || !brand || !productName) return null;
-  if (normalizeSearch(productName) === normalizeSearch(barcode)) return null;
+  if (normalizeCatalogSearch(productName) === normalizeCatalogSearch(barcode))
+    return null;
 
   const quantity = clean(row[columns.quantity] ?? "");
   const category = first(row[columns.categories_en] ?? "");
@@ -59,45 +56,61 @@ export function toCatalogProduct(columns, row) {
     productName,
     ...(quantity ? { quantity } : {}),
     ...(category ? { category } : {}),
-    searchText: normalizeSearch(`${brands} ${productName}`),
+    searchText: normalizeCatalogSearch(`${brands} ${productName}`),
     uniqueScans: numberOrZero(row[columns.unique_scans_n]),
     completeness: numberOrZero(row[columns.completeness]),
   };
 }
 
-export async function buildCatalog(inputPath, outputPath) {
+export async function buildCatalog(inputPath: string, outputPath: string) {
+  const temporaryPath = `${outputPath}.${process.pid}.${Date.now()}.tmp`;
   const input = createReadStream(inputPath).pipe(createGunzip());
   const lines = createInterface({ input, crlfDelay: Infinity });
-  const output = createWriteStream(outputPath, { encoding: "utf8" });
-  let columns;
+  const output = createWriteStream(temporaryPath, {
+    encoding: "utf8",
+    flags: "wx",
+  });
+  let columns: Record<string, number> | undefined;
   let imported = 0;
   let skipped = 0;
 
-  for await (const line of lines) {
-    const row = line.split("\t");
-    if (!columns) {
-      columns = Object.fromEntries(row.map((name, index) => [name, index]));
-      const missing = REQUIRED_COLUMNS.filter(
-        (name) => columns[name] === undefined,
-      );
-      if (missing.length)
-        throw new Error(`Missing OBF columns: ${missing.join(", ")}`);
-      continue;
+  try {
+    await once(output, "open");
+    for await (const line of lines) {
+      const row = line.split("\t");
+      if (!columns) {
+        const parsedColumns = Object.fromEntries(
+          row.map((name, index) => [name, index]),
+        );
+        const missing = REQUIRED_COLUMNS.filter(
+          (name) => parsedColumns[name] === undefined,
+        );
+        if (missing.length)
+          throw new Error(`Missing OBF columns: ${missing.join(", ")}`);
+        columns = parsedColumns;
+        continue;
+      }
+
+      const product = toCatalogProduct(columns, row);
+      if (!product) {
+        skipped++;
+        continue;
+      }
+      if (!output.write(`${JSON.stringify(product)}\n`))
+        await once(output, "drain");
+      imported++;
     }
 
-    const product = toCatalogProduct(columns, row);
-    if (!product) {
-      skipped++;
-      continue;
-    }
-    if (!output.write(`${JSON.stringify(product)}\n`))
-      await once(output, "drain");
-    imported++;
+    output.end();
+    await once(output, "finish");
+    await rename(temporaryPath, outputPath);
+    return { imported, skipped };
+  } catch (error) {
+    output.destroy();
+    lines.close();
+    await rm(temporaryPath, { force: true });
+    throw error;
   }
-
-  output.end();
-  await once(output, "finish");
-  return { imported, skipped };
 }
 
 async function main() {

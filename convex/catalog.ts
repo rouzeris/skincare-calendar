@@ -1,22 +1,14 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { normalizeCatalogSearch } from "../shared/catalog-search";
 
 const RESULT_LIMIT = 15;
 const SEARCH_CANDIDATES = 60;
 
-function normalizeSearch(value: string) {
-  return value
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim()
-    .toLowerCase();
-}
-
 export const search = query({
   args: { query: v.string() },
   handler: async (ctx, args) => {
-    const search = normalizeSearch(args.query)
+    const search = normalizeCatalogSearch(args.query)
       .split(" ")
       .slice(0, 16)
       .join(" ")

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -36,8 +36,7 @@ import {
 } from "date-fns";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { useCatalogSuggestions } from "@/hooks/use-catalog-suggestions";
 
 const WEEKDAY_INDEXES = [0, 1, 2, 3, 4, 5, 6];
 
@@ -60,7 +59,6 @@ export default function AddProductScreen() {
   const [endCalendarViewMonth, setEndCalendarViewMonth] = useState(new Date());
   const [selectedRoutine, setSelectedRoutine] = useState<TimeOfDay[]>([]);
   const [imageUri, setImageUri] = useState<string | null>(null);
-  const [catalogQuery, setCatalogQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [freqType, setFreqType] = useState<"daily" | "interval" | "weekly">(
@@ -69,22 +67,7 @@ export default function AddProductScreen() {
   const [intervalDays, setIntervalDays] = useState("2");
   const [selectedWeekDays, setSelectedWeekDays] = useState<number[]>([]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setCatalogQuery(name.trim()), 200);
-    return () => clearTimeout(timeout);
-  }, [name]);
-
-  const suggestions = useQuery(
-    api.catalog.search,
-    catalogQuery.length > 1 ? { query: catalogQuery } : "skip",
-  );
-  const [displayedSuggestions, setDisplayedSuggestions] = useState<
-    NonNullable<typeof suggestions>
-  >([]);
-
-  useEffect(() => {
-    if (suggestions !== undefined) setDisplayedSuggestions(suggestions);
-  }, [suggestions]);
+  const displayedSuggestions = useCatalogSuggestions(name);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(calendarViewMonth);
@@ -380,7 +363,7 @@ export default function AddProductScreen() {
               onChangeText={handleNameChange}
               placeholderTextColor={colors.subtext}
             />
-            {showSuggestions && displayedSuggestions.length > 0 && (
+            {showSuggestions && (
               <YStack
                 testID="catalog-suggestions"
                 position="absolute"
@@ -398,21 +381,27 @@ export default function AddProductScreen() {
                 shadowRadius={12}
                 elevation={8}
               >
-                {displayedSuggestions.slice(0, 5).map((item) => (
-                  <YStack
-                    key={item._id}
-                    paddingVertical={12}
-                    paddingHorizontal={12}
-                    borderBottomWidth={1}
-                    borderBottomColor={colors.border}
-                    onPress={() => selectSuggestion(item)}
-                  >
-                    <Text fontSize={14} color={colors.text}>
-                      <Text fontWeight="600">{item.brand}</Text>{" "}
-                      {item.productName}
-                    </Text>
-                  </YStack>
-                ))}
+                {displayedSuggestions.length > 0 ? (
+                  displayedSuggestions.slice(0, 5).map((item) => (
+                    <YStack
+                      key={item.id}
+                      paddingVertical={12}
+                      paddingHorizontal={12}
+                      borderBottomWidth={1}
+                      borderBottomColor={colors.border}
+                      onPress={() => selectSuggestion(item)}
+                    >
+                      <Text fontSize={14} color={colors.text}>
+                        <Text fontWeight="600">{item.brand}</Text>{" "}
+                        {item.productName}
+                      </Text>
+                    </YStack>
+                  ))
+                ) : (
+                  <Text padding={12} fontSize={14} color={colors.subtext}>
+                    {t("add.noCatalogMatches")}
+                  </Text>
+                )}
               </YStack>
             )}
           </YStack>

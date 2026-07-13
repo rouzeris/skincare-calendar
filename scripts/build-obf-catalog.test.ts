@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
-import { normalizeSearch, toCatalogProduct } from "./build-obf-catalog.mjs";
+import { gzipSync } from "node:zlib";
+import { normalizeCatalogSearch } from "../shared/catalog-search";
+import { buildCatalog, toCatalogProduct } from "./build-obf-catalog";
 
 const columns = {
   code: 0,
@@ -15,9 +20,28 @@ const columns = {
 
 test("normalizes accents and punctuation for prefix search", () => {
   assert.equal(
-    normalizeSearch("  L’Oréal — Crème  SPF-50  "),
+    normalizeCatalogSearch("  L’Oréal — Crème  SPF-50  "),
     "l oreal creme spf 50",
   );
+});
+
+test("preserves an existing catalog when the source is invalid", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "cera-catalog-"));
+  const inputPath = join(directory, "invalid.csv.gz");
+  const outputPath = join(directory, "catalog.jsonl");
+
+  try {
+    await writeFile(inputPath, gzipSync("code\tproduct_name\n"));
+    await writeFile(outputPath, "existing catalog\n");
+
+    await assert.rejects(
+      buildCatalog(inputPath, outputPath),
+      /Missing OBF columns/,
+    );
+    assert.equal(await readFile(outputPath, "utf8"), "existing catalog\n");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test("builds an attributed catalog product", () => {

@@ -19,7 +19,11 @@ import "../tamagui-web.css";
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
-const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
+const convexUrl =
+  process.env.EXPO_PUBLIC_CONVEX_URL ??
+  (process.env.EXPO_PUBLIC_CATALOG_FIXTURE === "true"
+    ? "https://catalog-fixture.convex.cloud"
+    : undefined);
 if (!convexUrl) throw new Error("EXPO_PUBLIC_CONVEX_URL is required");
 const convexClient = new ConvexReactClient(convexUrl);
 
