@@ -41,6 +41,16 @@ const tr = t(locale);
       preload="metadata"></video>
   </div>
 
+  <script>
+    // ponytail: iOS blocks autoplay in Low Power Mode and shows a dead play
+    // glyph; the video is decorative, so just drop it when playback is denied.
+    const v = document.querySelector<HTMLVideoElement>(".leaves-scroll video");
+    if (v) {
+      v.muted = true;
+      v.play().catch(() => v.remove());
+    }
+  </script>
+
   <div
     class="relative mx-auto flex w-full max-w-6xl flex-col items-center px-gutter pt-[clamp(7rem,15vh,10rem)] text-center min-[940px]:grid min-[940px]:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] min-[940px]:items-center min-[940px]:gap-[clamp(2.5rem,5vw,5rem)] min-[940px]:pb-section min-[940px]:text-left"
   >
