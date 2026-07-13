@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { seedLocalData } from "./local-data";
 
 test.describe("Routine Management", () => {
   test.beforeEach(async ({ page }) => {
@@ -38,29 +39,23 @@ test.describe("Routine Management", () => {
 
   test("manage morning and evening routines separately", async ({ page }) => {
     // Setup: Add two products with different routine times
-    await page.evaluate(() => {
-      const products = [
-        {
-          id: "morning-prod",
-          name: "Morning Cleanser",
-          brand: "CeraVe",
-          frequency: { type: "daily" },
-        },
-        {
-          id: "evening-prod",
-          name: "Night Cream",
-          brand: "La Roche-Posay",
-          frequency: { type: "daily" },
-        },
-      ];
-      localStorage.setItem("cosmetics_shelf", JSON.stringify(products));
-      localStorage.setItem(
-        "routine_config",
-        JSON.stringify({
-          morning: ["morning-prod"],
-          evening: ["evening-prod"],
-        }),
-      );
+    const products = [
+      {
+        id: "morning-prod",
+        name: "Morning Cleanser",
+        brand: "CeraVe",
+        frequency: { type: "daily" },
+      },
+      {
+        id: "evening-prod",
+        name: "Night Cream",
+        brand: "La Roche-Posay",
+        frequency: { type: "daily" },
+      },
+    ];
+    await seedLocalData(page, products, {
+      morning: ["morning-prod"],
+      evening: ["evening-prod"],
     });
     await page.reload();
 
@@ -91,19 +86,16 @@ test.describe("Routine Management", () => {
     const tomorrow = (today + 1) % 7;
 
     // Setup: Product scheduled for tomorrow only
-    await page.evaluate((dayIndex) => {
-      const product = {
-        id: "weekly-treatment",
-        name: "Retinol Treatment",
-        brand: "Paula's Choice",
-        frequency: { type: "weekly", daysOfWeek: [dayIndex] },
-      };
-      localStorage.setItem("cosmetics_shelf", JSON.stringify([product]));
-      localStorage.setItem(
-        "routine_config",
-        JSON.stringify({ morning: ["weekly-treatment"], evening: [] }),
-      );
-    }, tomorrow);
+    const product = {
+      id: "weekly-treatment",
+      name: "Retinol Treatment",
+      brand: "Paula's Choice",
+      frequency: { type: "weekly", daysOfWeek: [tomorrow] },
+    };
+    await seedLocalData(page, [product], {
+      morning: ["weekly-treatment"],
+      evening: [],
+    });
     await page.reload();
 
     // Product should NOT appear today since it's scheduled for tomorrow
@@ -111,26 +103,21 @@ test.describe("Routine Management", () => {
   });
 
   test("interval frequency uses calendar days", async ({ page }) => {
-    await page.evaluate(() => {
+    const product = await page.evaluate(() => {
       const openedAt = new Date();
       openedAt.setDate(openedAt.getDate() - 1);
       openedAt.setHours(23, 59, 0, 0);
-      localStorage.setItem(
-        "cosmetics_shelf",
-        JSON.stringify([
-          {
-            id: "interval-treatment",
-            name: "Every Other Day Treatment",
-            brand: "Test Brand",
-            openedAt: openedAt.toISOString(),
-            frequency: { type: "interval", days: 2 },
-          },
-        ]),
-      );
-      localStorage.setItem(
-        "routine_config",
-        JSON.stringify({ morning: ["interval-treatment"], evening: [] }),
-      );
+      return {
+        id: "interval-treatment",
+        name: "Every Other Day Treatment",
+        brand: "Test Brand",
+        openedAt: openedAt.toISOString(),
+        frequency: { type: "interval", days: 2 },
+      };
+    });
+    await seedLocalData(page, [product], {
+      morning: ["interval-treatment"],
+      evening: [],
     });
     await page.reload();
 
@@ -138,37 +125,31 @@ test.describe("Routine Management", () => {
   });
 
   test("daily routines respect schedule boundaries", async ({ page }) => {
-    await page.evaluate(() => {
+    const products = await page.evaluate(() => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
-      localStorage.setItem(
-        "cosmetics_shelf",
-        JSON.stringify([
-          {
-            id: "ended-treatment",
-            name: "Ended Treatment",
-            brand: "Test Brand",
-            endDate: yesterday.toISOString(),
-            frequency: { type: "daily" },
-          },
-          {
-            id: "future-treatment",
-            name: "Future Treatment",
-            brand: "Test Brand",
-            openedAt: tomorrow.toISOString(),
-            frequency: { type: "daily" },
-          },
-        ]),
-      );
-      localStorage.setItem(
-        "routine_config",
-        JSON.stringify({
-          morning: ["ended-treatment", "future-treatment"],
-          evening: [],
-        }),
-      );
+      return [
+        {
+          id: "ended-treatment",
+          name: "Ended Treatment",
+          brand: "Test Brand",
+          endDate: yesterday.toISOString(),
+          frequency: { type: "daily" },
+        },
+        {
+          id: "future-treatment",
+          name: "Future Treatment",
+          brand: "Test Brand",
+          openedAt: tomorrow.toISOString(),
+          frequency: { type: "daily" },
+        },
+      ];
+    });
+    await seedLocalData(page, products, {
+      morning: ["ended-treatment", "future-treatment"],
+      evening: [],
     });
     await page.reload();
 

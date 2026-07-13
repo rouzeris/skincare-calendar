@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -52,9 +52,10 @@ const WEEKDAY_INDEXES = [0, 1, 2, 3, 4, 5, 6];
 
 export default function AddProductScreen() {
   const router = useRouter();
-  const { addProduct } = useCosmetics();
+  const { addProduct, isAddingProduct } = useCosmetics();
   const { colors } = useTheme();
   const { t, formatDate } = useIntl();
+  const savePending = useRef(false);
 
   const [brand, setBrand] = useState("");
   const [name, setName] = useState("");
@@ -143,7 +144,8 @@ export default function AddProductScreen() {
   };
 
   const handleSave = () => {
-    if (!name || !brand) return;
+    if (!name || !brand || isAddingProduct || savePending.current) return;
+    savePending.current = true;
 
     let frequency: Frequency = { type: "daily" };
 
@@ -172,7 +174,10 @@ export default function AddProductScreen() {
       { product, imageUri: imageUri ?? undefined, times: selectedRoutine },
       {
         onSuccess: () => router.back(),
-        onError: () => Alert.alert(t("common.oops"), t("error.message")),
+        onError: () => {
+          savePending.current = false;
+          Alert.alert(t("common.oops"), t("error.message"));
+        },
       },
     );
   };
@@ -287,15 +292,19 @@ export default function AddProductScreen() {
             paddingHorizontal={16}
             paddingVertical={8}
             borderRadius={20}
-            backgroundColor={!name || !brand ? colors.border : colors.tint}
-            opacity={!name || !brand ? 0.7 : 1}
+            backgroundColor={
+              !name || !brand || isAddingProduct ? colors.border : colors.tint
+            }
+            opacity={!name || !brand || isAddingProduct ? 0.7 : 1}
             onPress={handleSave}
-            disabled={!name || !brand}
+            disabled={!name || !brand || isAddingProduct}
           >
             <Text
               fontWeight="600"
               fontSize={14}
-              color={!name || !brand ? colors.subtext : "#FFF"}
+              color={
+                !name || !brand || isAddingProduct ? colors.subtext : "#FFF"
+              }
             >
               {t("common.save")}
             </Text>

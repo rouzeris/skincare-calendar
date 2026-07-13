@@ -32,8 +32,9 @@ export type RoutineHistory = Record<
 >;
 
 export const localDataKeys = {
-  cosmetics: "cosmetics_shelf",
-  routineConfig: "routine_config",
+  state: "local_data_v1",
+  legacyCosmetics: "cosmetics_shelf",
+  legacyRoutineConfig: "routine_config",
   routineHistory: "routine_history",
 } as const;
 
@@ -43,18 +44,51 @@ export const localDataQueryKeys = {
   routineHistory: ["routineHistory"] as const,
 };
 
-const emptyRoutineConfig = (): RoutineConfig => ({ morning: [], evening: [] });
+type LocalData = {
+  version: 1;
+  products: Product[];
+  routineConfig: RoutineConfig;
+};
 
-async function readJson<T>(key: string, fallback: T): Promise<T> {
-  const stored = await AsyncStorage.getItem(key);
-  return stored ? (JSON.parse(stored) as T) : fallback;
+const emptyRoutineConfig = (): RoutineConfig => ({ morning: [], evening: [] });
+let operations = Promise.resolve();
+
+function serialized<T>(operation: () => Promise<T>): Promise<T> {
+  const result = operations.then(operation, operation);
+  operations = result.then(
+    () => undefined,
+    () => undefined,
+  );
+  return result;
 }
 
+async function load(): Promise<LocalData> {
+  const stored = await AsyncStorage.getItem(localDataKeys.state);
+  if (stored) return JSON.parse(stored) as LocalData;
+
+  const [products, routineConfig] = await Promise.all([
+    AsyncStorage.getItem(localDataKeys.legacyCosmetics),
+    AsyncStorage.getItem(localDataKeys.legacyRoutineConfig),
+  ]);
+  const migrated: LocalData = {
+    version: 1,
+    products: products ? (JSON.parse(products) as Product[]) : [],
+    routineConfig: routineConfig
+      ? (JSON.parse(routineConfig) as RoutineConfig)
+      : emptyRoutineConfig(),
+  };
+  await save(migrated);
+  return migrated;
+}
+
+const save = (data: LocalData) =>
+  AsyncStorage.setItem(localDataKeys.state, JSON.stringify(data));
+
 export const readProducts = () =>
-  readJson<Product[]>(localDataKeys.cosmetics, []);
+  serialized(async () => (await load()).products);
 
 export const readRoutineConfig = () =>
-  readJson<RoutineConfig>(localDataKeys.routineConfig, emptyRoutineConfig());
+  serialized(async () => (await load()).routineConfig);
 
 export type CreateProductInput = {
   product: Omit<Product, "id" | "image">;
@@ -62,60 +96,84 @@ export type CreateProductInput = {
   times: TimeOfDay[];
 };
 
-export async function createProduct({
+export function createProduct({
   product: productInput,
   imageUri,
   times,
 }: CreateProductInput) {
-  const id = Math.random().toString(36).slice(2, 11);
-  let image: string | undefined;
+  return serialized(async () => {
+    const id = Math.random().toString(36).slice(2, 11);
+    let image: string | undefined;
 
-  try {
-    image = imageUri ? persistProductImage(imageUri, id) : undefined;
-    const [products, currentConfig] = await Promise.all([
-      readProducts(),
-      readRoutineConfig(),
-    ]);
-    const product: Product = { ...productInput, id, image };
-    const updatedProducts = [...products, product];
-    const routineConfig: RoutineConfig = {
-      morning: times.includes("morning")
-        ? [...currentConfig.morning, id]
-        : currentConfig.morning,
-      evening: times.includes("evening")
-        ? [...currentConfig.evening, id]
-        : currentConfig.evening,
-    };
+    try {
+      image = imageUri ? persistProductImage(imageUri, id) : undefined;
+      const current = await load();
+      const product: Product = { ...productInput, id, image };
+      const updated: LocalData = {
+        version: 1,
+        products: [...current.products, product],
+        routineConfig: {
+          morning: times.includes("morning")
+            ? [...current.routineConfig.morning, id]
+            : current.routineConfig.morning,
+          evening: times.includes("evening")
+            ? [...current.routineConfig.evening, id]
+            : current.routineConfig.evening,
+        },
+      };
 
-    await AsyncStorage.multiSet([
-      [localDataKeys.cosmetics, JSON.stringify(updatedProducts)],
-      [localDataKeys.routineConfig, JSON.stringify(routineConfig)],
-    ]);
-    return { products: updatedProducts, routineConfig };
-  } catch (error) {
-    deleteProductImage(image);
-    throw error;
-  }
+      await save(updated);
+      return updated;
+    } catch (error) {
+      deleteProductImage(image);
+      throw error;
+    }
+  });
 }
 
-export async function removeProduct(productId: string) {
-  const [products, currentConfig] = await Promise.all([
-    readProducts(),
-    readRoutineConfig(),
-  ]);
-  const removed = products.find((product) => product.id === productId);
-  const updatedProducts = products.filter(
-    (product) => product.id !== productId,
-  );
-  const routineConfig: RoutineConfig = {
-    morning: currentConfig.morning.filter((id) => id !== productId),
-    evening: currentConfig.evening.filter((id) => id !== productId),
-  };
+export function removeProduct(productId: string) {
+  return serialized(async () => {
+    const current = await load();
+    const removed = current.products.find(
+      (product) => product.id === productId,
+    );
+    const updated: LocalData = {
+      version: 1,
+      products: current.products.filter((product) => product.id !== productId),
+      routineConfig: {
+        morning: current.routineConfig.morning.filter((id) => id !== productId),
+        evening: current.routineConfig.evening.filter((id) => id !== productId),
+      },
+    };
 
-  await AsyncStorage.multiSet([
-    [localDataKeys.cosmetics, JSON.stringify(updatedProducts)],
-    [localDataKeys.routineConfig, JSON.stringify(routineConfig)],
-  ]);
-  deleteProductImage(removed?.image);
-  return { products: updatedProducts, routineConfig };
+    await save(updated);
+    deleteProductImage(removed?.image);
+    return updated;
+  });
+}
+
+export function setRoutineConfig(routineConfig: RoutineConfig) {
+  return serialized(async () => {
+    const current = await load();
+    const updated = { ...current, routineConfig };
+    await save(updated);
+    return routineConfig;
+  });
+}
+
+export function removeProductFromRoutine(
+  productId: string,
+  timeOfDay: TimeOfDay,
+) {
+  return serialized(async () => {
+    const current = await load();
+    const routineConfig = {
+      ...current.routineConfig,
+      [timeOfDay]: current.routineConfig[timeOfDay].filter(
+        (id) => id !== productId,
+      ),
+    };
+    await save({ ...current, routineConfig });
+    return routineConfig;
+  });
 }

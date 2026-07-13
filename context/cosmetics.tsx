@@ -37,6 +37,7 @@ export const [CosmeticsProvider, useCosmetics] = createContextHook(() => {
   return {
     products: query.data || [],
     isLoading: query.isLoading,
+    isAddingProduct: addMutation.isPending,
     addProduct: addMutation.mutate,
     removeProduct: removeMutation.mutate,
   };

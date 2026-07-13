@@ -9,6 +9,7 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "test": "playwright test",
+    "test:unit": "bun test utils/local-data.test.ts",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug"

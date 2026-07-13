@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { readLocalData, seedLocalData } from "./local-data";
 
 test.describe("Product Shelf Management", () => {
   test.beforeEach(async ({ page }) => {
@@ -25,19 +26,16 @@ test.describe("Product Shelf Management", () => {
     await expect(page.getByText("The Ordinary")).toBeVisible();
 
     // 5. Verify product was persisted
-    const shelf = await page.evaluate(() =>
-      localStorage.getItem("cosmetics_shelf"),
-    );
-    expect(shelf).toContain("Hyaluronic Acid Serum");
+    const { products } = await readLocalData(page);
+    expect(products[0].name).toBe("Hyaluronic Acid Serum");
   });
 
   test("track product expiration status", async ({ page }) => {
     // Setup: Add product opened 6 months ago with 12-month PAO
-    await page.evaluate(() => {
+    const product = await page.evaluate(() => {
       const openedDate = new Date();
       openedDate.setMonth(openedDate.getMonth() - 6);
-
-      const product = {
+      return {
         id: "tracking-test",
         name: "Retinol Serum",
         brand: "Paula's Choice",
@@ -45,8 +43,8 @@ test.describe("Product Shelf Management", () => {
         periodAfterOpening: 12,
         frequency: { type: "daily" },
       };
-      localStorage.setItem("cosmetics_shelf", JSON.stringify([product]));
     });
+    await seedLocalData(page, [product]);
     await page.reload();
     await page.getByRole("tab", { name: "Shelf" }).click();
 
@@ -57,11 +55,11 @@ test.describe("Product Shelf Management", () => {
 
   test("warn about expired products", async ({ page }) => {
     // Setup: Add product that expired 2 months ago
-    await page.evaluate(() => {
+    const product = await page.evaluate(() => {
       const openedDate = new Date();
       openedDate.setMonth(openedDate.getMonth() - 14); // 14 months ago
 
-      const product = {
+      return {
         id: "expired-test",
         name: "Old Moisturizer",
         brand: "CeraVe",
@@ -69,8 +67,8 @@ test.describe("Product Shelf Management", () => {
         periodAfterOpening: 12, // 12-month PAO = expired
         frequency: { type: "daily" },
       };
-      localStorage.setItem("cosmetics_shelf", JSON.stringify([product]));
     });
+    await seedLocalData(page, [product]);
     await page.reload();
     await page.getByRole("tab", { name: "Shelf" }).click();
 
@@ -91,18 +89,11 @@ test.describe("Product Shelf Management", () => {
   });
 
   test("deleting a product also removes it from routines", async ({ page }) => {
-    await page.evaluate(() => {
-      localStorage.setItem(
-        "cosmetics_shelf",
-        JSON.stringify([
-          { id: "delete-me", name: "Delete Me", brand: "Test Brand" },
-        ]),
-      );
-      localStorage.setItem(
-        "routine_config",
-        JSON.stringify({ morning: ["delete-me"], evening: ["delete-me"] }),
-      );
-    });
+    await seedLocalData(
+      page,
+      [{ id: "delete-me", name: "Delete Me", brand: "Test Brand" }],
+      { morning: ["delete-me"], evening: ["delete-me"] },
+    );
     await page.reload();
 
     page.once("dialog", (dialog) => dialog.accept());
@@ -110,10 +101,8 @@ test.describe("Product Shelf Management", () => {
     await expect(page.getByText("Delete Me")).not.toBeVisible();
     await page.reload();
 
-    const config = await page.evaluate(() =>
-      JSON.parse(localStorage.getItem("routine_config")!),
-    );
-    expect(config).toEqual({ morning: [], evening: [] });
+    const { routineConfig } = await readLocalData(page);
+    expect(routineConfig).toEqual({ morning: [], evening: [] });
     await expect(page.getByText("Delete Me")).not.toBeVisible();
   });
 });
