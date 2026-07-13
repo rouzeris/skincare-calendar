@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -36,17 +36,8 @@ import {
 } from "date-fns";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
-
-const MOCK_SUGGESTIONS = [
-  { brand: "The Ordinary", name: "Niacinamide 10% + Zinc 1%" },
-  { brand: "The Ordinary", name: "Hyaluronic Acid 2% + B5" },
-  { brand: "CeraVe", name: "Hydrating Cleanser" },
-  { brand: "CeraVe", name: "Moisturizing Cream" },
-  { brand: "La Roche-Posay", name: "Anthelios UV Mune 400" },
-  { brand: "La Roche-Posay", name: "Cicaplast Baume B5" },
-  { brand: "Paula's Choice", name: "Skin Perfecting 2% BHA Liquid Exfoliant" },
-  { brand: "Cosrx", name: "Advanced Snail 96 Mucin Power Essence" },
-];
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const WEEKDAY_INDEXES = [0, 1, 2, 3, 4, 5, 6];
 
@@ -69,6 +60,8 @@ export default function AddProductScreen() {
   const [endCalendarViewMonth, setEndCalendarViewMonth] = useState(new Date());
   const [selectedRoutine, setSelectedRoutine] = useState<TimeOfDay[]>([]);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [catalogQuery, setCatalogQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [freqType, setFreqType] = useState<"daily" | "interval" | "weekly">(
     "daily",
@@ -76,7 +69,15 @@ export default function AddProductScreen() {
   const [intervalDays, setIntervalDays] = useState("2");
   const [selectedWeekDays, setSelectedWeekDays] = useState<number[]>([]);
 
-  const [suggestions, setSuggestions] = useState<typeof MOCK_SUGGESTIONS>([]);
+  useEffect(() => {
+    const timeout = setTimeout(() => setCatalogQuery(name.trim()), 200);
+    return () => clearTimeout(timeout);
+  }, [name]);
+
+  const suggestions = useQuery(
+    api.catalog.search,
+    catalogQuery.length > 1 ? { query: catalogQuery } : "skip",
+  );
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(calendarViewMonth);
@@ -96,22 +97,13 @@ export default function AddProductScreen() {
 
   const handleNameChange = (text: string) => {
     setName(text);
-    if (text.length > 1) {
-      const filtered = MOCK_SUGGESTIONS.filter(
-        (s) =>
-          s.name.toLowerCase().includes(text.toLowerCase()) ||
-          s.brand.toLowerCase().includes(text.toLowerCase()),
-      );
-      setSuggestions(filtered.slice(0, 3));
-    } else {
-      setSuggestions([]);
-    }
+    setShowSuggestions(text.trim().length > 1);
   };
 
-  const selectSuggestion = (item: (typeof MOCK_SUGGESTIONS)[0]) => {
+  const selectSuggestion = (item: NonNullable<typeof suggestions>[number]) => {
     setBrand(item.brand);
-    setName(item.name);
-    setSuggestions([]);
+    setName(item.productName);
+    setShowSuggestions(false);
   };
 
   const toggleRoutine = (time: TimeOfDay) => {
@@ -359,7 +351,7 @@ export default function AddProductScreen() {
             </YStack>
           </YStack>
 
-          <YStack zIndex={10}>
+          <YStack zIndex={20}>
             <Text
               fontSize={14}
               fontWeight="500"
@@ -381,7 +373,7 @@ export default function AddProductScreen() {
               onChangeText={handleNameChange}
               placeholderTextColor={colors.subtext}
             />
-            {suggestions.length > 0 && (
+            {showSuggestions && suggestions && suggestions.length > 0 && (
               <YStack
                 position="absolute"
                 top="100%"
@@ -398,9 +390,9 @@ export default function AddProductScreen() {
                 shadowRadius={12}
                 elevation={8}
               >
-                {suggestions.map((item, index) => (
+                {suggestions.slice(0, 5).map((item) => (
                   <YStack
-                    key={index}
+                    key={item._id}
                     paddingVertical={12}
                     paddingHorizontal={12}
                     borderBottomWidth={1}
@@ -408,7 +400,8 @@ export default function AddProductScreen() {
                     onPress={() => selectSuggestion(item)}
                   >
                     <Text fontSize={14} color={colors.text}>
-                      <Text fontWeight="600">{item.brand}</Text> {item.name}
+                      <Text fontWeight="600">{item.brand}</Text>{" "}
+                      {item.productName}
                     </Text>
                   </YStack>
                 ))}

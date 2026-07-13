@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useColorScheme } from "react-native";
 import { TamaguiProvider } from "tamagui";
 import { StatusBar } from "expo-status-bar";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { tamaguiConfig } from "../tamagui.config";
 
 import "../tamagui-web.css";
@@ -18,6 +19,9 @@ import "../tamagui-web.css";
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
+const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
+if (!convexUrl) throw new Error("EXPO_PUBLIC_CONVEX_URL is required");
+const convexClient = new ConvexReactClient(convexUrl);
 
 function RootNavigator() {
   const { colors, colorScheme } = useTheme();
@@ -92,15 +96,17 @@ function AppProviders() {
       onReset={handleErrorReset}
       labels={errorLabels}
     >
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <CosmeticsProvider>
-            <RoutineProvider>
-              <RootNavigator />
-            </RoutineProvider>
-          </CosmeticsProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <ConvexProvider client={convexClient}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <CosmeticsProvider>
+              <RoutineProvider>
+                <RootNavigator />
+              </RoutineProvider>
+            </CosmeticsProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </ConvexProvider>
     </ErrorBoundary>
   );
 }

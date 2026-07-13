@@ -38,6 +38,8 @@ jobs:
 
       - name: Run Playwright e2e tests
         run: bun run test
+        env:
+          EXPO_PUBLIC_CONVEX_URL: https://effervescent-setter-607.convex.cloud
 
       - name: Upload Playwright report
         if: failure()

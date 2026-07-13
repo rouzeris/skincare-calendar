@@ -81,11 +81,18 @@ test.describe("Product Shelf Management", () => {
     await page.getByText("Add First Product").click();
 
     // 1. Type partial product name
-    await page.getByPlaceholder(/Niacinamide/).fill("Niac");
+    const productName = page.getByPlaceholder(/Niacinamide/);
+    const brand = page.getByPlaceholder(/The Ordinary/);
+    await productName.fill("CeraVe");
 
-    // 2. Verify suggestions appear from mock database
-    await expect(page.getByText(/Niacinamide 10%/)).toBeVisible();
-    await expect(page.getByText(/The Ordinary/)).toBeVisible();
+    // 2. Verify suggestions appear from the shared catalog
+    await expect(page.getByText(/moisturising cream/i)).toBeVisible();
+    await expect(page.getByText(/CeraVe/).first()).toBeVisible();
+
+    // 3. Selecting a result fills both product fields
+    await page.getByText(/moisturising cream/i).click();
+    await expect(productName).toHaveValue("moisturising cream");
+    await expect(brand).toHaveValue("CeraVe");
   });
 
   test("deleting a product also removes it from routines", async ({ page }) => {
