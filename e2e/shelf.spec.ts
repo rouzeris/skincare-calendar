@@ -89,10 +89,22 @@ test.describe("Product Shelf Management", () => {
     await expect(page.getByText(/moisturising cream/i)).toBeVisible();
     await expect(page.getByText(/CeraVe/).first()).toBeVisible();
 
-    // 3. Selecting a result fills both product fields
-    await page.getByText(/moisturising cream/i).click();
-    await expect(productName).toHaveValue("moisturising cream");
-    await expect(brand).toHaveValue("CeraVe");
+    // 3. Refetch swaps rows without remounting the dropdown surface
+    const dropdown = page.getByTestId("catalog-suggestions");
+    const dropdownElement = await dropdown.elementHandle();
+    await productName.fill("Nivea");
+    await expect(page.getByText(/NIVEA Crème/i).first()).toBeVisible();
+    expect(
+      await dropdownElement!.evaluate((element) => element.isConnected),
+    ).toBe(true);
+
+    // 4. Selecting a result fills both product fields
+    await page
+      .getByText(/NIVEA Crème/i)
+      .first()
+      .click();
+    await expect(productName).toHaveValue(/NIVEA Crème/i);
+    await expect(brand).toHaveValue(/nivea/i);
   });
 
   test("deleting a product also removes it from routines", async ({ page }) => {

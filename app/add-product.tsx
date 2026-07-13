@@ -78,6 +78,13 @@ export default function AddProductScreen() {
     api.catalog.search,
     catalogQuery.length > 1 ? { query: catalogQuery } : "skip",
   );
+  const [displayedSuggestions, setDisplayedSuggestions] = useState<
+    NonNullable<typeof suggestions>
+  >([]);
+
+  useEffect(() => {
+    if (suggestions !== undefined) setDisplayedSuggestions(suggestions);
+  }, [suggestions]);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(calendarViewMonth);
@@ -100,7 +107,7 @@ export default function AddProductScreen() {
     setShowSuggestions(text.trim().length > 1);
   };
 
-  const selectSuggestion = (item: NonNullable<typeof suggestions>[number]) => {
+  const selectSuggestion = (item: (typeof displayedSuggestions)[number]) => {
     setBrand(item.brand);
     setName(item.productName);
     setShowSuggestions(false);
@@ -373,8 +380,9 @@ export default function AddProductScreen() {
               onChangeText={handleNameChange}
               placeholderTextColor={colors.subtext}
             />
-            {showSuggestions && suggestions && suggestions.length > 0 && (
+            {showSuggestions && displayedSuggestions.length > 0 && (
               <YStack
+                testID="catalog-suggestions"
                 position="absolute"
                 top="100%"
                 left={0}
@@ -390,7 +398,7 @@ export default function AddProductScreen() {
                 shadowRadius={12}
                 elevation={8}
               >
-                {suggestions.slice(0, 5).map((item) => (
+                {displayedSuggestions.slice(0, 5).map((item) => (
                   <YStack
                     key={item._id}
                     paddingVertical={12}
