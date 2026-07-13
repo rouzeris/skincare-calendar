@@ -40,11 +40,14 @@ test.describe("Add Product Form", () => {
     await expect(page.getByText("AHA/BHA Peel").first()).toBeVisible();
 
     // 9. Verify routine assignment in localStorage
-    const config = await page.evaluate(() =>
-      localStorage.getItem("routine_config"),
-    );
-    expect(config).toContain("morning");
-    expect(config).toContain("evening");
+    const stored = await page.evaluate(() => ({
+      shelf: localStorage.getItem("cosmetics_shelf"),
+      config: localStorage.getItem("routine_config"),
+    }));
+    const [product] = JSON.parse(stored.shelf!);
+    const config = JSON.parse(stored.config!);
+    expect(config.morning).toContain(product.id);
+    expect(config.evening).toContain(product.id);
   });
 
   test("save product with weekly frequency", async ({ page }) => {

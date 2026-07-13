@@ -1,6 +1,8 @@
 import createContextHook from "@nkzw/create-context-hook";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { RoutineConfig } from "@/context/routine";
+import { deleteProductImage } from "@/utils/product-image";
 
 export type Frequency =
   | { type: "daily" }
@@ -12,6 +14,7 @@ export type Product = {
   name: string;
   brand: string;
   openedAt?: string; // ISO Date
+  endDate?: string; // ISO schedule end date
   periodAfterOpening?: number; // months
   expirationDate?: string; // ISO Date
   category?: string;
@@ -47,12 +50,27 @@ export const [CosmeticsProvider, useCosmetics] = createContextHook(() => {
   const removeMutation = useMutation({
     mutationFn: async (productId: string) => {
       const current = query.data || [];
+      const removed = current.find((product) => product.id === productId);
       const updated = current.filter((p) => p.id !== productId);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      return updated;
+      const storedConfig = await AsyncStorage.getItem("routine_config");
+      const currentConfig: RoutineConfig = storedConfig
+        ? (JSON.parse(storedConfig) as RoutineConfig)
+        : { morning: [], evening: [] };
+      const routineConfig = {
+        morning: currentConfig.morning.filter((id) => id !== productId),
+        evening: currentConfig.evening.filter((id) => id !== productId),
+      };
+
+      await AsyncStorage.multiSet([
+        [STORAGE_KEY, JSON.stringify(updated)],
+        ["routine_config", JSON.stringify(routineConfig)],
+      ]);
+      deleteProductImage(removed?.image);
+      return { products: updated, routineConfig };
     },
-    onSuccess: (updated) => {
-      queryClient.setQueryData(["cosmetics"], updated);
+    onSuccess: ({ products, routineConfig }) => {
+      queryClient.setQueryData(["cosmetics"], products);
+      queryClient.setQueryData(["routineConfig"], routineConfig);
     },
   });
 

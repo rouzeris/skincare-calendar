@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { FlatList } from "react-native";
+import { Alert, FlatList, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { YStack, XStack, Text } from "tamagui";
 import { useCosmetics, Product } from "@/context/cosmetics";
@@ -41,6 +41,22 @@ export default function ShelfScreen() {
   );
 
   const visibleConflicts = showAllConflicts ? conflicts : conflicts.slice(0, 3);
+
+  const confirmRemoveProduct = (product: Product) => {
+    const remove = () => removeProduct(product.id);
+    const title = t("shelf.deleteTitle");
+    const body = t("shelf.deleteBody", { name: product.name });
+
+    if (Platform.OS === "web") {
+      if (window.confirm(`${title}\n\n${body}`)) remove();
+      return;
+    }
+
+    Alert.alert(title, body, [
+      { text: t("common.cancel"), style: "cancel" },
+      { text: t("common.delete"), style: "destructive", onPress: remove },
+    ]);
+  };
 
   const getExpirationStatus = (product: Product) => {
     if (!product.openedAt || !product.periodAfterOpening) return null;
@@ -258,7 +274,9 @@ export default function ShelfScreen() {
         <YStack
           padding={8}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          onPress={() => removeProduct(item.id)}
+          accessibilityRole="button"
+          accessibilityLabel={`${t("common.delete")} ${item.name}`}
+          onPress={() => confirmRemoveProduct(item)}
         >
           <Trash2 size={20} color={colors.subtext} />
         </YStack>

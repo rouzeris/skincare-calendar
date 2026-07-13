@@ -87,20 +87,26 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
     },
   });
 
-  const addToRoutineMutation = useMutation({
+  const addToRoutinesMutation = useMutation({
     mutationFn: async ({
       productId,
-      timeOfDay,
+      times,
     }: {
       productId: string;
-      timeOfDay: TimeOfDay;
+      times: TimeOfDay[];
     }) => {
       const currentConfig = configQuery.data || { morning: [], evening: [] };
-      if (currentConfig[timeOfDay].includes(productId)) return currentConfig;
-
       const newConfig = {
-        ...currentConfig,
-        [timeOfDay]: [...currentConfig[timeOfDay], productId],
+        morning:
+          times.includes("morning") &&
+          !currentConfig.morning.includes(productId)
+            ? [...currentConfig.morning, productId]
+            : currentConfig.morning,
+        evening:
+          times.includes("evening") &&
+          !currentConfig.evening.includes(productId)
+            ? [...currentConfig.evening, productId]
+            : currentConfig.evening,
       };
       await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
       return newConfig;
@@ -136,7 +142,7 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
     routineConfig: configQuery.data || { morning: [], evening: [] },
     routineHistory: historyQuery.data || {},
     toggleCompletion: toggleCompletionMutation.mutate,
-    addToRoutine: addToRoutineMutation.mutate,
+    addToRoutines: addToRoutinesMutation.mutate,
     removeFromRoutine: removeFromRoutineMutation.mutate,
     setRoutineConfig: updateConfigMutation.mutate,
     isLoading: configQuery.isLoading || historyQuery.isLoading,

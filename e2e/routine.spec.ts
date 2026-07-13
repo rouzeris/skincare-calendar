@@ -109,4 +109,70 @@ test.describe("Routine Management", () => {
     // Product should NOT appear today since it's scheduled for tomorrow
     await expect(page.getByText("Retinol Treatment")).not.toBeVisible();
   });
+
+  test("interval frequency uses calendar days", async ({ page }) => {
+    await page.evaluate(() => {
+      const openedAt = new Date();
+      openedAt.setDate(openedAt.getDate() - 1);
+      openedAt.setHours(23, 59, 0, 0);
+      localStorage.setItem(
+        "cosmetics_shelf",
+        JSON.stringify([
+          {
+            id: "interval-treatment",
+            name: "Every Other Day Treatment",
+            brand: "Test Brand",
+            openedAt: openedAt.toISOString(),
+            frequency: { type: "interval", days: 2 },
+          },
+        ]),
+      );
+      localStorage.setItem(
+        "routine_config",
+        JSON.stringify({ morning: ["interval-treatment"], evening: [] }),
+      );
+    });
+    await page.reload();
+
+    await expect(page.getByText("Every Other Day Treatment")).not.toBeVisible();
+  });
+
+  test("daily routines respect schedule boundaries", async ({ page }) => {
+    await page.evaluate(() => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      localStorage.setItem(
+        "cosmetics_shelf",
+        JSON.stringify([
+          {
+            id: "ended-treatment",
+            name: "Ended Treatment",
+            brand: "Test Brand",
+            endDate: yesterday.toISOString(),
+            frequency: { type: "daily" },
+          },
+          {
+            id: "future-treatment",
+            name: "Future Treatment",
+            brand: "Test Brand",
+            openedAt: tomorrow.toISOString(),
+            frequency: { type: "daily" },
+          },
+        ]),
+      );
+      localStorage.setItem(
+        "routine_config",
+        JSON.stringify({
+          morning: ["ended-treatment", "future-treatment"],
+          evening: [],
+        }),
+      );
+    });
+    await page.reload();
+
+    await expect(page.getByText("Ended Treatment")).not.toBeVisible();
+    await expect(page.getByText("Future Treatment")).not.toBeVisible();
+  });
 });

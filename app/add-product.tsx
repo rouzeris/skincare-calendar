@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  Alert,
   Modal,
   Pressable,
   View,
@@ -35,6 +36,7 @@ import {
 } from "date-fns";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
+import { persistProductImage } from "@/utils/product-image";
 
 const MOCK_SUGGESTIONS = [
   { brand: "The Ordinary", name: "Niacinamide 10% + Zinc 1%" },
@@ -52,7 +54,7 @@ const WEEKDAY_INDEXES = [0, 1, 2, 3, 4, 5, 6];
 export default function AddProductScreen() {
   const router = useRouter();
   const { addProduct } = useCosmetics();
-  const { addToRoutine } = useRoutine();
+  const { addToRoutines } = useRoutine();
   const { colors } = useTheme();
   const { t, formatDate } = useIntl();
 
@@ -123,7 +125,7 @@ export default function AddProductScreen() {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -148,7 +150,10 @@ export default function AddProductScreen() {
     let frequency: Frequency = { type: "daily" };
 
     if (freqType === "interval") {
-      frequency = { type: "interval", days: parseInt(intervalDays) || 2 };
+      frequency = {
+        type: "interval",
+        days: Math.max(1, parseInt(intervalDays, 10) || 2),
+      };
     } else if (freqType === "weekly") {
       frequency = {
         type: "weekly",
@@ -156,24 +161,32 @@ export default function AddProductScreen() {
       };
     }
 
+    const id = Math.random().toString(36).slice(2, 11);
+    let persistedImage: string | undefined;
+    try {
+      persistedImage = imageUri ? persistProductImage(imageUri, id) : undefined;
+    } catch {
+      Alert.alert(t("common.oops"), t("error.message"));
+      return;
+    }
+
     const newProduct = {
-      id: Math.random().toString(36).substr(2, 9),
+      id,
       brand,
       name,
       openedAt: openedAt.toISOString(),
       periodAfterOpening: parseInt(pao) || 12,
-      image: imageUri || undefined,
+      image: persistedImage,
       frequency,
       endDate: noEndDate ? undefined : endDate?.toISOString(),
     };
 
     addProduct(newProduct, {
       onSuccess: () => {
-        selectedRoutine.forEach((time) => {
-          addToRoutine({ productId: newProduct.id, timeOfDay: time });
-        });
-
-        router.back();
+        addToRoutines(
+          { productId: newProduct.id, times: selectedRoutine },
+          { onSuccess: () => router.back() },
+        );
       },
     });
   };

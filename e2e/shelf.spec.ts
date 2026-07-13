@@ -89,4 +89,31 @@ test.describe("Product Shelf Management", () => {
     await expect(page.getByText(/Niacinamide 10%/)).toBeVisible();
     await expect(page.getByText(/The Ordinary/)).toBeVisible();
   });
+
+  test("deleting a product also removes it from routines", async ({ page }) => {
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "cosmetics_shelf",
+        JSON.stringify([
+          { id: "delete-me", name: "Delete Me", brand: "Test Brand" },
+        ]),
+      );
+      localStorage.setItem(
+        "routine_config",
+        JSON.stringify({ morning: ["delete-me"], evening: ["delete-me"] }),
+      );
+    });
+    await page.reload();
+
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("button", { name: "Delete Delete Me" }).click();
+    await expect(page.getByText("Delete Me")).not.toBeVisible();
+    await page.reload();
+
+    const config = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("routine_config")!),
+    );
+    expect(config).toEqual({ morning: [], evening: [] });
+    await expect(page.getByText("Delete Me")).not.toBeVisible();
+  });
 });
