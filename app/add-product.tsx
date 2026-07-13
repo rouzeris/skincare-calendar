@@ -12,7 +12,7 @@ import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
 import { useTheme } from "@/context/theme";
 import { useIntl } from "@/context/intl";
 import { useCosmetics, Frequency } from "@/context/cosmetics";
-import { useRoutine, TimeOfDay } from "@/context/routine";
+import { TimeOfDay } from "@/context/routine";
 import { useRouter } from "expo-router";
 import {
   X,
@@ -36,7 +36,6 @@ import {
 } from "date-fns";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
-import { persistProductImage } from "@/utils/product-image";
 
 const MOCK_SUGGESTIONS = [
   { brand: "The Ordinary", name: "Niacinamide 10% + Zinc 1%" },
@@ -54,7 +53,6 @@ const WEEKDAY_INDEXES = [0, 1, 2, 3, 4, 5, 6];
 export default function AddProductScreen() {
   const router = useRouter();
   const { addProduct } = useCosmetics();
-  const { addToRoutines } = useRoutine();
   const { colors } = useTheme();
   const { t, formatDate } = useIntl();
 
@@ -161,34 +159,22 @@ export default function AddProductScreen() {
       };
     }
 
-    const id = Math.random().toString(36).slice(2, 11);
-    let persistedImage: string | undefined;
-    try {
-      persistedImage = imageUri ? persistProductImage(imageUri, id) : undefined;
-    } catch {
-      Alert.alert(t("common.oops"), t("error.message"));
-      return;
-    }
-
-    const newProduct = {
-      id,
+    const product = {
       brand,
       name,
       openedAt: openedAt.toISOString(),
       periodAfterOpening: parseInt(pao) || 12,
-      image: persistedImage,
       frequency,
       endDate: noEndDate ? undefined : endDate?.toISOString(),
     };
 
-    addProduct(newProduct, {
-      onSuccess: () => {
-        addToRoutines(
-          { productId: newProduct.id, times: selectedRoutine },
-          { onSuccess: () => router.back() },
-        );
+    addProduct(
+      { product, imageUri: imageUri ?? undefined, times: selectedRoutine },
+      {
+        onSuccess: () => router.back(),
+        onError: () => Alert.alert(t("common.oops"), t("error.message")),
       },
-    });
+    );
   };
 
   const insets = useSafeAreaInsets();

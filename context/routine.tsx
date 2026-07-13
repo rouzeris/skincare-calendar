@@ -1,51 +1,48 @@
 import createContextHook from "@nkzw/create-context-hook";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  localDataKeys,
+  localDataQueryKeys,
+  readRoutineConfig,
+  type RoutineConfig,
+  type RoutineHistory,
+  type TimeOfDay,
+} from "@/utils/local-data";
 
-export type TimeOfDay = "morning" | "evening";
-
-export type RoutineConfig = {
-  morning: string[]; // Product IDs
-  evening: string[]; // Product IDs
-};
-
-export type RoutineHistory = Record<
-  string,
-  { morning: string[]; evening: string[] }
->;
-
-const CONFIG_KEY = "routine_config";
-const HISTORY_KEY = "routine_history";
+export type {
+  RoutineConfig,
+  RoutineHistory,
+  TimeOfDay,
+} from "@/utils/local-data";
 
 export const [RoutineProvider, useRoutine] = createContextHook(() => {
   const queryClient = useQueryClient();
 
   // --- Configuration (Which products are in the routine) ---
   const configQuery = useQuery({
-    queryKey: ["routineConfig"],
-    queryFn: async () => {
-      const stored = await AsyncStorage.getItem(CONFIG_KEY);
-      return stored
-        ? (JSON.parse(stored) as RoutineConfig)
-        : { morning: [], evening: [] };
-    },
+    queryKey: localDataQueryKeys.routineConfig,
+    queryFn: readRoutineConfig,
   });
 
   const updateConfigMutation = useMutation({
     mutationFn: async (newConfig: RoutineConfig) => {
-      await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
+      await AsyncStorage.setItem(
+        localDataKeys.routineConfig,
+        JSON.stringify(newConfig),
+      );
       return newConfig;
     },
     onSuccess: (updated) => {
-      queryClient.setQueryData(["routineConfig"], updated);
+      queryClient.setQueryData(localDataQueryKeys.routineConfig, updated);
     },
   });
 
   // --- History (Which products were completed on a given date) ---
   const historyQuery = useQuery({
-    queryKey: ["routineHistory"],
+    queryKey: localDataQueryKeys.routineHistory,
     queryFn: async () => {
-      const stored = await AsyncStorage.getItem(HISTORY_KEY);
+      const stored = await AsyncStorage.getItem(localDataKeys.routineHistory);
       return stored ? (JSON.parse(stored) as RoutineHistory) : {};
     },
   });
@@ -79,11 +76,14 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
         },
       };
 
-      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
+      await AsyncStorage.setItem(
+        localDataKeys.routineHistory,
+        JSON.stringify(updatedHistory),
+      );
       return updatedHistory;
     },
     onSuccess: (updated) => {
-      queryClient.setQueryData(["routineHistory"], updated);
+      queryClient.setQueryData(localDataQueryKeys.routineHistory, updated);
     },
   });
 
@@ -108,11 +108,14 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
             ? [...currentConfig.evening, productId]
             : currentConfig.evening,
       };
-      await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
+      await AsyncStorage.setItem(
+        localDataKeys.routineConfig,
+        JSON.stringify(newConfig),
+      );
       return newConfig;
     },
     onSuccess: (updated) => {
-      queryClient.setQueryData(["routineConfig"], updated);
+      queryClient.setQueryData(localDataQueryKeys.routineConfig, updated);
     },
   });
 
@@ -130,11 +133,14 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
         ...currentConfig,
         [timeOfDay]: currentConfig[timeOfDay].filter((id) => id !== productId),
       };
-      await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
+      await AsyncStorage.setItem(
+        localDataKeys.routineConfig,
+        JSON.stringify(newConfig),
+      );
       return newConfig;
     },
     onSuccess: (updated) => {
-      queryClient.setQueryData(["routineConfig"], updated);
+      queryClient.setQueryData(localDataQueryKeys.routineConfig, updated);
     },
   });
 

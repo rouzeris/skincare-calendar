@@ -23,6 +23,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
+import { localDataKeys } from "@/utils/local-data";
 
 const PRIVACY_POLICY_URL = "https://cera.love/privacy";
 const TERMS_URL = "https://cera.love/terms";
@@ -131,11 +132,7 @@ export default function SettingsScreen() {
         text: t("common.delete"),
         style: "destructive",
         onPress: async () => {
-          await AsyncStorage.multiRemove([
-            "cosmetics_shelf",
-            "routine_config",
-            "routine_history",
-          ]);
+          await AsyncStorage.multiRemove(Object.values(localDataKeys));
           if (Platform.OS === "web") {
             window.location.reload();
           } else {
