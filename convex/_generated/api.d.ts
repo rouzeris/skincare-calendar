@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as catalog from "../catalog.js";
 import type * as http from "../http.js";
 import type * as waitlist from "../waitlist.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  catalog: typeof catalog;
   http: typeof http;
   waitlist: typeof waitlist;
 }>;
