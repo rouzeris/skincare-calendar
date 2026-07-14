@@ -197,7 +197,7 @@ export default function CalendarScreen() {
                   borderWidth={isToday && !isSelected ? 1 : 0}
                   borderColor={colors.tint}
                   onPress={() => setSelectedDate(day)}
-                  role="button"
+                  role="option"
                   aria-label={formatDate(day, "longDayMonth")}
                   aria-selected={!!isSelected}
                 >

@@ -218,7 +218,7 @@ export default function AddProductScreen() {
           borderColor={colors.tint}
           opacity={isDisabled ? 0.3 : 1}
           onPress={() => !isDisabled && onSelectDate(day)}
-          role="button"
+          role="option"
           aria-label={formatDate(day, "longDayMonth")}
           aria-selected={isSelected}
           aria-disabled={isDisabled}

@@ -246,7 +246,7 @@ export default function RoutineScreen() {
                 borderRadius={16}
                 backgroundColor={isSelected ? colors.tint : "transparent"}
                 onPress={() => setSelectedDate(date)}
-                role="button"
+                role="option"
                 aria-label={formatDate(date, "longDayMonth")}
                 aria-selected={isSelected}
               >
