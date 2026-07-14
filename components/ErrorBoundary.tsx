@@ -23,6 +23,7 @@ interface State {
 
 export class ErrorBoundary extends Component<Props, State> {
   private pulseAnim = new Animated.Value(1);
+  private pulseLoop: Animated.CompositeAnimation | null = null;
 
   constructor(props: Props) {
     super(props);
@@ -45,7 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   startPulseAnimation = () => {
-    Animated.loop(
+    this.pulseLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(this.pulseAnim, {
           toValue: 1.1,
@@ -58,10 +59,14 @@ export class ErrorBoundary extends Component<Props, State> {
           useNativeDriver: true,
         }),
       ]),
-    ).start();
+    );
+    this.pulseLoop.start();
   };
 
   handleReset = () => {
+    this.pulseLoop?.stop();
+    this.pulseLoop = null;
+    this.pulseAnim.setValue(1);
     this.setState({ hasError: false, error: null });
     this.props.onReset?.();
   };
