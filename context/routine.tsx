@@ -5,8 +5,6 @@ import {
   localDataKeys,
   localDataQueryKeys,
   readRoutineConfig,
-  removeProductFromRoutine,
-  setRoutineConfig,
   type RoutineHistory,
   type TimeOfDay,
 } from "@/utils/local-data";
@@ -24,13 +22,6 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
   const configQuery = useQuery({
     queryKey: localDataQueryKeys.routineConfig,
     queryFn: readRoutineConfig,
-  });
-
-  const updateConfigMutation = useMutation({
-    mutationFn: setRoutineConfig,
-    onSuccess: (updated) => {
-      queryClient.setQueryData(localDataQueryKeys.routineConfig, updated);
-    },
   });
 
   // --- History (Which products were completed on a given date) ---
@@ -82,27 +73,10 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
     },
   });
 
-  const removeFromRoutineMutation = useMutation({
-    mutationFn: async ({
-      productId,
-      timeOfDay,
-    }: {
-      productId: string;
-      timeOfDay: TimeOfDay;
-    }) => {
-      return removeProductFromRoutine(productId, timeOfDay);
-    },
-    onSuccess: (updated) => {
-      queryClient.setQueryData(localDataQueryKeys.routineConfig, updated);
-    },
-  });
-
   return {
     routineConfig: configQuery.data || { morning: [], evening: [] },
     routineHistory: historyQuery.data || {},
     toggleCompletion: toggleCompletionMutation.mutate,
-    removeFromRoutine: removeFromRoutineMutation.mutate,
-    setRoutineConfig: updateConfigMutation.mutate,
     isLoading: configQuery.isLoading || historyQuery.isLoading,
   };
 });

@@ -151,29 +151,3 @@ export function removeProduct(productId: string) {
     return updated;
   });
 }
-
-export function setRoutineConfig(routineConfig: RoutineConfig) {
-  return serialized(async () => {
-    const current = await load();
-    const updated = { ...current, routineConfig };
-    await save(updated);
-    return routineConfig;
-  });
-}
-
-export function removeProductFromRoutine(
-  productId: string,
-  timeOfDay: TimeOfDay,
-) {
-  return serialized(async () => {
-    const current = await load();
-    const routineConfig = {
-      ...current.routineConfig,
-      [timeOfDay]: current.routineConfig[timeOfDay].filter(
-        (id) => id !== productId,
-      ),
-    };
-    await save({ ...current, routineConfig });
-    return routineConfig;
-  });
-}
