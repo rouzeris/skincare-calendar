@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { CatalogSuggestion } from "@/catalog/types";
 import { useCatalogSearch } from "@/context/catalog";
 
@@ -7,51 +8,39 @@ export type CatalogSuggestionsState = {
   suggestions: CatalogSuggestion[];
 };
 
-type CatalogRequestState = CatalogSuggestionsState & { query: string };
-
-const notQueried: CatalogRequestState = {
-  query: "",
+const notQueried: CatalogSuggestionsState = {
   status: "not-queried",
   suggestions: [],
 };
 
 export function useCatalogSuggestions(name: string): CatalogSuggestionsState {
   const search = useCatalogSearch();
-  const request = useRef(0);
-  const [state, setState] = useState<CatalogRequestState>(notQueried);
+  const query = name.trim();
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
   useEffect(() => {
-    const query = name.trim();
-    const requestId = ++request.current;
     if (query.length < 2) {
-      setState(notQueried);
+      setDebouncedQuery("");
       return;
     }
 
-    setState((current) => ({
-      query,
-      status: "loading",
-      suggestions: current.suggestions,
-    }));
-    const timeout = setTimeout(() => {
-      void search(query).then(
-        (suggestions) => {
-          if (request.current === requestId)
-            setState({ query, status: "complete", suggestions });
-        },
-        () => {
-          if (request.current === requestId)
-            setState((current) => ({ ...current, status: "error" }));
-        },
-      );
-    }, 200);
+    const timeout = setTimeout(() => setDebouncedQuery(query), 200);
 
     return () => clearTimeout(timeout);
-  }, [name, search]);
+  }, [query]);
 
-  const query = name.trim();
+  const result = useQuery({
+    queryKey: ["catalogSuggestions", debouncedQuery],
+    queryFn: () => search(debouncedQuery),
+    enabled: debouncedQuery.length > 1,
+    placeholderData: keepPreviousData,
+    retry: false,
+  });
+  const suggestions = result.data ?? [];
+
   if (query.length < 2) return notQueried;
-  if (state.query !== query)
-    return { status: "loading", suggestions: state.suggestions } as const;
-  return state;
+  if (result.isError) return { status: "error", suggestions };
+  if (query !== debouncedQuery || result.isFetching)
+    return { status: "loading", suggestions };
+  return { status: "complete", suggestions };
 }
