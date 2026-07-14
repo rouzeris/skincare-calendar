@@ -1,5 +1,4 @@
 import { CosmeticsProvider } from "@/context/cosmetics";
-import { CatalogProvider } from "@/context/catalog";
 import { IntlProvider, useIntl } from "@/context/intl";
 import { RoutineProvider } from "@/context/routine";
 import { ThemeProvider, useTheme } from "@/context/theme";
@@ -92,17 +91,15 @@ function AppProviders() {
       onReset={handleErrorReset}
       labels={errorLabels}
     >
-      <CatalogProvider>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            <CosmeticsProvider>
-              <RoutineProvider>
-                <RootNavigator />
-              </RoutineProvider>
-            </CosmeticsProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </CatalogProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <CosmeticsProvider>
+            <RoutineProvider>
+              <RootNavigator />
+            </RoutineProvider>
+          </CosmeticsProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

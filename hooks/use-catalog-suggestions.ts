@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { CatalogSuggestion } from "@/catalog/types";
-import { useCatalogSearch } from "@/context/catalog";
+import { searchCatalog } from "@/catalog/search";
 
 export type CatalogSuggestionsState = {
   status: "not-queried" | "loading" | "complete" | "error";
@@ -14,7 +14,6 @@ const notQueried: CatalogSuggestionsState = {
 };
 
 export function useCatalogSuggestions(name: string): CatalogSuggestionsState {
-  const search = useCatalogSearch();
   const query = name.trim();
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
@@ -31,7 +30,7 @@ export function useCatalogSuggestions(name: string): CatalogSuggestionsState {
 
   const result = useQuery({
     queryKey: ["catalogSuggestions", debouncedQuery],
-    queryFn: () => search(debouncedQuery),
+    queryFn: () => searchCatalog(debouncedQuery),
     enabled: debouncedQuery.length > 1,
     placeholderData: keepPreviousData,
     retry: false,
