@@ -57,3 +57,76 @@ test("bounds long pasted searches", async () => {
     t.query(api.catalog.search, { query: "cream ".repeat(100) }),
   ).resolves.toEqual([]);
 });
+
+function catalogRow(
+  index: number,
+  fields: {
+    brand: string;
+    productName: string;
+    searchText: string;
+    uniqueScans: number;
+    completeness?: number;
+  },
+) {
+  return {
+    source: "open_beauty_facts" as const,
+    sourceKey: `obf:${index}`,
+    sourceUrl: `https://world.openbeautyfacts.org/product/${index}`,
+    sourceModifiedAt: 1,
+    license: "ODbL-1.0" as const,
+    barcode: String(index),
+    completeness: 0.5,
+    ...fields,
+  };
+}
+
+test("ranks multi-token matches above a more popular partial match", async () => {
+  const t = convexTest(schema, modules);
+
+  await t.run(async (ctx) => {
+    await ctx.db.insert(
+      "catalogProducts",
+      catalogRow(1, {
+        brand: "CeraVe",
+        productName: "Hydrating Cleanser",
+        searchText: "cerave hydrating cleanser",
+        uniqueScans: 9999,
+      }),
+    );
+    await ctx.db.insert(
+      "catalogProducts",
+      catalogRow(2, {
+        brand: "CeraVe",
+        productName: "AM Facial Moisturizing Lotion SPF 30",
+        searchText: "cerave am facial moisturizing lotion spf 30",
+        uniqueScans: 5,
+      }),
+    );
+  });
+
+  const results = await t.query(api.catalog.search, { query: "CeraVe SPF" });
+
+  expect(results[0]?.productName).toBe("AM Facial Moisturizing Lotion SPF 30");
+});
+
+test("resolves a brand alias to the intended family", async () => {
+  const t = convexTest(schema, modules);
+
+  await t.run(async (ctx) => {
+    await ctx.db.insert(
+      "catalogProducts",
+      catalogRow(1, {
+        brand: "L'Oréal",
+        productName: "Revitalift Cream",
+        searchText: "l oreal revitalift cream",
+        uniqueScans: 3,
+      }),
+    );
+  });
+
+  const results = await t.query(api.catalog.search, { query: "loreal" });
+
+  expect(results.map((product) => product.productName)).toContain(
+    "Revitalift Cream",
+  );
+});
