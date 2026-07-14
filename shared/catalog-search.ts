@@ -153,13 +153,19 @@ export function expandCatalogSearchQuery(normalizedQuery: string): string {
   const tokens = normalizedQuery ? normalizedQuery.split(" ") : [];
   const out: string[] = [];
   const seen = new Set<string>();
-  for (const token of tokens) {
-    for (const variant of aliasesFor(token)) {
-      if (!seen.has(variant)) {
-        seen.add(variant);
-        out.push(variant);
-      }
+  const push = (variant: string) => {
+    if (!seen.has(variant)) {
+      seen.add(variant);
+      out.push(variant);
     }
-  }
+  };
+  tokens.forEach((token, i) => {
+    if (i === tokens.length - 1) {
+      (CATALOG_ALIASES[token] ?? []).forEach(push);
+      push(token);
+    } else {
+      aliasesFor(token).forEach(push);
+    }
+  });
   return out.slice(0, 16).join(" ");
 }

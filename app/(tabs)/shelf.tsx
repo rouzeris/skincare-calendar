@@ -198,14 +198,12 @@ const ProductRow = React.memo(function ProductRow({
 
 const ConflictCard = ({
   conflict,
-  index,
   isExpanded,
   showDetailedConflicts,
   colors,
   onToggle,
 }: {
   conflict: DetectedConflict;
-  index: number;
   isExpanded: boolean;
   showDetailedConflicts: boolean;
   colors: ShelfColors;
@@ -215,7 +213,6 @@ const ConflictCard = ({
 
   return (
     <YStack
-      key={`${conflict.productA.id}-${conflict.productB.id}-${index}`}
       borderRadius={16}
       marginBottom={8}
       overflow="hidden"
@@ -276,8 +273,6 @@ const ConflictCard = ({
 
 const ConflictBanner = ({
   conflicts,
-  visibleConflicts,
-  highSeverityCount,
   showAllConflicts,
   setShowAllConflicts,
   expandedConflict,
@@ -287,8 +282,6 @@ const ConflictBanner = ({
   t,
 }: {
   conflicts: DetectedConflict[];
-  visibleConflicts: DetectedConflict[];
-  highSeverityCount: number;
   showAllConflicts: boolean;
   setShowAllConflicts: (value: boolean) => void;
   expandedConflict: number | null;
@@ -298,6 +291,11 @@ const ConflictBanner = ({
   t: TranslateFn;
 }) => {
   if (conflicts.length === 0) return null;
+
+  const visibleConflicts = showAllConflicts ? conflicts : conflicts.slice(0, 3);
+  const highSeverityCount = conflicts.filter(
+    (c) => c.severity === "high",
+  ).length;
 
   return (
     <YStack paddingHorizontal={20} paddingTop={4} paddingBottom={8}>
@@ -345,7 +343,6 @@ const ConflictBanner = ({
           <ConflictCard
             key={`${conflict.productA.id}-${conflict.productB.id}-${index}`}
             conflict={conflict}
-            index={index}
             isExpanded={expandedConflict === index}
             showDetailedConflicts={showDetailedConflicts}
             colors={colors}
@@ -429,12 +426,6 @@ export default function ShelfScreen() {
   const [showAllConflicts, setShowAllConflicts] = useState(false);
 
   const conflicts = useMemo(() => detectConflicts(products), [products]);
-  const highSeverityCount = useMemo(
-    () => conflicts.filter((c) => c.severity === "high").length,
-    [conflicts],
-  );
-
-  const visibleConflicts = showAllConflicts ? conflicts : conflicts.slice(0, 3);
 
   const productMeta = useMemo(() => {
     const map = new Map<
@@ -522,8 +513,6 @@ export default function ShelfScreen() {
           <>
             <ConflictBanner
               conflicts={conflicts}
-              visibleConflicts={visibleConflicts}
-              highSeverityCount={highSeverityCount}
               showAllConflicts={showAllConflicts}
               setShowAllConflicts={setShowAllConflicts}
               expandedConflict={expandedConflict}

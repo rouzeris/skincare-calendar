@@ -45,6 +45,10 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
+  componentWillUnmount() {
+    this.pulseLoop?.stop();
+  }
+
   startPulseAnimation = () => {
     this.pulseLoop = Animated.loop(
       Animated.sequence([
