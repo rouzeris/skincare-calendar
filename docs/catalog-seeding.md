@@ -31,6 +31,14 @@ bunx convex import --table catalogProducts --replace /tmp/catalog-products.jsonl
 bunx convex import --prod --table catalogProducts --replace /tmp/catalog-products.jsonl
 ```
 
+## Search ranking
+
+Typo tolerance and prefix matching come from the Convex `search_searchText`
+index. Relevance-first ranking, multi-token AND prioritization, and brand-alias
+expansion live in `shared/catalog-search.ts` and run at query time. Changing that
+logic (including the `CATALOG_ALIASES` map) needs no re-import or reindex — only a
+schema change to `searchText` / the search index would require rebuilding rows.
+
 User-submitted brands and products remain separate. Reconciliation can match
 GTIN first, then normalized brand and product name. This avoids mixing submission
 ownership/moderation state into the ODbL source table.
