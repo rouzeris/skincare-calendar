@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { ScrollView as RNScrollView } from "react-native";
+import React, { useState, useMemo, useCallback } from "react";
+import { Dimensions, ScrollView as RNScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { YStack, XStack, Text, ScrollView } from "tamagui";
 import {
@@ -13,7 +13,7 @@ import {
   isAfter,
 } from "date-fns";
 import { Check, Sun, Moon, CalendarDays } from "lucide-react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
 import { useRoutine, TimeOfDay } from "@/context/routine";
 import { useCosmetics } from "@/context/cosmetics";
@@ -21,19 +21,38 @@ import { useTheme } from "@/context/theme";
 import { useIntl } from "@/context/intl";
 import { PageTitleBar } from "@/components/PageTitleBar";
 
+const DAY_ITEM_PITCH = 60;
+const STRIP_PADDING = 15;
+const TODAY_INDEX = 7;
+
 export default function RoutineScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [today, setToday] = useState(() => startOfDay(new Date()));
   const { routineConfig, routineHistory, toggleCompletion } = useRoutine();
   const { products } = useCosmetics();
   const { colors } = useTheme();
   const { t, formatDate } = useIntl();
   const router = useRouter();
 
+  useFocusEffect(
+    useCallback(() => {
+      const now = startOfDay(new Date());
+      setToday((prev) => (isSameDay(prev, now) ? prev : now));
+    }, []),
+  );
+
   const calendarDays = useMemo(() => {
-    const today = new Date();
-    const start = subDays(today, 7);
+    const start = subDays(today, TODAY_INDEX);
     return Array.from({ length: 14 }).map((_, i) => addDays(start, i));
-  }, []);
+  }, [today]);
+
+  const initialScrollX = Math.max(
+    0,
+    STRIP_PADDING +
+      TODAY_INDEX * DAY_ITEM_PITCH +
+      DAY_ITEM_PITCH / 2 -
+      Dimensions.get("window").width / 2,
+  );
 
   const getProductDetails = (id: string) => products.find((p) => p.id === id);
 
@@ -203,11 +222,12 @@ export default function RoutineScreen() {
         <RNScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 15 }}
+          contentOffset={{ x: initialScrollX, y: 0 }}
+          contentContainerStyle={{ paddingHorizontal: STRIP_PADDING }}
         >
           {calendarDays.map((date) => {
             const isSelected = isSameDay(date, selectedDate);
-            const isToday = isSameDay(date, new Date());
+            const isToday = isSameDay(date, today);
 
             return (
               <YStack
