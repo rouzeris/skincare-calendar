@@ -2,6 +2,7 @@ import { beforeEach, expect, mock, test } from "bun:test";
 
 const storage = new Map<string, string>();
 let deletedImageDirectories = 0;
+let imageDirectoryDeletionError: Error | undefined;
 
 mock.module("@react-native-async-storage/async-storage", () => ({
   default: {
@@ -20,7 +21,10 @@ mock.module("@react-native-async-storage/async-storage", () => ({
 mock.module("@/utils/product-image", () => ({
   persistProductImage: (uri: string) => uri,
   deleteProductImage: () => undefined,
-  deleteAllProductImages: () => deletedImageDirectories++,
+  deleteAllProductImages: () => {
+    deletedImageDirectories++;
+    if (imageDirectoryDeletionError) throw imageDirectoryDeletionError;
+  },
 }));
 
 const {
@@ -37,6 +41,7 @@ const {
 beforeEach(() => {
   storage.clear();
   deletedImageDirectories = 0;
+  imageDirectoryDeletionError = undefined;
 });
 
 test("serializes concurrent product creation", async () => {
@@ -121,4 +126,20 @@ test("clears data after an in-flight create and deletes managed images", async (
   expect(await readRoutineConfig()).toEqual({ morning: [], evening: [] });
   expect(await readRoutineHistory()).toEqual({});
   expect(deletedImageDirectories).toBe(1);
+});
+
+test("rejects clear when managed images cannot be deleted", async () => {
+  imageDirectoryDeletionError = new Error("image cleanup failed");
+
+  await expect(clearLocalData()).rejects.toThrow("image cleanup failed");
+  expect(deletedImageDirectories).toBe(1);
+
+  imageDirectoryDeletionError = undefined;
+  await createProduct({
+    product: { name: "After failure", brand: "Brand" },
+    times: [],
+  });
+  expect((await readProducts()).map(({ name }) => name)).toEqual([
+    "After failure",
+  ]);
 });

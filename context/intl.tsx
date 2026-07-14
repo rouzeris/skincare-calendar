@@ -69,6 +69,9 @@ const enTranslations = {
   "settings.deleteAllData": "Delete All Data",
   "settings.deleteAllDataBody":
     "This will permanently delete all your products, routines, and history. This action cannot be undone.",
+  "settings.deleteFailed": "Deletion Failed",
+  "settings.deleteFailedBody":
+    "Some local data could not be deleted. Please try again.",
   "settings.detailedExplanations": "Detailed Explanations",
   "settings.detailedExplanationsBody":
     "Show why ingredients conflict. Warnings are always visible.",
@@ -171,6 +174,9 @@ const translations = {
     "settings.deleteAllData": "Usuń wszystkie dane",
     "settings.deleteAllDataBody":
       "To trwale usunie wszystkie produkty, rutyny i historię. Tej akcji nie można cofnąć.",
+    "settings.deleteFailed": "Usuwanie nie powiodło się",
+    "settings.deleteFailedBody":
+      "Nie udało się usunąć części danych lokalnych. Spróbuj ponownie.",
     "settings.detailedExplanations": "Szczegółowe wyjaśnienia",
     "settings.detailedExplanationsBody":
       "Pokazuj, dlaczego składniki się wykluczają. Ostrzeżenia są zawsze widoczne.",
@@ -269,6 +275,9 @@ const translations = {
     "settings.deleteAllData": "Видалити всі дані",
     "settings.deleteAllDataBody":
       "Це назавжди видалить усі продукти, рутини та історію. Цю дію не можна скасувати.",
+    "settings.deleteFailed": "Не вдалося видалити дані",
+    "settings.deleteFailedBody":
+      "Не вдалося видалити частину локальних даних. Спробуйте ще раз.",
     "settings.detailedExplanations": "Детальні пояснення",
     "settings.detailedExplanationsBody":
       "Показувати, чому інгредієнти конфліктують. Попередження завжди видимі.",

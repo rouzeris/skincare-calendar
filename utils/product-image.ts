@@ -35,10 +35,6 @@ export function deleteProductImage(uri: string | undefined): void {
 export function deleteAllProductImages(): void {
   if (Platform.OS === "web") return;
 
-  try {
-    const directory = productImages();
-    if (directory.exists) directory.delete();
-  } catch {
-    console.warn("Could not delete locally stored product images");
-  }
+  const directory = productImages();
+  if (directory.exists) directory.delete();
 }

@@ -131,7 +131,16 @@ export default function SettingsScreen() {
         text: t("common.delete"),
         style: "destructive",
         onPress: async () => {
-          await clearLocalData();
+          try {
+            await clearLocalData();
+          } catch {
+            Alert.alert(
+              t("settings.deleteFailed"),
+              t("settings.deleteFailedBody"),
+            );
+            return;
+          }
+
           if (Platform.OS === "web") {
             window.location.reload();
           } else {
