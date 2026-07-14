@@ -32,6 +32,22 @@ const alertMessage = (title: string, body: string) => {
   else Alert.alert(title, body);
 };
 
+const confirmMessage = (
+  title: string,
+  body: string,
+  labels: { confirm: string; cancel: string },
+  onConfirm: () => void,
+) => {
+  if (Platform.OS === "web") {
+    if (window.confirm(`${title}\n\n${body}`)) onConfirm();
+    return;
+  }
+  Alert.alert(title, body, [
+    { text: labels.cancel, style: "cancel" },
+    { text: labels.confirm, style: "destructive", onPress: onConfirm },
+  ]);
+};
+
 const PRIVACY_POLICY_URL = "https://cera.love/privacy";
 const TERMS_URL = "https://cera.love/terms";
 const SUPPORT_EMAIL = "help@cera.love";
@@ -235,21 +251,12 @@ export default function SettingsScreen() {
       }
     };
 
-    if (Platform.OS === "web") {
-      if (
-        window.confirm(
-          `${t("settings.deleteAllData")}\n\n${t("settings.deleteAllDataBody")}`,
-        )
-      ) {
-        void runDelete();
-      }
-      return;
-    }
-
-    Alert.alert(t("settings.deleteAllData"), t("settings.deleteAllDataBody"), [
-      { text: t("common.cancel"), style: "cancel" },
-      { text: t("common.delete"), style: "destructive", onPress: runDelete },
-    ]);
+    confirmMessage(
+      t("settings.deleteAllData"),
+      t("settings.deleteAllDataBody"),
+      { confirm: t("common.delete"), cancel: t("common.cancel") },
+      () => void runDelete(),
+    );
   };
 
   return (

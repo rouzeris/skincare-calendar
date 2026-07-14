@@ -21,7 +21,9 @@ import { useTheme } from "@/context/theme";
 import { useIntl } from "@/context/intl";
 import { PageTitleBar } from "@/components/PageTitleBar";
 
-const DAY_ITEM_PITCH = 60;
+const DAY_ITEM_WIDTH = 50;
+const DAY_ITEM_GAP = 5;
+const DAY_ITEM_PITCH = DAY_ITEM_WIDTH + DAY_ITEM_GAP * 2;
 const STRIP_PADDING = 15;
 const TODAY_INDEX = 7;
 
@@ -232,11 +234,11 @@ export default function RoutineScreen() {
             return (
               <YStack
                 key={date.toISOString()}
-                width={50}
+                width={DAY_ITEM_WIDTH}
                 height={70}
                 justifyContent="center"
                 alignItems="center"
-                marginHorizontal={5}
+                marginHorizontal={DAY_ITEM_GAP}
                 borderRadius={16}
                 backgroundColor={isSelected ? colors.tint : "transparent"}
                 onPress={() => setSelectedDate(date)}
