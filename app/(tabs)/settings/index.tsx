@@ -27,6 +27,27 @@ import * as Linking from "expo-linking";
 import { useQueryClient } from "@tanstack/react-query";
 import { clearLocalData } from "@/utils/local-data";
 
+const alertMessage = (title: string, body: string) => {
+  if (Platform.OS === "web") window.alert(`${title}\n\n${body}`);
+  else Alert.alert(title, body);
+};
+
+const confirmMessage = (
+  title: string,
+  body: string,
+  labels: { confirm: string; cancel: string },
+  onConfirm: () => void,
+) => {
+  if (Platform.OS === "web") {
+    if (window.confirm(`${title}\n\n${body}`)) onConfirm();
+    return;
+  }
+  Alert.alert(title, body, [
+    { text: labels.cancel, style: "cancel" },
+    { text: labels.confirm, style: "destructive", onPress: onConfirm },
+  ]);
+};
+
 const PRIVACY_POLICY_URL = "https://cera.love/privacy";
 const TERMS_URL = "https://cera.love/terms";
 const SUPPORT_EMAIL = "help@cera.love";
@@ -173,7 +194,7 @@ export default function SettingsScreen() {
         "market://details?id=app.rork.kalendarz_kosmetykow_twarz",
       );
     } else {
-      Alert.alert(t("settings.rateTitle"), t("settings.rateBody"));
+      alertMessage(t("settings.rateTitle"), t("settings.rateBody"));
     }
   };
 
@@ -205,37 +226,37 @@ export default function SettingsScreen() {
         });
       }
     } catch {
-      Alert.alert(t("settings.exportFailed"), t("settings.exportFailedBody"));
+      alertMessage(t("settings.exportFailed"), t("settings.exportFailedBody"));
     } finally {
       setIsExporting(false);
     }
   };
 
   const handleDeleteAllData = () => {
-    Alert.alert(t("settings.deleteAllData"), t("settings.deleteAllDataBody"), [
-      { text: t("common.cancel"), style: "cancel" },
-      {
-        text: t("common.delete"),
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await clearLocalData();
-          } catch {
-            Alert.alert(
-              t("settings.deleteFailed"),
-              t("settings.deleteFailedBody"),
-            );
-            return;
-          }
+    const runDelete = async () => {
+      try {
+        await clearLocalData();
+      } catch {
+        alertMessage(
+          t("settings.deleteFailed"),
+          t("settings.deleteFailedBody"),
+        );
+        return;
+      }
 
-          if (Platform.OS === "web") {
-            window.location.reload();
-          } else {
-            await queryClient.resetQueries();
-          }
-        },
-      },
-    ]);
+      if (Platform.OS === "web") {
+        window.location.reload();
+      } else {
+        await queryClient.resetQueries();
+      }
+    };
+
+    confirmMessage(
+      t("settings.deleteAllData"),
+      t("settings.deleteAllDataBody"),
+      { confirm: t("common.delete"), cancel: t("common.cancel") },
+      () => void runDelete(),
+    );
   };
 
   return (
