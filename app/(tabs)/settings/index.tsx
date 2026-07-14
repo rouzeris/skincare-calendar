@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { Platform, Alert, Share } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { YStack, XStack, Text, Separator, ScrollView } from "tamagui";
+import { Stack } from "expo-router";
 import { useTheme } from "@/context/theme";
 import { useIntl, type AppLocale } from "@/context/intl";
+import { PageTitleBar } from "@/components/PageTitleBar";
 import { useCosmetics } from "@/context/cosmetics";
 import { useRoutine } from "@/context/routine";
 import {
@@ -48,6 +51,90 @@ const useIsDeveloper = () => {
   // e.g., return useAuth().user?.role === 'developer'
   // e.g., return useFeatureFlags().isDeveloper
   return false;
+};
+
+type SettingsColors = ReturnType<typeof useTheme>["colors"];
+type TranslateFn = ReturnType<typeof useIntl>["t"];
+type SetLocaleFn = ReturnType<typeof useIntl>["setLocale"];
+
+const SettingsRow = ({
+  icon,
+  label,
+  onPress,
+  showChevron = true,
+  danger = false,
+  subtitle,
+  colors,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onPress: () => void;
+  showChevron?: boolean;
+  danger?: boolean;
+  subtitle?: string;
+  colors: SettingsColors;
+}) => (
+  <XStack
+    alignItems="center"
+    padding={16}
+    pressStyle={{ opacity: 0.7 }}
+    onPress={onPress}
+  >
+    <YStack marginRight={12}>{icon}</YStack>
+    <YStack flex={1}>
+      <Text
+        fontSize={16}
+        color={danger ? colors.error : colors.text}
+        fontWeight="500"
+      >
+        {label}
+      </Text>
+      {subtitle && (
+        <Text fontSize={13} color={colors.subtext} marginTop={2}>
+          {subtitle}
+        </Text>
+      )}
+    </YStack>
+    {showChevron && <ChevronRight size={18} color={colors.subtext} />}
+  </XStack>
+);
+
+const LanguageRow = ({
+  language,
+  locale,
+  setLocale,
+  colors,
+  t,
+}: {
+  language: AppLocale;
+  locale: AppLocale;
+  setLocale: SetLocaleFn;
+  colors: SettingsColors;
+  t: TranslateFn;
+}) => {
+  const selected = locale === language;
+
+  return (
+    <XStack
+      alignItems="center"
+      padding={16}
+      backgroundColor={selected ? colors.border : colors.card}
+      onPress={() => void setLocale(language)}
+    >
+      <YStack width={24} marginRight={12} alignItems="center">
+        <Text fontSize={20}>{LANGUAGE_FLAGS[language]}</Text>
+      </YStack>
+      <Text
+        flex={1}
+        fontSize={16}
+        color={selected ? colors.tint : colors.text}
+        fontWeight={selected ? "600" : "500"}
+      >
+        {t(LANGUAGE_LABEL_KEYS[language])}
+      </Text>
+      {selected && <Check size={18} color={colors.tint} />}
+    </XStack>
+  );
 };
 
 export default function SettingsScreen() {
@@ -151,262 +238,16 @@ export default function SettingsScreen() {
     ]);
   };
 
-  const SettingsRow = ({
-    icon,
-    label,
-    onPress,
-    showChevron = true,
-    danger = false,
-    subtitle,
-  }: {
-    icon: React.ReactNode;
-    label: string;
-    onPress: () => void;
-    showChevron?: boolean;
-    danger?: boolean;
-    subtitle?: string;
-  }) => (
-    <XStack
-      alignItems="center"
-      padding={16}
-      pressStyle={{ opacity: 0.7 }}
-      onPress={onPress}
-    >
-      <YStack marginRight={12}>{icon}</YStack>
-      <YStack flex={1}>
-        <Text
-          fontSize={16}
-          color={danger ? colors.error : colors.text}
-          fontWeight="500"
-        >
-          {label}
-        </Text>
-        {subtitle && (
-          <Text fontSize={13} color={colors.subtext} marginTop={2}>
-            {subtitle}
-          </Text>
-        )}
-      </YStack>
-      {showChevron && <ChevronRight size={18} color={colors.subtext} />}
-    </XStack>
-  );
-
-  const LanguageRow = ({ language }: { language: AppLocale }) => {
-    const selected = locale === language;
-
-    return (
-      <XStack
-        alignItems="center"
-        padding={16}
-        backgroundColor={selected ? colors.border : colors.card}
-        onPress={() => void setLocale(language)}
-      >
-        <YStack width={24} marginRight={12} alignItems="center">
-          <Text fontSize={20}>{LANGUAGE_FLAGS[language]}</Text>
-        </YStack>
-        <Text
-          flex={1}
-          fontSize={16}
-          color={selected ? colors.tint : colors.text}
-          fontWeight={selected ? "600" : "500"}
-        >
-          {t(LANGUAGE_LABEL_KEYS[language])}
-        </Text>
-        {selected && <Check size={18} color={colors.tint} />}
-      </XStack>
-    );
-  };
-
   return (
-    <ScrollView flex={1} backgroundColor={colors.background}>
-      <YStack padding={20} paddingBottom={40}>
-        {/* Ingredient Analysis Section */}
-        <YStack marginBottom={32}>
-          <Text
-            fontSize={14}
-            fontWeight="600"
-            marginBottom={12}
-            textTransform="uppercase"
-            letterSpacing={0.5}
-            color={colors.subtext}
-          >
-            {t("settings.ingredientAnalysis")}
-          </Text>
-          <YStack
-            borderRadius={16}
-            borderWidth={1}
-            overflow="hidden"
-            backgroundColor={colors.card}
-            borderColor={colors.border}
-          >
-            <XStack
-              alignItems="center"
-              padding={16}
-              onPress={() =>
-                setAppSettings({
-                  showDetailedConflicts: !showDetailedConflicts,
-                })
-              }
-            >
-              <YStack marginRight={12}>
-                <FlaskConical size={20} color={colors.text} />
-              </YStack>
-              <YStack flex={1}>
-                <Text fontSize={16} color={colors.text} fontWeight="500">
-                  {t("settings.detailedExplanations")}
-                </Text>
-                <Text fontSize={13} color={colors.subtext} marginTop={2}>
-                  {t("settings.detailedExplanationsBody")}
-                </Text>
-              </YStack>
-              <YStack
-                width={50}
-                height={30}
-                borderRadius={15}
-                justifyContent="center"
-                paddingHorizontal={3}
-                backgroundColor={
-                  showDetailedConflicts ? colors.tint : colors.border
-                }
-              >
-                <YStack
-                  width={24}
-                  height={24}
-                  borderRadius={12}
-                  backgroundColor="#FFFFFF"
-                  alignSelf={showDetailedConflicts ? "flex-end" : "flex-start"}
-                  shadowColor="#000"
-                  shadowOffset={{ width: 0, height: 1 }}
-                  shadowOpacity={0.15}
-                  shadowRadius={2}
-                  elevation={2}
-                />
-              </YStack>
-            </XStack>
-          </YStack>
-        </YStack>
-
-        <YStack marginBottom={32}>
-          <Text
-            fontSize={14}
-            fontWeight="600"
-            marginBottom={12}
-            textTransform="uppercase"
-            letterSpacing={0.5}
-            color={colors.subtext}
-          >
-            {t("language.section")}
-          </Text>
-          <YStack
-            borderRadius={16}
-            borderWidth={1}
-            overflow="hidden"
-            backgroundColor={colors.card}
-            borderColor={colors.border}
-          >
-            {locales.map((language, index) => (
-              <React.Fragment key={language}>
-                <LanguageRow language={language} />
-                {index < locales.length - 1 && (
-                  <Separator marginLeft={48} backgroundColor={colors.border} />
-                )}
-              </React.Fragment>
-            ))}
-          </YStack>
-        </YStack>
-
-        {/* Appearance Section */}
-        <YStack marginBottom={32}>
-          <Text
-            fontSize={14}
-            fontWeight="600"
-            marginBottom={12}
-            textTransform="uppercase"
-            letterSpacing={0.5}
-            color={colors.subtext}
-          >
-            {t("settings.appearance")}
-          </Text>
-          <YStack
-            borderRadius={16}
-            borderWidth={1}
-            overflow="hidden"
-            backgroundColor={colors.card}
-            borderColor={colors.border}
-          >
-            <XStack
-              alignItems="center"
-              padding={16}
-              backgroundColor={
-                themeMode === "light" ? colors.border : colors.card
-              }
-              onPress={() => setTheme("light")}
-            >
-              <YStack marginRight={12}>
-                <Sun
-                  size={20}
-                  color={themeMode === "light" ? colors.tint : colors.text}
-                />
-              </YStack>
-              <Text
-                fontSize={16}
-                color={themeMode === "light" ? colors.tint : colors.text}
-                fontWeight={themeMode === "light" ? "600" : "500"}
-              >
-                {t("settings.light")}
-              </Text>
-            </XStack>
-            <Separator marginLeft={48} backgroundColor={colors.border} />
-            <XStack
-              alignItems="center"
-              padding={16}
-              backgroundColor={
-                themeMode === "dark" ? colors.border : colors.card
-              }
-              onPress={() => setTheme("dark")}
-            >
-              <YStack marginRight={12}>
-                <Moon
-                  size={20}
-                  color={themeMode === "dark" ? colors.tint : colors.text}
-                />
-              </YStack>
-              <Text
-                fontSize={16}
-                color={themeMode === "dark" ? colors.tint : colors.text}
-                fontWeight={themeMode === "dark" ? "600" : "500"}
-              >
-                {t("settings.dark")}
-              </Text>
-            </XStack>
-            <Separator marginLeft={48} backgroundColor={colors.border} />
-            <XStack
-              alignItems="center"
-              padding={16}
-              backgroundColor={
-                themeMode === "auto" ? colors.border : colors.card
-              }
-              onPress={() => setTheme("auto")}
-            >
-              <YStack marginRight={12}>
-                <Monitor
-                  size={20}
-                  color={themeMode === "auto" ? colors.tint : colors.text}
-                />
-              </YStack>
-              <Text
-                fontSize={16}
-                color={themeMode === "auto" ? colors.tint : colors.text}
-                fontWeight={themeMode === "auto" ? "600" : "500"}
-              >
-                {t("settings.auto")}
-              </Text>
-            </XStack>
-          </YStack>
-        </YStack>
-
-        {/* Data Section - Developer Only */}
-        {isDeveloper && (
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={["top"]}
+    >
+      <Stack.Screen options={{ headerShown: false }} />
+      <PageTitleBar title={t("tabs.settings")} />
+      <ScrollView flex={1} backgroundColor={colors.background}>
+        <YStack padding={20} paddingBottom={40}>
+          {/* Ingredient Analysis Section */}
           <YStack marginBottom={32}>
             <Text
               fontSize={14}
@@ -416,7 +257,245 @@ export default function SettingsScreen() {
               letterSpacing={0.5}
               color={colors.subtext}
             >
-              {t("settings.developer")}
+              {t("settings.ingredientAnalysis")}
+            </Text>
+            <YStack
+              borderRadius={16}
+              borderWidth={1}
+              overflow="hidden"
+              backgroundColor={colors.card}
+              borderColor={colors.border}
+            >
+              <XStack
+                alignItems="center"
+                padding={16}
+                onPress={() =>
+                  setAppSettings({
+                    showDetailedConflicts: !showDetailedConflicts,
+                  })
+                }
+              >
+                <YStack marginRight={12}>
+                  <FlaskConical size={20} color={colors.text} />
+                </YStack>
+                <YStack flex={1}>
+                  <Text fontSize={16} color={colors.text} fontWeight="500">
+                    {t("settings.detailedExplanations")}
+                  </Text>
+                  <Text fontSize={13} color={colors.subtext} marginTop={2}>
+                    {t("settings.detailedExplanationsBody")}
+                  </Text>
+                </YStack>
+                <YStack
+                  width={50}
+                  height={30}
+                  borderRadius={15}
+                  justifyContent="center"
+                  paddingHorizontal={3}
+                  backgroundColor={
+                    showDetailedConflicts ? colors.tint : colors.border
+                  }
+                >
+                  <YStack
+                    width={24}
+                    height={24}
+                    borderRadius={12}
+                    backgroundColor="#FFFFFF"
+                    alignSelf={
+                      showDetailedConflicts ? "flex-end" : "flex-start"
+                    }
+                    shadowColor="#000"
+                    shadowOffset={{ width: 0, height: 1 }}
+                    shadowOpacity={0.15}
+                    shadowRadius={2}
+                    elevation={2}
+                  />
+                </YStack>
+              </XStack>
+            </YStack>
+          </YStack>
+
+          <YStack marginBottom={32}>
+            <Text
+              fontSize={14}
+              fontWeight="600"
+              marginBottom={12}
+              textTransform="uppercase"
+              letterSpacing={0.5}
+              color={colors.subtext}
+            >
+              {t("language.section")}
+            </Text>
+            <YStack
+              borderRadius={16}
+              borderWidth={1}
+              overflow="hidden"
+              backgroundColor={colors.card}
+              borderColor={colors.border}
+            >
+              {locales.map((language, index) => (
+                <React.Fragment key={language}>
+                  <LanguageRow
+                    language={language}
+                    locale={locale}
+                    setLocale={setLocale}
+                    colors={colors}
+                    t={t}
+                  />
+                  {index < locales.length - 1 && (
+                    <Separator
+                      marginLeft={48}
+                      backgroundColor={colors.border}
+                    />
+                  )}
+                </React.Fragment>
+              ))}
+            </YStack>
+          </YStack>
+
+          {/* Appearance Section */}
+          <YStack marginBottom={32}>
+            <Text
+              fontSize={14}
+              fontWeight="600"
+              marginBottom={12}
+              textTransform="uppercase"
+              letterSpacing={0.5}
+              color={colors.subtext}
+            >
+              {t("settings.appearance")}
+            </Text>
+            <YStack
+              borderRadius={16}
+              borderWidth={1}
+              overflow="hidden"
+              backgroundColor={colors.card}
+              borderColor={colors.border}
+            >
+              <XStack
+                alignItems="center"
+                padding={16}
+                backgroundColor={
+                  themeMode === "light" ? colors.border : colors.card
+                }
+                onPress={() => setTheme("light")}
+              >
+                <YStack marginRight={12}>
+                  <Sun
+                    size={20}
+                    color={themeMode === "light" ? colors.tint : colors.text}
+                  />
+                </YStack>
+                <Text
+                  fontSize={16}
+                  color={themeMode === "light" ? colors.tint : colors.text}
+                  fontWeight={themeMode === "light" ? "600" : "500"}
+                >
+                  {t("settings.light")}
+                </Text>
+              </XStack>
+              <Separator marginLeft={48} backgroundColor={colors.border} />
+              <XStack
+                alignItems="center"
+                padding={16}
+                backgroundColor={
+                  themeMode === "dark" ? colors.border : colors.card
+                }
+                onPress={() => setTheme("dark")}
+              >
+                <YStack marginRight={12}>
+                  <Moon
+                    size={20}
+                    color={themeMode === "dark" ? colors.tint : colors.text}
+                  />
+                </YStack>
+                <Text
+                  fontSize={16}
+                  color={themeMode === "dark" ? colors.tint : colors.text}
+                  fontWeight={themeMode === "dark" ? "600" : "500"}
+                >
+                  {t("settings.dark")}
+                </Text>
+              </XStack>
+              <Separator marginLeft={48} backgroundColor={colors.border} />
+              <XStack
+                alignItems="center"
+                padding={16}
+                backgroundColor={
+                  themeMode === "auto" ? colors.border : colors.card
+                }
+                onPress={() => setTheme("auto")}
+              >
+                <YStack marginRight={12}>
+                  <Monitor
+                    size={20}
+                    color={themeMode === "auto" ? colors.tint : colors.text}
+                  />
+                </YStack>
+                <Text
+                  fontSize={16}
+                  color={themeMode === "auto" ? colors.tint : colors.text}
+                  fontWeight={themeMode === "auto" ? "600" : "500"}
+                >
+                  {t("settings.auto")}
+                </Text>
+              </XStack>
+            </YStack>
+          </YStack>
+
+          {/* Data Section - Developer Only */}
+          {isDeveloper && (
+            <YStack marginBottom={32}>
+              <Text
+                fontSize={14}
+                fontWeight="600"
+                marginBottom={12}
+                textTransform="uppercase"
+                letterSpacing={0.5}
+                color={colors.subtext}
+              >
+                {t("settings.developer")}
+              </Text>
+              <YStack
+                borderRadius={16}
+                borderWidth={1}
+                overflow="hidden"
+                backgroundColor={colors.card}
+                borderColor={colors.border}
+              >
+                <SettingsRow
+                  icon={<Download size={20} color={colors.text} />}
+                  label={t("settings.exportData")}
+                  subtitle={t("settings.productsCount", {
+                    count: products.length,
+                  })}
+                  onPress={handleExportData}
+                  colors={colors}
+                />
+                <Separator marginLeft={48} backgroundColor={colors.border} />
+                <SettingsRow
+                  icon={<Trash2 size={20} color={colors.error} />}
+                  label={t("settings.deleteAllData")}
+                  onPress={handleDeleteAllData}
+                  showChevron={false}
+                  danger
+                  colors={colors}
+                />
+              </YStack>
+            </YStack>
+          )}
+
+          {/* Support Section */}
+          <YStack marginBottom={32}>
+            <Text
+              fontSize={14}
+              fontWeight="600"
+              marginBottom={12}
+              textTransform="uppercase"
+              letterSpacing={0.5}
+              color={colors.subtext}
+            >
+              {t("settings.support")}
             </Text>
             <YStack
               borderRadius={16}
@@ -426,99 +505,65 @@ export default function SettingsScreen() {
               borderColor={colors.border}
             >
               <SettingsRow
-                icon={<Download size={20} color={colors.text} />}
-                label={t("settings.exportData")}
-                subtitle={t("settings.productsCount", {
-                  count: products.length,
-                })}
-                onPress={handleExportData}
+                icon={<Mail size={20} color={colors.text} />}
+                label={t("settings.contactSupport")}
+                subtitle={SUPPORT_EMAIL}
+                onPress={handleContactSupport}
+                colors={colors}
               />
               <Separator marginLeft={48} backgroundColor={colors.border} />
               <SettingsRow
-                icon={<Trash2 size={20} color={colors.error} />}
-                label={t("settings.deleteAllData")}
-                onPress={handleDeleteAllData}
-                showChevron={false}
-                danger
+                icon={<Star size={20} color={colors.text} />}
+                label={t("settings.rateApp")}
+                onPress={handleRateApp}
+                colors={colors}
               />
             </YStack>
           </YStack>
-        )}
 
-        {/* Support Section */}
-        <YStack marginBottom={32}>
-          <Text
-            fontSize={14}
-            fontWeight="600"
-            marginBottom={12}
-            textTransform="uppercase"
-            letterSpacing={0.5}
-            color={colors.subtext}
-          >
-            {t("settings.support")}
-          </Text>
-          <YStack
-            borderRadius={16}
-            borderWidth={1}
-            overflow="hidden"
-            backgroundColor={colors.card}
-            borderColor={colors.border}
-          >
-            <SettingsRow
-              icon={<Mail size={20} color={colors.text} />}
-              label={t("settings.contactSupport")}
-              subtitle={SUPPORT_EMAIL}
-              onPress={handleContactSupport}
-            />
-            <Separator marginLeft={48} backgroundColor={colors.border} />
-            <SettingsRow
-              icon={<Star size={20} color={colors.text} />}
-              label={t("settings.rateApp")}
-              onPress={handleRateApp}
-            />
+          {/* Legal Section */}
+          <YStack marginBottom={32}>
+            <Text
+              fontSize={14}
+              fontWeight="600"
+              marginBottom={12}
+              textTransform="uppercase"
+              letterSpacing={0.5}
+              color={colors.subtext}
+            >
+              {t("settings.legal")}
+            </Text>
+            <YStack
+              borderRadius={16}
+              borderWidth={1}
+              overflow="hidden"
+              backgroundColor={colors.card}
+              borderColor={colors.border}
+            >
+              <SettingsRow
+                icon={<Shield size={20} color={colors.text} />}
+                label={t("settings.privacyPolicy")}
+                onPress={() => handleOpenURL(PRIVACY_POLICY_URL)}
+                colors={colors}
+              />
+              <Separator marginLeft={48} backgroundColor={colors.border} />
+              <SettingsRow
+                icon={<FileText size={20} color={colors.text} />}
+                label={t("settings.terms")}
+                onPress={() => handleOpenURL(TERMS_URL)}
+                colors={colors}
+              />
+            </YStack>
+          </YStack>
+
+          {/* Version */}
+          <YStack alignItems="center" marginTop={20}>
+            <Text fontSize={12} color={colors.subtext}>
+              {t("common.version", { version: "1.0.0" })}
+            </Text>
           </YStack>
         </YStack>
-
-        {/* Legal Section */}
-        <YStack marginBottom={32}>
-          <Text
-            fontSize={14}
-            fontWeight="600"
-            marginBottom={12}
-            textTransform="uppercase"
-            letterSpacing={0.5}
-            color={colors.subtext}
-          >
-            {t("settings.legal")}
-          </Text>
-          <YStack
-            borderRadius={16}
-            borderWidth={1}
-            overflow="hidden"
-            backgroundColor={colors.card}
-            borderColor={colors.border}
-          >
-            <SettingsRow
-              icon={<Shield size={20} color={colors.text} />}
-              label={t("settings.privacyPolicy")}
-              onPress={() => handleOpenURL(PRIVACY_POLICY_URL)}
-            />
-            <Separator marginLeft={48} backgroundColor={colors.border} />
-            <SettingsRow
-              icon={<FileText size={20} color={colors.text} />}
-              label={t("settings.terms")}
-              onPress={() => handleOpenURL(TERMS_URL)}
-            />
-          </YStack>
-        </YStack>
-
-        {/* Version */}
-        <YStack alignItems="center" marginTop={20}>
-          <Text fontSize={12} color={colors.subtext}>
-            {t("common.version", { version: "1.0.0" })}
-          </Text>
-        </YStack>
-      </YStack>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
