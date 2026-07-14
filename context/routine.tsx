@@ -1,11 +1,10 @@
 import createContextHook from "@nkzw/create-context-hook";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  localDataKeys,
   localDataQueryKeys,
   readRoutineConfig,
-  type RoutineHistory,
+  readRoutineHistory,
+  toggleRoutineCompletion,
   type TimeOfDay,
 } from "@/utils/local-data";
 
@@ -27,47 +26,15 @@ export const [RoutineProvider, useRoutine] = createContextHook(() => {
   // --- History (Which products were completed on a given date) ---
   const historyQuery = useQuery({
     queryKey: localDataQueryKeys.routineHistory,
-    queryFn: async () => {
-      const stored = await AsyncStorage.getItem(localDataKeys.routineHistory);
-      return stored ? (JSON.parse(stored) as RoutineHistory) : {};
-    },
+    queryFn: readRoutineHistory,
   });
 
   const toggleCompletionMutation = useMutation({
-    mutationFn: async ({
-      date,
-      timeOfDay,
-      productId,
-    }: {
+    mutationFn: (input: {
       date: string;
       timeOfDay: TimeOfDay;
       productId: string;
-    }) => {
-      const currentHistory = historyQuery.data || {};
-      const dayEntry = currentHistory[date] || { morning: [], evening: [] };
-      const completedList = dayEntry[timeOfDay] || [];
-
-      let newCompletedList;
-      if (completedList.includes(productId)) {
-        newCompletedList = completedList.filter((id) => id !== productId);
-      } else {
-        newCompletedList = [...completedList, productId];
-      }
-
-      const updatedHistory = {
-        ...currentHistory,
-        [date]: {
-          ...dayEntry,
-          [timeOfDay]: newCompletedList,
-        },
-      };
-
-      await AsyncStorage.setItem(
-        localDataKeys.routineHistory,
-        JSON.stringify(updatedHistory),
-      );
-      return updatedHistory;
-    },
+    }) => toggleRoutineCompletion(input),
     onSuccess: (updated) => {
       queryClient.setQueryData(localDataQueryKeys.routineHistory, updated);
     },

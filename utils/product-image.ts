@@ -31,3 +31,14 @@ export function deleteProductImage(uri: string | undefined): void {
     console.warn("Could not delete a locally stored product image");
   }
 }
+
+export function deleteAllProductImages(): void {
+  if (Platform.OS === "web") return;
+
+  try {
+    const directory = productImages();
+    if (directory.exists) directory.delete();
+  } catch {
+    console.warn("Could not delete locally stored product images");
+  }
+}

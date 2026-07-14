@@ -1,5 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { deleteProductImage, persistProductImage } from "@/utils/product-image";
+import {
+  deleteAllProductImages,
+  deleteProductImage,
+  persistProductImage,
+} from "@/utils/product-image";
 
 export type Frequency =
   | { type: "daily" }
@@ -84,11 +88,18 @@ async function load(): Promise<LocalData> {
 const save = (data: LocalData) =>
   AsyncStorage.setItem(localDataKeys.state, JSON.stringify(data));
 
+async function loadRoutineHistory(): Promise<RoutineHistory> {
+  const stored = await AsyncStorage.getItem(localDataKeys.routineHistory);
+  return stored ? (JSON.parse(stored) as RoutineHistory) : {};
+}
+
 export const readProducts = () =>
   serialized(async () => (await load()).products);
 
 export const readRoutineConfig = () =>
   serialized(async () => (await load()).routineConfig);
+
+export const readRoutineHistory = () => serialized(loadRoutineHistory);
 
 export type CreateProductInput = {
   product: Omit<Product, "id" | "image">;
@@ -149,5 +160,43 @@ export function removeProduct(productId: string) {
     await save(updated);
     deleteProductImage(removed?.image);
     return updated;
+  });
+}
+
+export function toggleRoutineCompletion({
+  date,
+  timeOfDay,
+  productId,
+}: {
+  date: string;
+  timeOfDay: TimeOfDay;
+  productId: string;
+}) {
+  return serialized(async () => {
+    const current = await loadRoutineHistory();
+    const day = current[date] ?? { morning: [], evening: [] };
+    const completed = day[timeOfDay];
+    const updated: RoutineHistory = {
+      ...current,
+      [date]: {
+        ...day,
+        [timeOfDay]: completed.includes(productId)
+          ? completed.filter((id) => id !== productId)
+          : [...completed, productId],
+      },
+    };
+
+    await AsyncStorage.setItem(
+      localDataKeys.routineHistory,
+      JSON.stringify(updated),
+    );
+    return updated;
+  });
+}
+
+export function clearLocalData() {
+  return serialized(async () => {
+    await AsyncStorage.multiRemove(Object.values(localDataKeys));
+    deleteAllProductImages();
   });
 }
