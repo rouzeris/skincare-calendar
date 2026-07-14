@@ -10,6 +10,10 @@ const STORAGE_KEY = "app_locale";
 const SUPPORTED_LOCALES: AppLocale[] = ["en", "pl", "ua"];
 
 const enTranslations = {
+  "a11y.close": "Close",
+  "a11y.previousMonth": "Previous month",
+  "a11y.nextMonth": "Next month",
+  "a11y.openCalendar": "Open usage calendar",
   "add.addPhoto": "Add Photo",
   "add.brand": "Brand",
   "add.brandPlaceholder": "e.g. The Ordinary",
@@ -117,6 +121,10 @@ export type TranslationKey = keyof typeof enTranslations;
 const translations = {
   en: enTranslations,
   pl: {
+    "a11y.close": "Zamknij",
+    "a11y.previousMonth": "Poprzedni miesiąc",
+    "a11y.nextMonth": "Następny miesiąc",
+    "a11y.openCalendar": "Otwórz kalendarz użycia",
     "add.addPhoto": "Dodaj zdjęcie",
     "add.brand": "Marka",
     "add.brandPlaceholder": "np. The Ordinary",
@@ -220,6 +228,10 @@ const translations = {
     unknownProduct: "Nieznany produkt",
   },
   ua: {
+    "a11y.close": "Закрити",
+    "a11y.previousMonth": "Попередній місяць",
+    "a11y.nextMonth": "Наступний місяць",
+    "a11y.openCalendar": "Відкрити календар використання",
     "add.addPhoto": "Додати фото",
     "add.brand": "Бренд",
     "add.brandPlaceholder": "напр. The Ordinary",

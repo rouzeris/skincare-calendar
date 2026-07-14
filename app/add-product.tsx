@@ -218,6 +218,10 @@ export default function AddProductScreen() {
           borderColor={colors.tint}
           opacity={isDisabled ? 0.3 : 1}
           onPress={() => !isDisabled && onSelectDate(day)}
+          role="button"
+          aria-label={formatDate(day, "longDayMonth")}
+          aria-selected={isSelected}
+          aria-disabled={isDisabled}
         >
           <Text
             fontSize={14}
@@ -266,7 +270,14 @@ export default function AddProductScreen() {
           borderBottomWidth={1}
           borderBottomColor={colors.border}
         >
-          <YStack padding={8} marginLeft={-8} onPress={() => router.back()}>
+          <YStack
+            padding={8}
+            marginLeft={-8}
+            onPress={() => router.back()}
+            role="button"
+            aria-label={t("a11y.close")}
+            hitSlop={8}
+          >
             <X size={24} color={colors.text} />
           </YStack>
           <Text fontSize={18} fontWeight="600" color={colors.text}>
@@ -828,6 +839,9 @@ export default function AddProductScreen() {
                     onPress={() =>
                       setCalendarViewMonth(subMonths(calendarViewMonth, 1))
                     }
+                    role="button"
+                    aria-label={t("a11y.previousMonth")}
+                    hitSlop={8}
                   >
                     <ChevronLeft size={20} color={colors.text} />
                   </YStack>
@@ -841,6 +855,9 @@ export default function AddProductScreen() {
                     onPress={() =>
                       setCalendarViewMonth(addMonths(calendarViewMonth, 1))
                     }
+                    role="button"
+                    aria-label={t("a11y.nextMonth")}
+                    hitSlop={8}
                   >
                     <ChevronRight size={20} color={colors.text} />
                   </YStack>
@@ -931,6 +948,9 @@ export default function AddProductScreen() {
                         subMonths(endCalendarViewMonth, 1),
                       )
                     }
+                    role="button"
+                    aria-label={t("a11y.previousMonth")}
+                    hitSlop={8}
                   >
                     <ChevronLeft size={20} color={colors.text} />
                   </YStack>
@@ -946,6 +966,9 @@ export default function AddProductScreen() {
                         addMonths(endCalendarViewMonth, 1),
                       )
                     }
+                    role="button"
+                    aria-label={t("a11y.nextMonth")}
+                    hitSlop={8}
                   >
                     <ChevronRight size={20} color={colors.text} />
                   </YStack>
