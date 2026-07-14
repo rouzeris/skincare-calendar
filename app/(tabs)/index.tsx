@@ -230,6 +230,7 @@ export default function RoutineScreen() {
           showsHorizontalScrollIndicator={false}
           contentOffset={{ x: initialScrollX, y: 0 }}
           contentContainerStyle={{ paddingHorizontal: STRIP_PADDING }}
+          role="tablist"
         >
           {calendarDays.map((date) => {
             const isSelected = isSameDay(date, selectedDate);
@@ -246,7 +247,7 @@ export default function RoutineScreen() {
                 borderRadius={16}
                 backgroundColor={isSelected ? colors.tint : "transparent"}
                 onPress={() => setSelectedDate(date)}
-                role="option"
+                role="tab"
                 aria-label={formatDate(date, "longDayMonth")}
                 aria-selected={isSelected}
               >

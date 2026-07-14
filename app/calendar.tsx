@@ -163,11 +163,16 @@ export default function CalendarScreen() {
           ))}
         </XStack>
 
-        <YStack flexDirection="row" flexWrap="wrap">
+        <YStack flexDirection="row" flexWrap="wrap" role="tablist">
           {calendarDays.map((day, index) => {
             if (!day) {
               return (
-                <YStack key={`empty-${index}`} width="14.28%" aspectRatio={1} />
+                <YStack
+                  key={`empty-${index}`}
+                  width="14.28%"
+                  aspectRatio={1}
+                  role="none"
+                />
               );
             }
 
@@ -181,6 +186,7 @@ export default function CalendarScreen() {
                 width="14.28%"
                 aspectRatio={1}
                 padding={2}
+                role="none"
               >
                 <YStack
                   flex={1}
@@ -197,7 +203,7 @@ export default function CalendarScreen() {
                   borderWidth={isToday && !isSelected ? 1 : 0}
                   borderColor={colors.tint}
                   onPress={() => setSelectedDate(day)}
-                  role="option"
+                  role="tab"
                   aria-label={formatDate(day, "longDayMonth")}
                   aria-selected={!!isSelected}
                 >

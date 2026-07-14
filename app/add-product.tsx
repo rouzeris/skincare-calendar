@@ -197,7 +197,9 @@ export default function AddProductScreen() {
 
     const cells: React.ReactNode[] = [];
     for (let i = 0; i < startPadding; i++) {
-      cells.push(<YStack key={`pad-${i}`} width={44} height={38} />);
+      cells.push(
+        <YStack key={`pad-${i}`} width={44} height={38} role="none" />,
+      );
     }
 
     days.forEach((day) => {
@@ -218,7 +220,7 @@ export default function AddProductScreen() {
           borderColor={colors.tint}
           opacity={isDisabled ? 0.3 : 1}
           onPress={() => !isDisabled && onSelectDate(day)}
-          role="option"
+          role="tab"
           aria-label={formatDate(day, "longDayMonth")}
           aria-selected={isSelected}
           aria-disabled={isDisabled}
@@ -237,7 +239,9 @@ export default function AddProductScreen() {
     const totalCells = cells.length;
     const remainingCells = (7 - (totalCells % 7)) % 7;
     for (let i = 0; i < remainingCells; i++) {
-      cells.push(<YStack key={`end-pad-${i}`} width={44} height={38} />);
+      cells.push(
+        <YStack key={`end-pad-${i}`} width={44} height={38} role="none" />,
+      );
     }
 
     for (let i = 0; i < cells.length; i += 7) {
@@ -246,13 +250,14 @@ export default function AddProductScreen() {
           key={`row-${i}`}
           justifyContent="space-between"
           marginBottom={4}
+          role="none"
         >
           {cells.slice(i, i + 7)}
         </XStack>,
       );
     }
 
-    return rows;
+    return <YStack role="tablist">{rows}</YStack>;
   };
 
   return (
