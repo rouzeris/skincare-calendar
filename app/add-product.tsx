@@ -197,7 +197,9 @@ export default function AddProductScreen() {
 
     const cells: React.ReactNode[] = [];
     for (let i = 0; i < startPadding; i++) {
-      cells.push(<YStack key={`pad-${i}`} width={44} height={38} />);
+      cells.push(
+        <YStack key={`pad-${i}`} width={44} height={38} role="none" />,
+      );
     }
 
     days.forEach((day) => {
@@ -218,6 +220,10 @@ export default function AddProductScreen() {
           borderColor={colors.tint}
           opacity={isDisabled ? 0.3 : 1}
           onPress={() => !isDisabled && onSelectDate(day)}
+          role="tab"
+          aria-label={formatDate(day, "longDayMonth")}
+          aria-selected={isSelected}
+          aria-disabled={isDisabled}
         >
           <Text
             fontSize={14}
@@ -233,7 +239,9 @@ export default function AddProductScreen() {
     const totalCells = cells.length;
     const remainingCells = (7 - (totalCells % 7)) % 7;
     for (let i = 0; i < remainingCells; i++) {
-      cells.push(<YStack key={`end-pad-${i}`} width={44} height={38} />);
+      cells.push(
+        <YStack key={`end-pad-${i}`} width={44} height={38} role="none" />,
+      );
     }
 
     for (let i = 0; i < cells.length; i += 7) {
@@ -242,13 +250,14 @@ export default function AddProductScreen() {
           key={`row-${i}`}
           justifyContent="space-between"
           marginBottom={4}
+          role="none"
         >
           {cells.slice(i, i + 7)}
         </XStack>,
       );
     }
 
-    return rows;
+    return <YStack role="tablist">{rows}</YStack>;
   };
 
   return (
@@ -266,7 +275,14 @@ export default function AddProductScreen() {
           borderBottomWidth={1}
           borderBottomColor={colors.border}
         >
-          <YStack padding={8} marginLeft={-8} onPress={() => router.back()}>
+          <YStack
+            padding={8}
+            marginLeft={-8}
+            onPress={() => router.back()}
+            role="button"
+            aria-label={t("a11y.close")}
+            hitSlop={8}
+          >
             <X size={24} color={colors.text} />
           </YStack>
           <Text fontSize={18} fontWeight="600" color={colors.text}>
@@ -828,6 +844,9 @@ export default function AddProductScreen() {
                     onPress={() =>
                       setCalendarViewMonth(subMonths(calendarViewMonth, 1))
                     }
+                    role="button"
+                    aria-label={t("a11y.previousMonth")}
+                    hitSlop={8}
                   >
                     <ChevronLeft size={20} color={colors.text} />
                   </YStack>
@@ -841,6 +860,9 @@ export default function AddProductScreen() {
                     onPress={() =>
                       setCalendarViewMonth(addMonths(calendarViewMonth, 1))
                     }
+                    role="button"
+                    aria-label={t("a11y.nextMonth")}
+                    hitSlop={8}
                   >
                     <ChevronRight size={20} color={colors.text} />
                   </YStack>
@@ -931,6 +953,9 @@ export default function AddProductScreen() {
                         subMonths(endCalendarViewMonth, 1),
                       )
                     }
+                    role="button"
+                    aria-label={t("a11y.previousMonth")}
+                    hitSlop={8}
                   >
                     <ChevronLeft size={20} color={colors.text} />
                   </YStack>
@@ -946,6 +971,9 @@ export default function AddProductScreen() {
                         addMonths(endCalendarViewMonth, 1),
                       )
                     }
+                    role="button"
+                    aria-label={t("a11y.nextMonth")}
+                    hitSlop={8}
                   >
                     <ChevronRight size={20} color={colors.text} />
                   </YStack>

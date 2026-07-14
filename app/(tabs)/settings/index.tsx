@@ -295,6 +295,9 @@ export default function SettingsScreen() {
                     showDetailedConflicts: !showDetailedConflicts,
                   })
                 }
+                role="switch"
+                aria-checked={showDetailedConflicts}
+                aria-label={t("settings.detailedExplanations")}
               >
                 <YStack marginRight={12}>
                   <FlaskConical size={20} color={colors.text} />

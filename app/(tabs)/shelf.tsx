@@ -186,8 +186,8 @@ const ProductRow = React.memo(function ProductRow({
       <YStack
         padding={8}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        accessibilityRole="button"
-        accessibilityLabel={`${t("common.delete")} ${product.name}`}
+        role="button"
+        aria-label={`${t("common.delete")} ${product.name}`}
         onPress={() => onRemove(product)}
       >
         <Trash2 size={20} color={colors.subtext} />
@@ -503,6 +503,9 @@ export default function ShelfScreen() {
             shadowRadius={8}
             elevation={4}
             onPress={() => router.push("/add-product")}
+            role="button"
+            aria-label={t("add.title")}
+            hitSlop={8}
           >
             <Plus size={24} color="#FFF" />
           </YStack>

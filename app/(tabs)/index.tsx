@@ -148,6 +148,9 @@ export default function RoutineScreen() {
                   elevation={completed ? 0 : 2}
                   pressStyle={{ opacity: 0.7 }}
                   onPress={() => handleToggle(id, timeOfDay)}
+                  role="checkbox"
+                  aria-checked={completed}
+                  aria-label={`${product.brand} ${product.name}`}
                 >
                   <YStack flex={1}>
                     <Text
@@ -214,6 +217,9 @@ export default function RoutineScreen() {
             alignItems="center"
             backgroundColor={colors.card}
             onPress={() => router.push("/calendar")}
+            role="button"
+            aria-label={t("a11y.openCalendar")}
+            hitSlop={8}
           >
             <CalendarDays size={20} color={colors.tint} />
           </YStack>
@@ -226,6 +232,7 @@ export default function RoutineScreen() {
           showsHorizontalScrollIndicator={false}
           contentOffset={{ x: initialScrollX, y: 0 }}
           contentContainerStyle={{ paddingHorizontal: STRIP_PADDING }}
+          role="tablist"
         >
           {calendarDays.map((date) => {
             const isSelected = isSameDay(date, selectedDate);
@@ -242,6 +249,9 @@ export default function RoutineScreen() {
                 borderRadius={16}
                 backgroundColor={isSelected ? colors.tint : "transparent"}
                 onPress={() => setSelectedDate(date)}
+                role="tab"
+                aria-label={formatDate(date, "longDayMonth")}
+                aria-selected={isSelected}
               >
                 <Text
                   fontSize={12}

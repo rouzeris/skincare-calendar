@@ -97,7 +97,14 @@ export default function CalendarScreen() {
         borderBottomWidth={1}
         borderBottomColor={colors.border}
       >
-        <YStack padding={8} marginLeft={-8} onPress={() => router.back()}>
+        <YStack
+          padding={8}
+          marginLeft={-8}
+          onPress={() => router.back()}
+          role="button"
+          aria-label={t("a11y.close")}
+          hitSlop={8}
+        >
           <X size={24} color={colors.text} />
         </YStack>
         <Text fontSize={18} fontWeight="600" color={colors.text}>
@@ -117,6 +124,9 @@ export default function CalendarScreen() {
             borderRadius={12}
             backgroundColor={colors.card}
             onPress={() => setCurrentMonth((prev) => subMonths(prev, 1))}
+            role="button"
+            aria-label={t("a11y.previousMonth")}
+            hitSlop={8}
           >
             <ChevronLeft size={20} color={colors.text} />
           </YStack>
@@ -130,6 +140,9 @@ export default function CalendarScreen() {
             borderRadius={12}
             backgroundColor={colors.card}
             onPress={() => setCurrentMonth((prev) => addMonths(prev, 1))}
+            role="button"
+            aria-label={t("a11y.nextMonth")}
+            hitSlop={8}
           >
             <ChevronRight size={20} color={colors.text} />
           </YStack>
@@ -150,11 +163,16 @@ export default function CalendarScreen() {
           ))}
         </XStack>
 
-        <YStack flexDirection="row" flexWrap="wrap">
+        <YStack flexDirection="row" flexWrap="wrap" role="tablist">
           {calendarDays.map((day, index) => {
             if (!day) {
               return (
-                <YStack key={`empty-${index}`} width="14.28%" aspectRatio={1} />
+                <YStack
+                  key={`empty-${index}`}
+                  width="14.28%"
+                  aspectRatio={1}
+                  role="none"
+                />
               );
             }
 
@@ -168,6 +186,7 @@ export default function CalendarScreen() {
                 width="14.28%"
                 aspectRatio={1}
                 padding={2}
+                role="none"
               >
                 <YStack
                   flex={1}
@@ -184,6 +203,9 @@ export default function CalendarScreen() {
                   borderWidth={isToday && !isSelected ? 1 : 0}
                   borderColor={colors.tint}
                   onPress={() => setSelectedDate(day)}
+                  role="tab"
+                  aria-label={formatDate(day, "longDayMonth")}
+                  aria-selected={!!isSelected}
                 >
                   <Text
                     fontSize={14}
