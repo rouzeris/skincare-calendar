@@ -13,6 +13,25 @@ const notQueried: CatalogSuggestionsState = {
   suggestions: [],
 };
 
+type CatalogQueryResult = {
+  data?: CatalogSuggestion[];
+  isError: boolean;
+  isFetching: boolean;
+};
+
+export function resolveCatalogSuggestionsState(
+  query: string,
+  debouncedQuery: string,
+  result: CatalogQueryResult,
+): CatalogSuggestionsState {
+  const suggestions = result.data ?? [];
+  if (query.length < 2) return notQueried;
+  if (query !== debouncedQuery) return { status: "loading", suggestions };
+  if (result.isError) return { status: "error", suggestions };
+  if (result.isFetching) return { status: "loading", suggestions };
+  return { status: "complete", suggestions };
+}
+
 export function useCatalogSuggestions(name: string): CatalogSuggestionsState {
   const query = name.trim();
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -35,11 +54,5 @@ export function useCatalogSuggestions(name: string): CatalogSuggestionsState {
     placeholderData: keepPreviousData,
     retry: false,
   });
-  const suggestions = result.data ?? [];
-
-  if (query.length < 2) return notQueried;
-  if (result.isError) return { status: "error", suggestions };
-  if (query !== debouncedQuery || result.isFetching)
-    return { status: "loading", suggestions };
-  return { status: "complete", suggestions };
+  return resolveCatalogSuggestionsState(query, debouncedQuery, result);
 }

@@ -11,7 +11,7 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "test": "playwright test",
-    "test:unit": "bun test utils/local-data.test.ts",
+    "test:unit": "EXPO_PUBLIC_CATALOG_FIXTURE=true bun test utils/local-data.test.ts hooks/use-catalog-suggestions.test.ts",
     "test:convex": "vitest run",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
