@@ -69,6 +69,9 @@ const enTranslations = {
   "settings.deleteAllData": "Delete All Data",
   "settings.deleteAllDataBody":
     "This will permanently delete all your products, routines, and history. This action cannot be undone.",
+  "settings.deleteFailed": "Deletion Failed",
+  "settings.deleteFailedBody":
+    "Some local data could not be deleted. Please try again.",
   "settings.detailedExplanations": "Detailed Explanations",
   "settings.detailedExplanationsBody":
     "Show why ingredients conflict. Warnings are always visible.",
@@ -96,6 +99,8 @@ const enTranslations = {
   "shelf.emptyTitle": "Your shelf is empty",
   "shelf.expired": "Expired {count} days ago",
   "shelf.notOpened": "Not opened yet",
+  "shelf.deleteTitle": "Delete product?",
+  "shelf.deleteBody": "Delete {name} from your shelf and routines?",
   "shelf.title": "My Shelf",
   "tabs.routine": "Routine",
   "tabs.settings": "Settings",
@@ -169,6 +174,9 @@ const translations = {
     "settings.deleteAllData": "Usuń wszystkie dane",
     "settings.deleteAllDataBody":
       "To trwale usunie wszystkie produkty, rutyny i historię. Tej akcji nie można cofnąć.",
+    "settings.deleteFailed": "Usuwanie nie powiodło się",
+    "settings.deleteFailedBody":
+      "Nie udało się usunąć części danych lokalnych. Spróbuj ponownie.",
     "settings.detailedExplanations": "Szczegółowe wyjaśnienia",
     "settings.detailedExplanationsBody":
       "Pokazuj, dlaczego składniki się wykluczają. Ostrzeżenia są zawsze widoczne.",
@@ -197,6 +205,8 @@ const translations = {
     "shelf.emptyTitle": "Twoja półka jest pusta",
     "shelf.expired": "Przeterminowano dni temu: {count}",
     "shelf.notOpened": "Jeszcze nie otwarto",
+    "shelf.deleteTitle": "Usunąć produkt?",
+    "shelf.deleteBody": "Usunąć {name} z półki i rutyn?",
     "shelf.title": "Moja półka",
     "tabs.routine": "Rutyna",
     "tabs.settings": "Ustawienia",
@@ -265,6 +275,9 @@ const translations = {
     "settings.deleteAllData": "Видалити всі дані",
     "settings.deleteAllDataBody":
       "Це назавжди видалить усі продукти, рутини та історію. Цю дію не можна скасувати.",
+    "settings.deleteFailed": "Не вдалося видалити дані",
+    "settings.deleteFailedBody":
+      "Не вдалося видалити частину локальних даних. Спробуйте ще раз.",
     "settings.detailedExplanations": "Детальні пояснення",
     "settings.detailedExplanationsBody":
       "Показувати, чому інгредієнти конфліктують. Попередження завжди видимі.",
@@ -293,6 +306,8 @@ const translations = {
     "shelf.emptyTitle": "Ваша полиця порожня",
     "shelf.expired": "Прострочено днів тому: {count}",
     "shelf.notOpened": "Ще не відкрито",
+    "shelf.deleteTitle": "Видалити продукт?",
+    "shelf.deleteBody": "Видалити {name} з полиці та рутин?",
     "shelf.title": "Моя полиця",
     "tabs.routine": "Рутина",
     "tabs.settings": "Налаштування",

@@ -8,6 +8,9 @@ import {
   isSameDay,
   subDays,
   differenceInDays,
+  startOfDay,
+  isBefore,
+  isAfter,
 } from "date-fns";
 import { Check, Sun, Moon, CalendarDays } from "lucide-react-native";
 import { useRouter } from "expo-router";
@@ -39,6 +42,16 @@ export default function RoutineScreen() {
       const product = getProductDetails(id);
       if (!product) return false;
 
+      const selectedDay = startOfDay(selectedDate);
+      const startDate = product.openedAt
+        ? startOfDay(new Date(product.openedAt))
+        : null;
+      const endDate = product.endDate
+        ? startOfDay(new Date(product.endDate))
+        : null;
+      if (startDate && isBefore(selectedDay, startDate)) return false;
+      if (endDate && isAfter(selectedDay, endDate)) return false;
+
       if (!product.frequency || product.frequency.type === "daily") return true;
 
       if (product.frequency.type === "weekly") {
@@ -47,10 +60,8 @@ export default function RoutineScreen() {
       }
 
       if (product.frequency.type === "interval") {
-        const startDate = product.openedAt
-          ? new Date(product.openedAt)
-          : new Date();
-        const diff = differenceInDays(selectedDate, startDate);
+        const intervalStart = startDate ?? startOfDay(new Date());
+        const diff = differenceInDays(selectedDay, intervalStart);
 
         if (diff < 0) return false;
 

@@ -24,6 +24,9 @@ jobs:
       - name: Lint, typecheck, format check
         run: hk check --all
 
+      - name: Test local data repository
+        run: bun run test:unit
+
       - name: Build landing page
         run: bun run --cwd www build
 

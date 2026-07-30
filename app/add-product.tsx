@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  Alert,
   Modal,
   Pressable,
   View,
@@ -11,7 +12,7 @@ import { YStack, XStack, Text, Input, ScrollView } from "tamagui";
 import { useTheme } from "@/context/theme";
 import { useIntl } from "@/context/intl";
 import { useCosmetics, Frequency } from "@/context/cosmetics";
-import { useRoutine, TimeOfDay } from "@/context/routine";
+import { TimeOfDay } from "@/context/routine";
 import { useRouter } from "expo-router";
 import {
   X,
@@ -51,10 +52,10 @@ const WEEKDAY_INDEXES = [0, 1, 2, 3, 4, 5, 6];
 
 export default function AddProductScreen() {
   const router = useRouter();
-  const { addProduct } = useCosmetics();
-  const { addToRoutine } = useRoutine();
+  const { addProduct, isAddingProduct } = useCosmetics();
   const { colors } = useTheme();
   const { t, formatDate } = useIntl();
+  const savePending = useRef(false);
 
   const [brand, setBrand] = useState("");
   const [name, setName] = useState("");
@@ -123,7 +124,7 @@ export default function AddProductScreen() {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -143,12 +144,16 @@ export default function AddProductScreen() {
   };
 
   const handleSave = () => {
-    if (!name || !brand) return;
+    if (!name || !brand || isAddingProduct || savePending.current) return;
+    savePending.current = true;
 
     let frequency: Frequency = { type: "daily" };
 
     if (freqType === "interval") {
-      frequency = { type: "interval", days: parseInt(intervalDays) || 2 };
+      frequency = {
+        type: "interval",
+        days: Math.max(1, parseInt(intervalDays, 10) || 2),
+      };
     } else if (freqType === "weekly") {
       frequency = {
         type: "weekly",
@@ -156,26 +161,25 @@ export default function AddProductScreen() {
       };
     }
 
-    const newProduct = {
-      id: Math.random().toString(36).substr(2, 9),
+    const product = {
       brand,
       name,
       openedAt: openedAt.toISOString(),
       periodAfterOpening: parseInt(pao) || 12,
-      image: imageUri || undefined,
       frequency,
       endDate: noEndDate ? undefined : endDate?.toISOString(),
     };
 
-    addProduct(newProduct, {
-      onSuccess: () => {
-        selectedRoutine.forEach((time) => {
-          addToRoutine({ productId: newProduct.id, timeOfDay: time });
-        });
-
-        router.back();
+    addProduct(
+      { product, imageUri: imageUri ?? undefined, times: selectedRoutine },
+      {
+        onSuccess: () => router.back(),
+        onError: () => {
+          savePending.current = false;
+          Alert.alert(t("common.oops"), t("error.message"));
+        },
       },
-    });
+    );
   };
 
   const insets = useSafeAreaInsets();
@@ -288,15 +292,19 @@ export default function AddProductScreen() {
             paddingHorizontal={16}
             paddingVertical={8}
             borderRadius={20}
-            backgroundColor={!name || !brand ? colors.border : colors.tint}
-            opacity={!name || !brand ? 0.7 : 1}
+            backgroundColor={
+              !name || !brand || isAddingProduct ? colors.border : colors.tint
+            }
+            opacity={!name || !brand || isAddingProduct ? 0.7 : 1}
             onPress={handleSave}
-            disabled={!name || !brand}
+            disabled={!name || !brand || isAddingProduct}
           >
             <Text
               fontWeight="600"
               fontSize={14}
-              color={!name || !brand ? colors.subtext : "#FFF"}
+              color={
+                !name || !brand || isAddingProduct ? colors.subtext : "#FFF"
+              }
             >
               {t("common.save")}
             </Text>

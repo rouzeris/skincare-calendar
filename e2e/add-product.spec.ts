@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { readLocalData } from "./local-data";
 
 test.describe("Add Product Form", () => {
   test.beforeEach(async ({ page }) => {
@@ -40,11 +41,9 @@ test.describe("Add Product Form", () => {
     await expect(page.getByText("AHA/BHA Peel").first()).toBeVisible();
 
     // 9. Verify routine assignment in localStorage
-    const config = await page.evaluate(() =>
-      localStorage.getItem("routine_config"),
-    );
-    expect(config).toContain("morning");
-    expect(config).toContain("evening");
+    const { products, routineConfig } = await readLocalData(page);
+    expect(routineConfig.morning).toContain(products[0].id);
+    expect(routineConfig.evening).toContain(products[0].id);
   });
 
   test("save product with weekly frequency", async ({ page }) => {
@@ -59,10 +58,8 @@ test.describe("Add Product Form", () => {
     await page.getByText("Save").click();
 
     // 4. Verify saved with weekly frequency
-    const shelf = await page.evaluate(() =>
-      localStorage.getItem("cosmetics_shelf"),
-    );
-    expect(shelf).toContain("Weekly Treatment");
-    expect(shelf).toContain("weekly");
+    const { products } = await readLocalData(page);
+    expect(products[0].name).toBe("Weekly Treatment");
+    expect(products[0].frequency.type).toBe("weekly");
   });
 });
