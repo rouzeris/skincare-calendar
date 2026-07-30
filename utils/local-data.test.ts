@@ -128,18 +128,46 @@ test("clears data after an in-flight create and deletes managed images", async (
   expect(deletedImageDirectories).toBe(1);
 });
 
-test("rejects clear when managed images cannot be deleted", async () => {
+test("keeps data when managed images cannot be deleted", async () => {
+  await createProduct({
+    product: { name: "Before failure", brand: "Brand" },
+    imageUri: "file:///before.jpg",
+    times: ["morning"],
+  });
+
   imageDirectoryDeletionError = new Error("image cleanup failed");
 
   await expect(clearLocalData()).rejects.toThrow("image cleanup failed");
   expect(deletedImageDirectories).toBe(1);
 
-  imageDirectoryDeletionError = undefined;
-  await createProduct({
-    product: { name: "After failure", brand: "Brand" },
-    times: [],
-  });
+  // Nothing was wiped, so the user still sees their products and can retry.
   expect((await readProducts()).map(({ name }) => name)).toEqual([
-    "After failure",
+    "Before failure",
   ]);
+  expect((await readRoutineConfig()).morning).toHaveLength(1);
+
+  imageDirectoryDeletionError = undefined;
+  await clearLocalData();
+  expect(await readProducts()).toEqual([]);
+  expect(await readRoutineConfig()).toEqual({ morning: [], evening: [] });
+});
+
+test("never reuses a product id", async () => {
+  const realRandom = Math.random;
+  // First two draws collide; the third is free.
+  const draws = [0.5, 0.5, 0.25];
+  let draw = 0;
+  Math.random = () => draws[draw++] ?? realRandom();
+
+  try {
+    await createProduct({ product: { name: "First", brand: "B" }, times: [] });
+    await createProduct({ product: { name: "Second", brand: "B" }, times: [] });
+  } finally {
+    Math.random = realRandom;
+  }
+
+  const ids = (await readProducts()).map(({ id }) => id);
+  expect(ids).toHaveLength(2);
+  expect(new Set(ids).size).toBe(2);
+  expect(draw).toBe(3);
 });

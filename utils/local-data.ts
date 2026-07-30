@@ -107,18 +107,32 @@ export type CreateProductInput = {
   times: TimeOfDay[];
 };
 
+/**
+ * Product ids double as image filenames, so a collision would clobber another
+ * product's photo. Ids only have to be unique on this device, so we check the
+ * list we already loaded instead of pulling in a UUID dependency.
+ */
+function uniqueProductId(existing: Product[]) {
+  const taken = new Set(existing.map((product) => product.id));
+  let id: string;
+  do {
+    id = Math.random().toString(36).slice(2, 11);
+  } while (taken.has(id));
+  return id;
+}
+
 export function createProduct({
   product: productInput,
   imageUri,
   times,
 }: CreateProductInput) {
   return serialized(async () => {
-    const id = Math.random().toString(36).slice(2, 11);
+    const current = await load();
+    const id = uniqueProductId(current.products);
     let image: string | undefined;
 
     try {
       image = imageUri ? persistProductImage(imageUri, id) : undefined;
-      const current = await load();
       const product: Product = { ...productInput, id, image };
       const updated: LocalData = {
         version: 1,
@@ -196,7 +210,10 @@ export function toggleRoutineCompletion({
 
 export function clearLocalData() {
   return serialized(async () => {
-    await AsyncStorage.multiRemove(Object.values(localDataKeys));
+    // Images first: if the directory cannot be removed we leave the records
+    // alone rather than orphaning the user's photos on disk. All-or-nothing
+    // keeps "delete all my data" retryable and the UI truthful.
     deleteAllProductImages();
+    await AsyncStorage.multiRemove(Object.values(localDataKeys));
   });
 }
