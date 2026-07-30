@@ -81,11 +81,30 @@ test.describe("Product Shelf Management", () => {
     await page.getByText("Add First Product").click();
 
     // 1. Type partial product name
-    await page.getByPlaceholder(/Niacinamide/).fill("Niac");
+    const productName = page.getByPlaceholder(/Niacinamide/);
+    const brand = page.getByPlaceholder(/The Ordinary/);
+    await productName.fill("CeraVe");
+    await expect(page.getByText("Searching catalog…")).toBeVisible();
 
-    // 2. Verify suggestions appear from mock database
-    await expect(page.getByText(/Niacinamide 10%/)).toBeVisible();
-    await expect(page.getByText(/The Ordinary/)).toBeVisible();
+    // 2. Verify suggestions appear from the shared catalog
+    await expect(page.getByText(/Hydrating Facial Cleanser/i)).toBeVisible();
+    await expect(page.getByText(/CeraVe/).first()).toBeVisible();
+
+    // 3. Empty results replace rows without remounting the dropdown surface
+    const dropdown = page.getByTestId("catalog-suggestions");
+    const dropdownElement = await dropdown.elementHandle();
+    await productName.fill("no-such-catalog-product");
+    await expect(page.getByText(/Hydrating Facial Cleanser/i)).toBeVisible();
+    await expect(page.getByText("No catalog matches")).toBeVisible();
+    expect(
+      await dropdownElement!.evaluate((element) => element.isConnected),
+    ).toBe(true);
+
+    // 4. Selecting a result fills both product fields
+    await productName.fill("CeraVe");
+    await page.getByText(/Hydrating Facial Cleanser/i).click();
+    await expect(productName).toHaveValue(/Hydrating Facial Cleanser/i);
+    await expect(brand).toHaveValue("CeraVe");
   });
 
   test("deleting a product also removes it from routines", async ({ page }) => {

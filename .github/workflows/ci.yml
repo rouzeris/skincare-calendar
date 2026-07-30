@@ -27,6 +27,9 @@ jobs:
       - name: Test local data repository
         run: bun run test:unit
 
+      - name: Test catalog importer and backend
+        run: bun run catalog:test && bun run test:convex
+
       - name: Build landing page
         run: bun run --cwd www build
 
@@ -35,6 +38,8 @@ jobs:
 
       - name: Run Playwright e2e tests
         run: bun run test
+        env:
+          EXPO_PUBLIC_CATALOG_FIXTURE: "true"
 
       - name: Upload Playwright report
         if: failure()

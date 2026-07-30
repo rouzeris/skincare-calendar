@@ -18,7 +18,6 @@ import "../tamagui-web.css";
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
-
 function RootNavigator() {
   const { colors, colorScheme } = useTheme();
   const { t } = useIntl();
